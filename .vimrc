@@ -1,0 +1,148 @@
+"dein Scripts-----------------------------
+if &compatible
+  set nocompatible               " Be iMproved
+endif
+
+" Required:
+set runtimepath+=/home/nve3pd/.cache/dein/repos/github.com/Shougo/dein.vim
+
+" Required:
+call dein#begin('/home/nve3pd/.cache/dein')
+
+" Let dein manage dein
+" Required:
+call dein#add('Shougo/dein.vim')
+
+" Add or remove your plugins here:
+call dein#add('kana/vim-smartinput')
+call dein#add('scrooloose/syntastic')
+call dein#add('altercation/vim-colors-solarized')
+call dein#add('davidhalter/jedi-vim')
+
+" You can specify revision/branch/tag.
+call dein#add('Shougo/vimshell', { 'rev': '3787e5' })
+
+" Required:
+call dein#end()
+
+" Required:
+filetype plugin indent on
+syntax enable
+
+"solarized setting
+let g:solarized_termcolors=256
+let g:solarized_termtrans=0
+let g:solarized_degrade=0
+let g:solarized_bold=1
+let g:solarized_underline=1
+let g:solarized_italic=1
+let g:solarized_contrast='normal'
+let g:solarized_visibility='normal'
+
+"jedi-vim
+autocmd FileType python setlocal omnifunc=jedi#completions
+autocmd FileType python setlocal completeopt-=preview
+let g:jedi#force_py_version=3
+let g:jedi#auto_vim_configuration = 1
+if !exists('g:neocomplete#force_omni_input_patterns')
+  let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
+
+"If you want to install not installed plugins on startup.
+if dein#check_install()
+  call dein#install()
+endif
+
+"End dein Scripts-------------------------
+
+"カラースキーム設定
+
+autocmd ColorScheme * highlight Normal ctermbg=none
+autocmd ColorScheme * highlight LineNr ctermbg=none
+
+syntax on 
+set background=dark
+colorscheme solarized
+
+"画面表示設定
+set number
+set cursorline
+set showmatch
+
+"ファイル処理設定
+set noswapfile
+set confirm
+set title
+set hidden
+set nobackup
+set writebackup
+set foldmethod=marker
+"set paste
+set display=uhex
+set clipboard&
+set clipboard^=unnamedplus
+
+"文字コード設定
+set encoding=utf-8
+set fileencodings=utf-8,iso-2022-jp,cp932,sjis,euc-jpset 
+set fencs=utf-8,iso-2022-jp,enc-jp,cp932
+language en_US.UTF-8
+
+"タブとかの設定
+set tabstop=2
+set shiftwidth=2
+set expandtab
+
+"インデント設定
+inoremap <F5> <nop>
+set pastetoggle=<F5>
+
+"ステータスライン設定
+set t_Co=256
+set statusline=%F "ファイル名表示
+set statusline+=%m "変更チェック表示
+set statusline+=%r "読み込み専用かどうか表示
+set statusline+=%h "ヘルプページなら[HELP]と表示
+set statusline+=%w "プレビューウインドウなら[Prevew]と表示
+set statusline+=%= "これ以降は右寄せ表示
+set statusline+=[ENC=%{&fileencoding}] "file encoding
+set statusline+=%y "file type
+set statusline+=[LOW=%l/%L] " 現在行数/全行数
+set laststatus=2
+highlight StatusLine term=bold cterm=bold ctermfg=black ctermbg=blue
+
+"キーマッピング
+imap <C-j> <Down>
+imap <C-k> <Esc><Up> i
+imap <C-h> <Left>
+imap <C-l> <Right>
+imap <C-x> <Del>
+"imap <C-i> <BS>
+imap <C-u> <Esc>:undo<CR> i
+imap <C-d><C-d> <Esc>dd i
+
+"いろいろ
+set backspace=eol,indent,start
+inoremap @@ <ESC>
+
+"Python
+autocmd Filetype python setl autoindent
+autocmd FileType python setlocal completeopt-=preview
+autocmd Filetype python setl smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,pass,
+
+"C & CPP
+autocmd FileType c setl cindent
+autocmd FileType cpp setl cindent
+"autocmd BufNewFile *.cpp 0r ~/../../mnt/c/cygwin64/home/.vim/template/cpp.cpp
+
+"Go
+autocmd FileType go setl ts=4 sw=4 sts=4 noet
+
+"HTML & xml
+augroup MyXML
+  autocmd!
+  autocmd Filetype xml inoremap <buffer> </ </<C-x><C-o>
+  autocmd FileType html inoremap <buffer> </ </<C-x><C-o>
+augroup END
+
