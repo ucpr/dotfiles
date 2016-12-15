@@ -17,10 +17,17 @@ call dein#add('Shougo/dein.vim')
 call dein#add('kana/vim-smartinput')
 call dein#add('scrooloose/syntastic')
 call dein#add('altercation/vim-colors-solarized')
-call dein#add('davidhalter/jedi-vim')
 call dein#add('Shougo/neocomplete.vim')
-call dein#add('fatih/vim-go')
 
+call dein#add('davidhalter/jedi-vim', {
+  \ 'autoload': {
+  \ 'filetypes':['python']
+  \}})
+
+call dein#add('fatih/vim-go', {
+  \ 'autoload': {
+  \ 'filetypes':['go']
+  \}})
 
 " You can specify revision/branch/tag.
 call dein#add('Shougo/vimshell', { 'rev': '3787e5' })
