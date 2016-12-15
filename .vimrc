@@ -18,6 +18,9 @@ call dein#add('kana/vim-smartinput')
 call dein#add('scrooloose/syntastic')
 call dein#add('altercation/vim-colors-solarized')
 call dein#add('davidhalter/jedi-vim')
+call dein#add('Shougo/neocomplete.vim')
+call dein#add('fatih/vim-go')
+
 
 " You can specify revision/branch/tag.
 call dein#add('Shougo/vimshell', { 'rev': '3787e5' })
@@ -39,6 +42,12 @@ let g:solarized_italic=1
 let g:solarized_contrast='normal'
 let g:solarized_visibility='normal'
 
+"neocomplete
+let g:neocomplete#force_overwrite_completefunc = 1
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+
 "jedi-vim
 autocmd FileType python setlocal omnifunc=jedi#completions
 autocmd FileType python setlocal completeopt-=preview
@@ -48,6 +57,10 @@ if !exists('g:neocomplete#force_omni_input_patterns')
   let g:neocomplete#force_omni_input_patterns = {}
 endif
 let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
+
+"go
+"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['go']}
+"let g:syntastic_go_checkers = ['go', 'golint']
 
 "If you want to install not installed plugins on startup.
 if dein#check_install()
@@ -117,7 +130,7 @@ imap <C-j> <Down>
 imap <C-k> <Esc><Up> i
 imap <C-h> <Left>
 imap <C-l> <Right>
-imap <C-x> <Del>
+"imap <C-x> <Del>
 "imap <C-i> <BS>
 imap <C-u> <Esc>:undo<CR> i
 imap <C-d><C-d> <Esc>dd i
