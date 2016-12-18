@@ -14,10 +14,13 @@ call dein#begin('/home/nve3pd/.cache/dein')
 call dein#add('Shougo/dein.vim')
 
 " Add or remove your plugins here:
+
+call dein#add('altercation/vim-colors-solarized')
+
 call dein#add('kana/vim-smartinput')
 call dein#add('scrooloose/syntastic')
-call dein#add('altercation/vim-colors-solarized')
 call dein#add('Shougo/neocomplete.vim')
+call dein#add('scrooloose/nerdtree')
 
 call dein#add('davidhalter/jedi-vim', {
   \ 'autoload': {
@@ -66,8 +69,20 @@ endif
 let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
 
 "go
-"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['go']}
-"let g:syntastic_go_checkers = ['go', 'golint']
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_types = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+
+let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
+let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
+
+set completeopt=menu,preview
+
+"nerdTree
+nnoremap <silent><C-e> :NERDTreeToggle<CR> "ctrl-eで開く
 
 "If you want to install not installed plugins on startup.
 if dein#check_install()
