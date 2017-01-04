@@ -1,21 +1,15 @@
-"dein Scripts-----------------------------
+"""---dein scripts---"""
 if &compatible
-  set nocompatible               " Be iMproved
+  set nocompatible
 endif
+set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
 
-" Required:
-set runtimepath+=/home/nve3pd/.cache/dein/repos/github.com/Shougo/dein.vim
+call dein#begin(expand('~/.vim/dein'))
 
-" Required:
-call dein#begin('/home/nve3pd/.cache/dein')
-
-" Let dein manage dein
-" Required:
 call dein#add('Shougo/dein.vim')
+call dein#add('Shougo/vimproc.vim', {'build': 'make'})
 
-" Add or remove your plugins here:
-
-call dein#add('altercation/vim-colors-solarized')
+call dein#add('sjl/badwolf')
 
 call dein#add('kana/vim-smartinput')
 call dein#add('scrooloose/syntastic')
@@ -32,26 +26,10 @@ call dein#add('fatih/vim-go', {
   \ 'filetypes':['go']
   \}})
 
-" You can specify revision/branch/tag.
-call dein#add('Shougo/vimshell', { 'rev': '3787e5' })
-
-" Required:
 call dein#end()
 
-" Required:
 filetype plugin indent on
 syntax enable
-
-"solarized setting
-let g:solarized_termcolors=256
-let g:solarized_termtrans=0
-let g:solarized_degrade=0
-let g:solarized_bold=1
-let g:solarized_underline=1
-let g:solarized_italic=1
-let g:solarized_contrast='normal'
-let g:solarized_visibility='normal'
-
 "neocomplete
 let g:neocomplete#force_overwrite_completefunc = 1
 let g:neocomplete#enable_at_startup = 1
@@ -84,21 +62,21 @@ autocmd FileType go setlocal completeopt-=preview
 "nerdTree
 nnoremap <silent><C-e> :NERDTreeToggle<CR> "ctrl-eで開く
 
-"If you want to install not installed plugins on startup.
-if dein#check_install()
-  call dein#install()
-endif
+"badwolf
+let g:badwolf_darkgutter = 1
+let g:badwolf_tabline = 1
+let g:badwolf_html_link_underline = 1
+let g:badwolf_css_props_highlight = 1
 
-"End dein Scripts-------------------------
+"""---end dein scripts---""""
 
 "カラースキーム設定
-
 autocmd ColorScheme * highlight Normal ctermbg=none
 autocmd ColorScheme * highlight LineNr ctermbg=none
 
 syntax on 
-set background=dark
-colorscheme solarized
+"set background=dark
+colorscheme badwolf
 
 "画面表示設定
 set number
