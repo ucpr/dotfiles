@@ -1,3 +1,5 @@
+let $PATH = "~/.pyenv/shims:".$PATH
+
 """---dein scripts---"""
 if &compatible
   set nocompatible
@@ -21,6 +23,10 @@ call dein#add('davidhalter/jedi-vim', {
   \ 'filetypes':['python']
   \}})
 
+call dein#add("lambdalisue/vim-pyenv", {
+  \  "depends": ["jedi-vim"], "merged": 0,"on_ft": ["python", "python3"]
+  \})
+
 call dein#add('fatih/vim-go', {
   \ 'autoload': {
   \ 'filetypes':['go']
@@ -30,6 +36,7 @@ call dein#end()
 
 filetype plugin indent on
 syntax enable
+
 "neocomplete
 let g:neocomplete#force_overwrite_completefunc = 1
 let g:neocomplete#enable_at_startup = 1
