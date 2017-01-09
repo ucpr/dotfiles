@@ -60,10 +60,8 @@ let g:go_highlight_fields = 1
 let g:go_highlight_types = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
-
 let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
 let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
-
 autocmd FileType go setlocal completeopt-=preview
 
 "nerdTree
@@ -101,7 +99,7 @@ set foldmethod=marker
 "set paste
 set display=uhex
 set clipboard&
-set clipboard^=unnamedplus
+set clipboard+=unnamedplus
 
 "文字コード設定
 set encoding=utf-8
@@ -144,7 +142,7 @@ imap <C-d><C-d> <Esc>dd i
 
 "いろいろ
 set backspace=eol,indent,start
-inoremap @@ <ESC>
+inoremap <C-f><C-f> <ESC>
 
 "Python
 autocmd Filetype python setl autoindent
@@ -154,7 +152,7 @@ autocmd Filetype python setl smartindent cinwords=if,elif,else,for,while,try,exc
 "C & CPP
 autocmd FileType c setl cindent
 autocmd FileType cpp setl cindent
-"autocmd BufNewFile *.cpp 0r ~/../../mnt/c/cygwin64/home/.vim/template/cpp.cpp
+autocmd BufNewFile *.cpp 0r ~/.vim/template/cpp.cpp
 
 "Go
 autocmd FileType go setl ts=4 sw=4 sts=4 noet
@@ -165,4 +163,3 @@ augroup MyXML
   autocmd Filetype xml inoremap <buffer> </ </<C-x><C-o>
   autocmd FileType html inoremap <buffer> </ </<C-x><C-o>
 augroup END
-
