@@ -80,7 +80,6 @@ autocmd ColorScheme * highlight Normal ctermbg=none
 autocmd ColorScheme * highlight LineNr ctermbg=none
 
 syntax on 
-"set background=dark
 colorscheme badwolf
 
 "画面表示設定
@@ -144,6 +143,13 @@ imap <C-d><C-d> <Esc>dd i
 set backspace=eol,indent,start
 inoremap <C-f><C-f> <ESC>
 
+"自動コメント挿入させない
+augroup auto_comment_off
+  autocmd!
+  autocmd BufEnter * setlocal formatoptions-=r
+  autocmd BufEnter * setlocal formatoptions-=o
+augroup END
+
 "Python
 autocmd Filetype python setl autoindent
 autocmd FileType python setlocal completeopt-=preview
@@ -152,6 +158,7 @@ autocmd Filetype python setl smartindent cinwords=if,elif,else,for,while,try,exc
 "C & CPP
 autocmd FileType c setl cindent
 autocmd FileType cpp setl cindent
+autocmd BufNewFile *.c 0r ~/.vim/template/c.c
 autocmd BufNewFile *.cpp 0r ~/.vim/template/cpp.cpp
 
 "Go
@@ -163,3 +170,5 @@ augroup MyXML
   autocmd Filetype xml inoremap <buffer> </ </<C-x><C-o>
   autocmd FileType html inoremap <buffer> </ </<C-x><C-o>
 augroup END
+
+
