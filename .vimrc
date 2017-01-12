@@ -98,7 +98,7 @@ set foldmethod=marker
 "set paste
 set display=uhex
 set clipboard&
-set clipboard+=unnamedplus
+set clipboard=unnamed,autoselect
 
 "文字コード設定
 set encoding=utf-8
