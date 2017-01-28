@@ -11,12 +11,13 @@ call dein#begin(expand('~/.vim/dein'))
 call dein#add('Shougo/dein.vim')
 call dein#add('Shougo/vimproc.vim', {'build': 'make'})
 
-call dein#add('sjl/badwolf')
-
 call dein#add('kana/vim-smartinput')
 call dein#add('scrooloose/syntastic')
 call dein#add('Shougo/neocomplete.vim')
 call dein#add('scrooloose/nerdtree')
+call dein#add('itchyny/lightline.vim')
+
+call dein#add('altercation/vim-colors-solarized')
 
 call dein#add('davidhalter/jedi-vim', {
   \ 'autoload': {
@@ -67,11 +68,21 @@ autocmd FileType go setlocal completeopt-=preview
 "nerdTree
 nnoremap <silent><C-e> :NERDTreeToggle<CR> "ctrl-eで開く
 
-"badwolf
-let g:badwolf_darkgutter = 1
-let g:badwolf_tabline = 1
-let g:badwolf_html_link_underline = 1
-let g:badwolf_css_props_highlight = 1
+"lightline
+let g:lightline = {
+  \ 'colorscheme': 'solarized', 
+  \ 'active': {
+    \   'right': [ [ 'syntastic', 'lineinfo' ],
+    \              [ 'percent' ],
+    \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
+    \ },
+    \ 'component_expand': {
+    \   'syntastic': 'SyntasticStatuslineFlag'
+    \ },
+    \ 'component_type': {
+    \   'syntastic': 'error'
+    \ }
+  \ }
 
 """---end dein scripts---""""
 
@@ -80,7 +91,7 @@ autocmd ColorScheme * highlight Normal ctermbg=none
 autocmd ColorScheme * highlight LineNr ctermbg=none
 
 syntax on 
-colorscheme badwolf
+colorscheme solarized
 
 "画面表示設定
 set number
@@ -117,17 +128,7 @@ set pastetoggle=<F5>
 
 "ステータスライン設定
 set t_Co=256
-set statusline=%F "ファイル名表示
-set statusline+=%m "変更チェック表示
-set statusline+=%r "読み込み専用かどうか表示
-set statusline+=%h "ヘルプページなら[HELP]と表示
-set statusline+=%w "プレビューウインドウなら[Prevew]と表示
-set statusline+=%= "これ以降は右寄せ表示
-set statusline+=[ENC=%{&fileencoding}] "file encoding
-set statusline+=%y "file type
-set statusline+=[LOW=%l/%L] " 現在行数/全行数
 set laststatus=2
-highlight StatusLine term=bold cterm=bold ctermfg=black ctermbg=blue
 
 "キーマッピング
 imap <C-j> <Down>
@@ -158,8 +159,8 @@ autocmd Filetype python setl smartindent cinwords=if,elif,else,for,while,try,exc
 "C & CPP
 autocmd FileType c setl cindent
 autocmd FileType cpp setl cindent
-autocmd BufNewFile *.c 0r ~/.vim/template/c.c
-autocmd BufNewFile *.cpp 0r ~/.vim/template/cpp.cpp
+"autocmd BufNewFile *.c 0r ~/.vim/template/c.c
+autocmd BufNewFile *.cpp 0r ~/.vim/templates/cpp.cpp
 
 "Go
 autocmd FileType go setl ts=4 sw=4 sts=4 noet
@@ -170,5 +171,3 @@ augroup MyXML
   autocmd Filetype xml inoremap <buffer> </ </<C-x><C-o>
   autocmd FileType html inoremap <buffer> </ </<C-x><C-o>
 augroup END
-
-
