@@ -17,6 +17,9 @@ call dein#add('Shougo/neocomplete.vim')
 call dein#add('scrooloose/nerdtree')
 call dein#add('itchyny/lightline.vim')
 
+call dein#add('nvie/vim-flake8')
+call dein#add('kevinw/pyflakes-vim')
+
 call dein#add('altercation/vim-colors-solarized')
 
 call dein#add('davidhalter/jedi-vim', {
@@ -96,6 +99,7 @@ colorscheme solarized
 "画面表示設定
 set number
 set cursorline
+set cursorcolumn
 set showmatch
 
 "ファイル処理設定
@@ -155,6 +159,7 @@ augroup END
 autocmd Filetype python setl autoindent
 autocmd FileType python setlocal completeopt-=preview
 autocmd Filetype python setl smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,pass,
+nnoremap <C-l> :call Flake8()
 
 "C & CPP
 autocmd FileType c setl cindent
