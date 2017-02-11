@@ -20,6 +20,9 @@ call dein#add('itchyny/lightline.vim')
 call dein#add('nvie/vim-flake8')
 call dein#add('kevinw/pyflakes-vim')
 
+call dein#add('justmao945/vim-clang')
+call dein#add('Shougo/neoinclude.vim')
+
 call dein#add('altercation/vim-colors-solarized')
 
 call dein#add('davidhalter/jedi-vim', {
@@ -27,10 +30,9 @@ call dein#add('davidhalter/jedi-vim', {
   \ 'filetypes':['python']
   \}})
 
-call dein#add("lambdalisue/vim-pyenv", {
+call dein#add('lambdalisue/vim-pyenv', {
   \  "depends": ["jedi-vim"], "merged": 0,"on_ft": ["python", "python3"]
   \})
-
 call dein#add('fatih/vim-go', {
   \ 'autoload': {
   \ 'filetypes':['go']
@@ -46,6 +48,12 @@ let g:neocomplete#force_overwrite_completefunc = 1
 let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#enable_smart_case = 1
 inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+if !exists('g:neocomplete#force_omni_input_patterns')
+        let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_overwrite_completefunc = 1
+let g:neocomplete#force_omni_input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+let g:neocomplete#force_omni_input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 
 "jedi-vim
 autocmd FileType python setlocal omnifunc=jedi#completions
@@ -56,6 +64,17 @@ if !exists('g:neocomplete#force_omni_input_patterns')
   let g:neocomplete#force_omni_input_patterns = {}
 endif
 let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
+
+"vim-clang
+let g:clang_auto = 0
+let g:clang_complete_auto = 0
+let g:clang_auto_select = 0
+let g:clang_use_library = 1
+let g:clang_c_completeopt   = 'menuone'
+let g:clang_cpp_completeopt = 'menuone'
+let g:clang_c_options = '-std=c11'
+let g:clang_cpp_options = '-std=c++11 -I/usr/lib/gcc/x86_64-linux-gnu/5.4.0/include/c++'
+
 
 "go
 let g:go_highlight_functions = 1
@@ -166,6 +185,11 @@ autocmd FileType c setl cindent
 autocmd FileType cpp setl cindent
 "autocmd BufNewFile *.c 0r ~/.vim/template/c.c
 autocmd BufNewFile *.cpp 0r ~/.vim/templates/cpp.cpp
+
+"augroup cpp-path
+"    autocmd!
+"    autocmd FileType cpp setlocal path=/usr/include/c++/5.4.0
+"augroup END
 
 "Go
 autocmd FileType go setl ts=4 sw=4 sts=4 noet
