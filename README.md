@@ -1,6 +1,6 @@
 # config-files
 
-###.vimrc  
+### .vimrc  
 
 ``` 
 $ mkdir -p ~/.vim/dein/repos/github.com/Shougo/dein.vim
