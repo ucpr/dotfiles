@@ -20,6 +20,8 @@ call dein#add('itchyny/lightline.vim')
 call dein#add('justmao945/vim-clang')
 call dein#add('Shougo/neoinclude.vim')
 
+call dein#add('nve3pd/nim.vim')
+
 call dein#add('altercation/vim-colors-solarized')
 
 call dein#add('davidhalter/jedi-vim', {
@@ -89,7 +91,7 @@ nnoremap <silent><C-e> :NERDTreeToggle<CR> "ctrl-eで開く
 
 "lightline
 let g:lightline = {
-  \ 'colorscheme': 'solarized', 
+ \ 'colorscheme': 'solarized', 
   \ 'active': {
     \   'right': [ [ 'syntastic', 'lineinfo' ],
     \              [ 'percent' ],
@@ -110,6 +112,7 @@ autocmd ColorScheme * highlight Normal ctermbg=none
 autocmd ColorScheme * highlight LineNr ctermbg=none
 
 syntax on 
+set background=dark
 colorscheme solarized
 
 "画面表示設定
@@ -138,9 +141,9 @@ set fencs=utf-8,iso-2022-jp,enc-jp,cp932
 language en_US.UTF-8
 
 "タブとかの設定
+set expandtab
 set tabstop=2
 set shiftwidth=2
-set expandtab
 
 "インデント設定
 inoremap <F5> <nop>
