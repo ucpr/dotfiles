@@ -13,3 +13,4 @@ tomlは ~/.vim の中に.
 $ mv ~/dotfiles/toml ~/.vim
 ```
 dotfileのところは書き換えてください.
+~ .vimrcがちゃんと動かないっぽい?? 
