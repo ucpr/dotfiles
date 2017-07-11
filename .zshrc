@@ -1,26 +1,3 @@
-# zplug {{{
-if [[ ! -d ~/.zplug ]];then
-  git clone https://github.com/zplug/zplug ~/.zplug
-fi
-
-source ~/.zplug/init.zsh
-
-zplug "zsh-users/zsh-syntax-highlighting"
-zplug "zsh-users/zsh-history-substring-search"
-zplug "zsh-users/zsh-completions"
-zplug "mafredri/zsh-async"
-zplug "sindresorhus/pure"
-
-if ! zplug check --verbose; then
-  printf "Install? [y/N]: "
-  if read -q; then
-    echo; zplug install
-  fi
-fi
-
-zplug load --verbose
-# }}}
-
 # ヒストリの設定 {{{
 HISTFILE=~/.zsh_history
 HISTSIZE=1000000
@@ -58,9 +35,57 @@ export PATH="$HOME/.linuxbrew/bin:$PATH"
 export MANPATH="$HOME/.linuxbrew/share/man:$MANPATH"
 export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
 export XDG_DATA_DIRS="$HOME/.linuxbrew/share:$XDG_DATA_DIRS"
+
+export PATH="$HOME/.anyenv/bin:$PATH"
+eval "$(anyenv init -)"
 # }}}
 
 # その他 {{{
+if [ -f ~/.bash_aliases ]; then
+  . ~/.bash_aliases
+fi
 bindkey "^[[3~" delete-char # Deleteを使えるように
 eval `dircolors ~/.config/color/dircolors-solarized/dircolors.ansi-dark`
+# }}}
+
+# zplug {{{
+if [[ ! -d ~/.zplug ]];then
+  git clone https://github.com/zplug/zplug ~/.zplug
+fi
+
+source ~/.zplug/init.zsh
+
+zplug "zsh-users/zsh-syntax-highlighting"
+zplug "zsh-users/zsh-history-substring-search"
+zplug "zsh-users/zsh-completions"
+zplug "mafredri/zsh-async"
+zplug "sindresorhus/pure"
+zplug "mrowa44/emojify", as:command
+
+if ! zplug check --verbose; then
+  printf "Install? [y/N]: "
+  if read -q; then
+    echo; zplug install
+  fi
+fi
+
+zplug load --verbose
+# }}}
+
+# function {{{
+function set_proxy() {
+  export http_proxy="http://proxy:0000"
+  export https_prxoy=$http_proxy
+  git config --global http.proxy http://proxy:0000
+  mv ~/.curlrc.conf ~/.curlrc
+  mv ~/.wgetrc.conf ~/.wgetrc
+}
+
+function unset_proxy() {
+  unset http_proxy
+  unset https_prxoy
+  git config --global --unset http.proxy
+  mv ~/.wgetrc ~/.wgetrc.conf
+  mv ~/.curlrc ~/.curlrc.conf
+}
 # }}}
