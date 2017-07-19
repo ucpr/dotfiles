@@ -74,18 +74,28 @@ zplug load --verbose
 
 # function {{{
 function set_proxy() {
-  export http_proxy="http://proxy:0000"
+  export http_proxy="http://proxy:port"
   export https_prxoy=$http_proxy
-  git config --global http.proxy http://proxy:0000
-  mv ~/.curlrc.conf ~/.curlrc
-  mv ~/.wgetrc.conf ~/.wgetrc
+  git config --global http.proxy http://cproxy.okinawa-ct.ac.jp:8080
+  if [ -f ~/.curlrc.conf ]; then 
+    mv ~/.curlrc.conf ~/.curlrc
+  fi
+  if [ -f ~/.wgetrc.conf ]; then 
+    mv ~/.wgetrc.conf ~/.wgetrc
+  fi
+  echo "Proxy environment variable set."
 }
 
 function unset_proxy() {
   unset http_proxy
   unset https_prxoy
   git config --global --unset http.proxy
-  mv ~/.wgetrc ~/.wgetrc.conf
-  mv ~/.curlrc ~/.curlrc.conf
+  if [ -f ~/.curlrc ]; then 
+    mv ~/.curlrc ~/.curlrc.conf
+  fi
+  if [ -f ~/.wgetrc ]; then 
+    mv ~/.wgetrc ~/.wgetrc.conf
+  fi
+  echo -e "Proxy environment variable removed."
 }
 # }}}
