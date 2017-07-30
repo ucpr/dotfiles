@@ -1,0 +1,289 @@
+*sonictemplate-vim.txt*	SonicTemplate for Vim
+
+	   -------------------------------------------------------
+		  SonicTemplate: hi speed coding method
+	   -------------------------------------------------------
+
+Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+WebSite: http://mattn.kaoriya.net/
+Repository: http://github.com/mattn/sonictemplate-vim
+Site: http://mattn.github.com/sonictemplate-vim
+License: BSD style license
+
+==============================================================================
+CONTENTS                                           *sonictemplate-vim-contents*
+
+Introduction           |sonictemplate-vim-introduction|
+Install                |sonictemplate-vim-install|
+Tutorial               |sonictemplate-vim-tutorial|
+Postfix Completion     |sonictemplate-vim-postfix-completion|
+Customize              |sonictemplate-vim-customize|
+Unite Source           |sonictemplate-vim-unitesource|
+Write Your Template    |sonictemplate-vim-writetemplate|
+
+==============================================================================
+INTRODUCTION                                   *sonictemplate-vim-introduction*
+
+|SonicTemplate| is easy and high speed coding method.
+
+ * Choose template for the filetype
+ * Few typings.
+ * Flexible customization.
+
+==============================================================================
+INSTALL                                             *sonictemplate-vim-install*
+
+Install the distributed files into Vim runtime directory which is usually
+~/.vim/, or $HOME/vimfiles on Windows.
+
+If you install pathogen that provided from Tim Pope, you should extract the
+file into 'bundle' directory.
+
+==============================================================================
+TUTORIAL                                           *sonictemplate-vim-tutorial*
+
+For example, you are writing C++ file.
+
+1. Create main function
+
+  Open new C++ file, and type following.
+>
+  :Template boost-main
+<
+  Then you can see following.
+>
+  #include <iostream>
+  #include <string>
+  #include <boost/foreach.hpp>
+
+  int
+  main(int argc, char* argv[]) {
+      _
+      return 0;
+  }
+<
+  The cursor is in the position of |_|.
+
+2. Add foreach loop
+
+  Type following.
+>
+  :Template boost-for
+<
+  Then you will be asked like following.
+>
+  variable:
+<
+  Then type "foo".
+>
+  #include <iostream>
+  #include <string>
+  #include <boost/foreach.hpp>
+
+  int
+  main(int argc, char* argv[]) {
+      BOOST_FOREACH(auto x, foo) {
+          _
+      }
+      return 0;
+  }
+<
+3. Add std::cout << xxx << std::endl;
+>
+  :Template cout
+<
+  Answer "x" for the question "string:".
+>
+  #include <iostream>
+  #include <string>
+  #include <boost/foreach.hpp>
+  
+  int
+  main(int argc, char* argv[]) {
+      BOOST_FOREACH(auto x, foo) {
+          std::cout << x << std::endl;
+      }
+      return 0;
+  }
+<
+==============================================================================
+POSTFIX COMPLETION                         *sonictemplate-vim-postfix-completion*
+
+Sonictemplate provide postfix-completion. For example: >
+
+  name.var_
+<
+Typing "<c-y><c-y>" expand to: >
+
+  var name = _;
+<
+You can customize your own postfix patterns with putting file "pattern.stpl"
+in template directory. >
+
+  \(\S\+\)\.var$
+  	var {{$1}} = {{_cursor_}};
+  
+  ^\s*\zs\(\S.*\)\.throw$
+  	throw {{$1}};
+  
+  \(\S\+\)\.notif$
+  	if ({{$1}} != null) {
+  		{{_cursor_}}
+  	}
+<
+The pattern must be located at leading of per lines. The texts should be
+expanded are following with tab characters prefixed.
+
+==============================================================================
+CUSTOMIZE                                         *sonictemplate-vim-customize*
+
+You can modify template directory for your-self templates: >
+  let g:sonictemplate_vim_template_dir = '/path/to/your/template/directory'
+<
+  or >
+
+  let g:sonictemplate_vim_template_dir = [
+  \ '$HOME/.vim/template',
+  \ '/path/to/another/template/directory'
+  \]
+<
+You can override default template to make same structures. For example, a
+default C language template 'main' is like following.
+>
+  #include <stdio.h>
+  
+  int
+  main(int argc, char* argv[]) {
+      {{_cursor_}}
+      return 0;
+  }
+
+This template is stored in 'sonictemplate-vim/template/c/base-main.c'.
+If you store base-main.c in another template directory that is specified
+|g:sonictemplate_vim_template_dir|, it will be overrided with your's one.
+
+                                                *sonictemplate_vim_template_dir*
+Specify your template directory if you want.
+
+                                                       *sonictemplate_vim_vars*
+When template contains |{{_input_:var}}|, sonictemplate-vim ask you to input
+value. But in most of cases, it's always same value, maybe. For example, if
+you want to set 'author' in LICENSE-mit template as your name, set like below: >
+
+  let g:sonictemplate_vim_vars = {
+  \ '_': {
+  \   'author': 'Yasuhiro Matsumoto',
+  \ },
+  \}
+<
+==============================================================================
+UNITE SOURCE                                    *sonictemplate-vim-unitesource*
+
+You can use unite source for sonictemplate. For example,
+>
+  :Unite sonictemplate
+<
+
+==============================================================================
+WRITE YOUR TEMPLATE                           *sonictemplate-vim-writetemplate*
+
+Templates are stored in the directory that "g:sonictemplate_vim_template_dir"
+variable specified. On unix, directory structure is following.
+Note that I'm using pathogen-vim.
+>
+  ~/.vim/bundle/sonictemplate-vim
+      plugin
+        sonictemplate.vim
+      doc
+        sonictemplate.txt
+      template
+        go                             ... filetype go
+          base-main.go                   ... base main
+          base-package.go                ... base package
+          snip-goroutine.go              ... snippet for goroutine
+          ...
+        perl                           ... filetype perl
+          base-package.pl                ... base package
+          base-script.pl                 ... base script
+          snip-dbi-connect-sqlite.pl     ... snippet for DBI/SQLite
+          ...
+        clojure                        ... filetype clojure
+          file-project-base.clj          ... file project base
+        _                              ... global template
+          base-foo.go                    ... base foo
+          snip-foo.go                    ... snip foo
+<
+  Global template '_' can be applied to any filetypes.
+
+1. The filename have following rule.
+
+    |[kind]|-|[name]|.|[extension]|
+
+  |[kind]|  'base' or 'snip' or 'file' should be used.
+
+    'base' is used when buffer is empty.
+    'file' should be matched if buffer name is leading as template name.
+           For example, "initialize.c" should be expanded template files like
+             "file-initialize-qt.c" or "file-initialize-gtk.c".
+
+  |[name]| template name
+
+    Words in the name must join with '-'.
+
+  |[extension]| file name extension like ".c".
+
+    If several extensions are exists in same directory, the first found is used.
+
+2. Template can have some keywords.
+
+  |{{_name_}}|      the filename without extension.
+
+    If you are opening "foo.pl" for perl, {{_name_}} become "foo".
+
+  |{{_cursor_}}|    : cursor position.
+
+    When expanded template, cursor will be moved to there.
+
+  |{{_input_:var}}| : ask the value of "var".
+
+    You'll be asked "var: " in prompt.
+
+  |{{_expr_:xxx}}|  : expression in vimscript.
+
+    For example: "Current Time:|{{_expr_:strftime('%c')}}|" will be
+>
+    Current Time: 2011/10/27 20:19:00
+<
+  |{{_if_:expr;foo;bar}}|  : ternary operator
+
+    For example: When today is saturday,
+    "Today is |{{_if_:strftime('%w')%6;OrdinaryDay;Holiday}}|" will be
+>
+    Today is Holiday
+<
+  |{{_inline_}}|  : inline expand.
+
+    If it's contained, template will be expanded as one line.
+    This operator affect to snip templates.
+
+    For example: When type "<c-y>t" on "left _ right" (_ is cursor),
+>
+      foo
+      bar
+<
+    Above template will be expanded as oneline
+>
+      left foobar right
+<
+  |{{_filter_:xxx}}|  : template filter
+
+    If it's contained, some templates are listed prior.
+    For example: When `base-helloworld.go` define filter as 'foo', 
+    `snip-foo.go` is located first than `snip-bar.go` in the template list
+>
+      base-helloworld.go
+      snip-foo.go
+      snip-bar.go
+<
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:

@@ -1,0 +1,2 @@
+100
+['Shougo/dein.vim', 'Shougo/deoplete.nvim', 'Shougo/vimproc.vim', 'Xuyuanp/nerdtree-git-plugin', 'cespare/vim-toml', 'cohama/lexima.vim', 'fatih/vim-go', 'flazz/vim-colorschemes', 'itchyny/lightline.vim', 'mattn/sonictemplate-vim', 'neomake/neomake', 'nve3pd/nim.vim', 'scrooloose/nerdtree', 'zchee/deoplete-go', 'zchee/deoplete-jedi']
