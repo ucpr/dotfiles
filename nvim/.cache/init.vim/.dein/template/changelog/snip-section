@@ -1,3 +1,0 @@
-{{_input_:title}} {{_expr_:strftime('%Y-%m-%dT%H:%M:%SZ', localtime())}}
-    - {{_cursor_}}
-
