@@ -17,6 +17,8 @@ zstyle ':completion:*:default' menu select=2
 zstyle ':completion:*' ignore-parents parent pwd ..
 # キャッシュを使ってコマンド高速化
 zstyle ':completion:*' use-cache true
+# 上下左右に補完選択
+zstyle ':completion:*:default' menu select=2
 # }}}
 
 # setopt {{{
@@ -31,13 +33,17 @@ setopt ignore_eof # Ctrl+Dでzshを終了しない
 # }}}
 
 # PATH {{{
-export PATH="$HOME/.linuxbrew/bin:$PATH"
-export MANPATH="$HOME/.linuxbrew/share/man:$MANPATH"
-export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
-export XDG_DATA_DIRS="$HOME/.linuxbrew/share:$XDG_DATA_DIRS"
-
 export PATH="$HOME/.anyenv/bin:$PATH"
 eval "$(anyenv init -)"
+
+export GOPATH="$HOME/.go"
+
+export PATH="/home/nve3pd/.gem/ruby/2.4.0/bin:$PATH"
+export PATH="/usr/bin/python2:$PATH"
+
+export XDG_CONFIG_HOME=$HOME/.config
+
+export VISUAL="vim"
 # }}}
 
 # その他 {{{
@@ -74,9 +80,11 @@ zplug load --verbose
 
 # function {{{
 function set_proxy() {
-  export http_proxy="http://proxy:port"
+  export http_proxy="http://proxy:8888"
   export https_prxoy=$http_proxy
-  git config --global http.proxy http://cproxy.okinawa-ct.ac.jp:8080
+  apm config set https-proxy $http_proxy
+  apm config set https-proxy $http_proxy
+  git config --global http.proxy $http_proxy
   if [ -f ~/.curlrc.conf ]; then 
     mv ~/.curlrc.conf ~/.curlrc
   fi
@@ -90,6 +98,8 @@ function unset_proxy() {
   unset http_proxy
   unset https_prxoy
   git config --global --unset http.proxy
+  apm config delete http-proxy
+  apm config delete https-proxy
   if [ -f ~/.curlrc ]; then 
     mv ~/.curlrc ~/.curlrc.conf
   fi
