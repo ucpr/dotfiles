@@ -1,50 +1,64 @@
-let g:python3_host_prog = '/usr/bin/python3'
-let g:python_host_prog = '/usr/bin/python2'
-
-"dein Scripts---{{{
+" {{{dein.vim
 if &compatible
-  set nocompatible               " Be iMproved
+  set nocompatible
 endif
+set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
 
-" Required:
-set runtimepath+=/home/nve3pd/.config/nvim/repos/github.com/Shougo/dein.vim
+call dein#begin(expand('~/.vim/dein'))
 
-" Required:
-if dein#load_state('/home/nve3pd/.config/nvim')
-  call dein#begin('/home/nve3pd/.config/nvim')
+  call dein#load_toml('~/.config/nvim/toml/dein.toml',{'lazy' : 0})
+  call dein#load_toml('~/.config/nvim/toml/dein_lazy.toml',{'lazy' : 1})
 
-  let s:toml = '~/.config/nvim/dein/dein.toml'
-  let s:toml_lazy = '~/.config/nvim/dein/dein_lazy.toml'
+call dein#end()
+" }}}
 
-  call dein#load_toml(s:toml, {'lazy': 0})
-  call dein#load_toml(s:toml_lazy, {'lazy': 1})
+" {{{color
+"autocmd ColorScheme * highlight Normal ctermbg=none
+autocmd ColorScheme * highlight LineNr ctermbg=none
+"set background=dark
+colorscheme onedark
+syntax on
+" }}}
 
-  " Required:
-  call dein#end()
-  call dein#save_state()
-endif
-"}}}End dein Scripts---
-
+" {{{setting
 set number
-set title
 set cursorline
 set cursorcolumn
-set clipboard=unnamed
+set showmatch
+
+set noswapfile
+set confirm
+set title
+set hidden
+set nobackup
+set writebackup
 set foldmethod=marker
+"set paste
+set display=uhex
+set clipboard&
+
+set encoding=utf-8
+set fileencodings=utf-8,iso-2022-jp,cp932,sjis,euc-jpset 
+set fencs=utf-8,iso-2022-jp,enc-jp,cp932
+language en_US.UTF-8
+
 set tabstop=2
 set shiftwidth=2
 set expandtab
-set cindent
 
-set fileencodings=utf-8,iso-2022-jp,cp932,sjis,euc-jp
-set fencs=utf-8,iso-2022-jp,enc-jp,cp932
+inoremap <F5> <nop>
+set pastetoggle=<F5>
 
-syntax on
-set background=dark
-colorscheme solarized
 set t_Co=256
 set laststatus=2
 
-inoremap <C-j> <Esc>
+set backspace=eol,indent,start
+inoremap <C-f><C-f> <ESC>
 
-language en_US.UTF-8
+autocmd FileType python set tabstop=4 shiftwidth=4 expandtab
+autocmd FileType python set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+autocmd FileType c setl cindent
+autocmd FileType cpp setl cindent
+"autocmd BufNewFile *.c 0r ~/.vim/template/c.c
+"autocmd BufNewFile *.cpp 0r ~/.vim/templates/cpp.cpp
+" }}}
