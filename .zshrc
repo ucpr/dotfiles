@@ -19,6 +19,12 @@ zstyle ':completion:*' ignore-parents parent pwd ..
 zstyle ':completion:*' use-cache true
 # 上下左右に補完選択
 zstyle ':completion:*:default' menu select=2
+
+autoload colors
+# 補完の色
+if [ -n "$LS_COLORS" ]; then
+    zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+fi
 # }}}
 
 # setopt {{{
@@ -36,14 +42,20 @@ setopt ignore_eof # Ctrl+Dでzshを終了しない
 export PATH="$HOME/.anyenv/bin:$PATH"
 eval "$(anyenv init -)"
 
-export GOPATH="$HOME/.go"
+export GOPATH="$HOME/.go/src/"
+export PATH="$GOPATH/bin:$PATH"
 
 export PATH="/home/nve3pd/.gem/ruby/2.4.0/bin:$PATH"
 export PATH="/usr/bin/python2:$PATH"
 
-export XDG_CONFIG_HOME=$HOME/.config
+export PATH="~/.anyenv/envs/ndenv/versions/v8.1.4/lib/node_modules:$PATH"
 
-export VISUAL="vim"
+export TERM=xterm-256color # ubuntu
+
+#eval `dircolors ~/.config/ls_color/dircolors-solarized/dircolors.ansi-universal`
+
+#export XDG_CONFIG_HOME=$HOME/.config
+#export VISUAL="vim"
 # }}}
 
 # その他 {{{
@@ -51,7 +63,7 @@ if [ -f ~/.bash_aliases ]; then
   . ~/.bash_aliases
 fi
 bindkey "^[[3~" delete-char # Deleteを使えるように
-eval `dircolors ~/.config/color/dircolors-solarized/dircolors.ansi-dark`
+#eval `dircolors ~/.config/color/dircolors-solarized/dircolors.ansi-dark`
 # }}}
 
 # zplug {{{
@@ -65,8 +77,8 @@ zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zsh-completions"
 zplug "mafredri/zsh-async"
-zplug "sindresorhus/pure"
-zplug "mrowa44/emojify", as:command
+#zplug "sindresorhus/pure"
+zplug "denysdovhan/spaceship-zsh-theme", use:spaceship.zsh, from:github, as:theme
 
 if ! zplug check --verbose; then
   printf "Install? [y/N]: "
@@ -80,10 +92,10 @@ zplug load --verbose
 
 # function {{{
 function set_proxy() {
-  export http_proxy="http://proxy:8888"
+  export http_proxy="http://cproxy.okinawa-ct.ac.jp:8080"
   export https_prxoy=$http_proxy
-  apm config set https-proxy $http_proxy
-  apm config set https-proxy $http_proxy
+#  apm config set https-proxy $http_proxy
+#  apm config set https-proxy $http_proxy
   git config --global http.proxy $http_proxy
   if [ -f ~/.curlrc.conf ]; then 
     mv ~/.curlrc.conf ~/.curlrc
@@ -98,8 +110,8 @@ function unset_proxy() {
   unset http_proxy
   unset https_prxoy
   git config --global --unset http.proxy
-  apm config delete http-proxy
-  apm config delete https-proxy
+#  apm config delete http-proxy
+#  apm config delete https-proxy
   if [ -f ~/.curlrc ]; then 
     mv ~/.curlrc ~/.curlrc.conf
   fi
