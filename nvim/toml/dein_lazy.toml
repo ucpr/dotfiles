@@ -30,5 +30,7 @@ repo = 'cespare/vim-toml'
 on_ft = ['toml']
 
 [[plugins]]
-repo = 'nve3pd/nim.vim'
+repo = 'zah/nim.vim'
 on_ft = ['nim']
+
+
