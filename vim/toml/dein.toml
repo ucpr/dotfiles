@@ -6,9 +6,6 @@ repo = 'Shougo/vimproc.vim'
 build = 'make'
 
 [[plugins]]
-repo = 'scrooloose/syntastic'
-
-[[plugins]]
 repo = 'cohama/lexima.vim'
 
 [[plugins]]
@@ -21,36 +18,48 @@ hook_add = '''
 repo = 'Xuyuanp/nerdtree-git-plugin'
 
 [[plugins]]
-repo = 'altercation/vim-colors-solarized'
-
-[[plugins]]
 repo = 'joshdick/onedark.vim'
-hook_add = """
-  highlight Normal ctermbg=none
-  highlight NonText ctermbg=none
-  highlight LineNr ctermbg=none
-  highlight Folded ctermbg=none
-  highlight EndOfBuffer ctermbg=none
-  colorscheme onedark
-"""
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
 hook_add = """
-  let g:lightline = {
-  \ 'colorscheme': 'onedark',
-  \ 'active': {
-    \   'right': [ [ 'syntastic', 'lineinfo' ],
-    \              [ 'percent' ],
-    \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
-    \ },
-    \ 'component_expand': {
-    \   'syntastic': 'SyntasticStatuslineFlag'
-    \ },
-    \ 'component_type': {
-    \   'syntastic': 'error'
-    \ }
-  \ }
+  autocmd ColorScheme * highlight Normal ctermbg=none
+  autocmd ColorScheme * highlight LineNr ctermbg=none
+  set background=dark
+  source ~/.config/nvim/toml/plugins/lightline.rc.vim
+"""
+
+[[plugins]]
+repo = 'ryanoasis/vim-devicons'
+
+[[plugins]]
+repo = 'w0rp/ale'
+hook_add = """
+  let g:ale_sign_error = '⨉'
+  let g:ale_sign_warning = '⚠'
+  let g:ale_sign_column_always = 1
+  let g:ale_linters = {
+\   'python': ['flake8'],
+\   'typescript': ['tsuquyomi'],
+\}
+  nmap <silent> <C-k> <Plug>(ale_previous_wrap)  # 前のエラーに
+  nmap <silent> <C-j> <Plug>(ale_next_wrap)  # 次のエラーに
+"""
+
+[[plugins]]
+repo = 'airblade/vim-gitgutter'
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'gosukiwi/vim-atom-dark'
+
+[[plugins]]
+repo = "tomasr/molokai"
+hook_add = """
+  colorscheme molokai
+  highlight Normal ctermbg=none
 """
 
 [[plugins]]

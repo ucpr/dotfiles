@@ -3,8 +3,9 @@ repo = 'cespare/vim-toml'
 on_ft = ['toml']
 
 [[plugins]]
-repo = 'nve3pd/nim.vim'
+repo = 'zah/nim.vim'
 on_ft = ['nim']
+
 
 [[plugins]]
 repo = 'davidhalter/jedi-vim'
@@ -21,17 +22,43 @@ if !exists('g:neocomplete#force_omni_input_patterns')
 """
 
 [[plugins]]
-repo = 'fatih/vim-go'
-on_ft = ['go']
+repo = 'justmao945/vim-clang'
+on_ft = ['cpp', 'c']
 hook_add = """
-let g:go_bin_path = '~/.go/src/bin'
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_types = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
-let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
-autocmd FileType go setlocal completeopt-=preview
+let g:clang_auto = 0
+let g:clang_complete_auto = 0
+let g:clang_auto_select = 0
+let g:clang_use_library = 1
+let g:clang_c_completeopt   = 'menuone'
+let g:clang_cpp_completeopt = 'menuone'
+let g:clang_exec = 'clang++'
+let g:clang_format_exec = 'clang-format'
+let g:clang_c_options = '-std=c11'
+let g:clang_cpp_options = '-std=c++11 -I/usr/lib/gcc/x86_64-linux-gnu/5.4.0/include/c++'
+let g:neocomplete#force_omni_input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+let g:neocomplete#force_omni_input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+"""
+
+[[plugins]]
+repo = 'Shougo/neoinclude.vim'
+on_ft = ['cpp', 'c']
+
+[[plugins]]
+repo = 'leafgarland/typescript-vim'
+on_ft = ['typescript']
+
+[[plugins]]
+repo = 'jason0x43/vim-js-indent'
+on_ft = ['javascript', 'typescript', 'html']
+hook_add = """
+  let g:js_indent_typescript = 1
+"""
+
+[[plugins]]
+repo = 'Quramy/tsuquyomi'
+on_ft = ['typescript']
+hook_add = """
+autocmd FileType typescript setlocal completeopt-=menu
+
+let g:neocomplete#force_omni_input_patterns.typescript = '\h\w*\|[^. \t]\.\w*'
 """
