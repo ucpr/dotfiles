@@ -48,14 +48,16 @@ export PATH="$GOPATH/bin:$PATH"
 export PATH="/home/nve3pd/.gem/ruby/2.4.0/bin:$PATH"
 export PATH="/usr/bin/python2:$PATH"
 
-export PATH="~/.anyenv/envs/ndenv/versions/v8.1.4/lib/node_modules:$PATH"
+export PATH="~/.anyenv/envs/ndenv/versions/v8.9.3/lib/node_modules:$PATH"
 
-export TERM=xterm-256color # ubuntu
+#export TERM=xterm-256color # ubuntu
+#
+export PATH="~/.bin/run_urxvt:$PATH"
 
 #eval `dircolors ~/.config/ls_color/dircolors-solarized/dircolors.ansi-universal`
 
 #export XDG_CONFIG_HOME=$HOME/.config
-#export VISUAL="vim"
+export VISUAL="vim"
 # }}}
 
 # その他 {{{
@@ -78,6 +80,7 @@ zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zsh-completions"
 zplug "mafredri/zsh-async"
 #zplug "sindresorhus/pure"
+#zplug "zsh-users/zsh-autosuggestions"
 zplug "denysdovhan/spaceship-zsh-theme", use:spaceship.zsh, from:github, as:theme
 
 if ! zplug check --verbose; then
@@ -92,7 +95,7 @@ zplug load --verbose
 
 # function {{{
 function set_proxy() {
-  export http_proxy="http://cproxy.okinawa-ct.ac.jp:8080"
+  export http_proxy="http://hoge.com:0000"
   export https_prxoy=$http_proxy
 #  apm config set https-proxy $http_proxy
 #  apm config set https-proxy $http_proxy

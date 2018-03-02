@@ -47,6 +47,14 @@ set smartindent
 
 inoremap <F5> <nop>
 set pastetoggle=<F5>
+"noremap <Up> <Nop>
+"noremap <Down> <Nop>
+"noremap <Left> <Nop>
+"noremap <Right> <Nop>
+"inoremap <Up> <Nop>
+"inoremap <Down> <Nop>
+"inoremap <Left> <Nop>
+"inoremap <Right> <Nop>
 
 syntax on
 set t_Co=256
@@ -61,5 +69,17 @@ autocmd FileType c setl cindent
 autocmd FileType cpp setl cindent
 "autocmd BufNewFile *.c 0r ~/.vim/template/c.c
 "autocmd BufNewFile *.cpp 0r ~/.vim/templates/cpp.cpp
-autocmd FileType go setl ts=4 sw=4 sts=4 noet
+autocmd FileType go setl ts=4 sw=4 noet
+autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 " }}}
+
+" {{{ function
+function! EasyMode ()
+  noremap <Up> <Up>
+  noremap <Down> <Down>
+  noremap <Left> <Left>
+  noremap <Right> <Right>
+endfunction
+
+command! EasyMode call EasyMode()
+"}}}
