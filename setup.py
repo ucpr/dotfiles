@@ -8,6 +8,7 @@ import shutil
 dotfiles = glob.glob(".*")
 dotfiles.remove(".git")
 dotfiles.remove(".bashrc")
+dotfiles.remove(".vimrc")
 
 
 def init_ubuntu():
@@ -21,25 +22,39 @@ def init_ubuntu():
 
 
 def vim():
+    # install dein.vim
+    subprocess.run(["mkdir", "-p", "~/.vim/dein/repos/github.com/Shougo/dein.vim"])
+    subprocess.run(["git", "clone", "https://github.com/Shougo/dein.vim.git", "~/.vim/dein/repos/github.com/Shougo/dein.vim"])
+
     n = input("vim or neovim?[vim/nvim] ")
+    if n == "vim":  # vim
+        shutil.copy(".vimrc", os.path.expanduser("~"))
+        shutil.move("toml", os.path.join(os.path.expanduser("~"), ".vim"))
+    else:  # neovim
+        nvim_path = os.path.join(os.path.expanduser("~"), ".config", "nvim")
+        if not os.path.exists(nvim_path):
+            os.mkdir(nvim_path)
+        shutil.copy(".vimrc", nvim_path + "/init.vim")
+        shutil.move("toml", nvim_path)
 
 def main():
     for f in dotfiles:
-        if os.path.exists("~/" + f):
+        if os.path.exists(os.path.join(os.path.expanduser("~"), f)):
             n = input("The file already exists.\nDo you want to overwrite?[y/n] ")
             if n != "n":
-                shutil.move(f, os.path.expanduser("~"))
+                shutil.copy(f, os.path.expanduser("~"))
                 print(f + " moved to home dir")
         else:
             shutil.copy(f, os.path.expanduser("~"))
             print(f + " moved to home dir")
 
-
     if "Ubuntu" in platform.dist():
         init_ubuntu()
+    vim()  # setting vim
     subprocess.run(["git", "clone", "git clone https://github.com/riywo/anyenv ~/.anyenv"])
     subprocess.run([])
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    vim()
