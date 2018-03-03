@@ -13,10 +13,10 @@ def main():
         if os.path.exists("~/" + f):
             n = input("The file already exists.\nDo you want to overwrite?[y/n] ")
             if n != "n":
-                shutil.move("./" + f, "~/")
+                shutil.move(f, os.path.expanduser("~"))
                 print(f + " moved to home dir")
         else:
-            shutil.move(f, f+".hoge")
+            shutil.copy(f, os.path.expanduser("~"))
             print(f + " moved to home dir")
 
 if __name__ == "__main__":
