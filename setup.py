@@ -35,7 +35,8 @@ def vim():
         if not os.path.exists(nvim_path):
             os.mkdir(nvim_path)
         shutil.copy(".vimrc", nvim_path + "/init.vim")
-        shutil.move("toml", nvim_path)
+        shutil.move("toml", os.path.join(os.path.expanduser("~"), "/.vim"))
+
 
 def main():
     for f in dotfiles:
@@ -52,9 +53,7 @@ def main():
         init_ubuntu()
     vim()  # setting vim
     subprocess.run(["git", "clone", "git clone https://github.com/riywo/anyenv ~/.anyenv"])
-    subprocess.run([])
 
 
 if __name__ == "__main__":
-    #main()
-    vim()
+    main()
