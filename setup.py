@@ -52,7 +52,7 @@ def main():
     if "Ubuntu" in platform.dist():
         init_ubuntu()
     vim()  # setting vim
-    subprocess.run(["git", "clone", "git clone https://github.com/riywo/anyenv ~/.anyenv"])
+    subprocess.run(["git", "clone", "https://github.com/riywo/anyenv", "~/.anyenv"])
 
 
 if __name__ == "__main__":
