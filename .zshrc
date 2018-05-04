@@ -39,25 +39,25 @@ setopt ignore_eof # Ctrl+Dでzshを終了しない
 # }}}
 
 # PATH {{{
-export PATH="$HOME/.anyenv/bin:$PATH"
-eval "$(anyenv init -)"
+#export PATH="$HOME/.anyenv/bin:$PATH"
+#eval "$(anyenv init -)"
 
-export GOPATH="$HOME/.go/src/"
-export PATH="$GOPATH/bin:$PATH"
+#export GOPATH="$HOME/.go/src/"
+#export PATH="$GOPATH/bin:$PATH"
 
-export PATH="/home/nve3pd/.gem/ruby/2.4.0/bin:$PATH"
-export PATH="/usr/bin/python2:$PATH"
+#export PATH="/home/nve3pd/.gem/ruby/2.4.0/bin:$PATH"
+#export PATH="/usr/bin/python2:$PATH"
 
-export PATH="~/.anyenv/envs/ndenv/versions/v8.9.3/lib/node_modules:$PATH"
+#export PATH="~/.anyenv/envs/ndenv/versions/v8.9.3/lib/node_modules:$PATH"
 
 #export TERM=xterm-256color # ubuntu
 #
-export PATH="~/.bin/run_urxvt:$PATH"
+#export PATH="~/.bin/run_urxvt:$PATH"
 
 #eval `dircolors ~/.config/ls_color/dircolors-solarized/dircolors.ansi-universal`
 
 #export XDG_CONFIG_HOME=$HOME/.config
-export VISUAL="vim"
+#export VISUAL="vim"
 # }}}
 
 # その他 {{{
@@ -93,34 +93,4 @@ fi
 zplug load --verbose
 # }}}
 
-# function {{{
-function set_proxy() {
-  export http_proxy="http://hoge.com:0000"
-  export https_prxoy=$http_proxy
-#  apm config set https-proxy $http_proxy
-#  apm config set https-proxy $http_proxy
-  git config --global http.proxy $http_proxy
-  if [ -f ~/.curlrc.conf ]; then 
-    mv ~/.curlrc.conf ~/.curlrc
-  fi
-  if [ -f ~/.wgetrc.conf ]; then 
-    mv ~/.wgetrc.conf ~/.wgetrc
-  fi
-  echo "Proxy environment variable set."
-}
 
-function unset_proxy() {
-  unset http_proxy
-  unset https_prxoy
-  git config --global --unset http.proxy
-#  apm config delete http-proxy
-#  apm config delete https-proxy
-  if [ -f ~/.curlrc ]; then 
-    mv ~/.curlrc ~/.curlrc.conf
-  fi
-  if [ -f ~/.wgetrc ]; then 
-    mv ~/.wgetrc ~/.wgetrc.conf
-  fi
-  echo -e "Proxy environment variable removed."
-}
-# }}}
