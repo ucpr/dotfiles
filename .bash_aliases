@@ -11,17 +11,32 @@ alias ll="ls -l"
 alias vim="nvim"
 alias py-reqirements='pip freeze > requirements.txt'
 
+export switch_tori="ajima"
+
 ggl() {
     open "https://www.google.co.jp/search?q=${*// /%20}"
 }
 
+urxvt_reload() {
+  xrdb -remove
+  xrdb -merge ~/.Xresources
+  }
+
 # function {{{
-function set_proxy() {
-  export http_proxy="http://hoge.com:0000"
+set_proxy() {
+  export http_proxy="http://cproxy.okinawa-ct.ac.jp:8080"
   export https_prxoy=$http_proxy
+  export ftp_proxy=$http_proxy
+  export HTTP_PROXY=$http_proxy
+  export HTTPS_PROXY=$http_proxy
+  export FTP_PROXY=$http_proxy
+
 #  apm config set https-proxy $http_proxy
 #  apm config set https-proxy $http_proxy
   git config --global http.proxy $http_proxy
+  npm config set proxy $http_proxy
+  npm config set https-proxy $http_proxy
+  alias sudo="sudo -E"
   if [ -f ~/.curlrc.conf ]; then 
     mv ~/.curlrc.conf ~/.curlrc
   fi
@@ -31,10 +46,15 @@ function set_proxy() {
   echo "Proxy environment variable set."
 }
 
-function unset_proxy() {
+unset_proxy() {
   unset http_proxy
   unset https_prxoy
+  unset HTTP_PROXY
+  unset HTTPS_PROXY
+
   git config --global --unset http.proxy
+  npm config delete proxy
+  npm config delete https-proxy
 #  apm config delete http-proxy
 #  apm config delete https-proxy
   if [ -f ~/.curlrc ]; then 

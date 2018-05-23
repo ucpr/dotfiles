@@ -39,20 +39,22 @@ setopt ignore_eof # Ctrl+Dでzshを終了しない
 # }}}
 
 # PATH {{{
-#export PATH="$HOME/.anyenv/bin:$PATH"
-#eval "$(anyenv init -)"
+export PATH="$HOME/.anyenv/bin:$PATH"
+eval "$(anyenv init -)"
 
-#export GOPATH="$HOME/.go/src/"
+export GOPATH="$HOME/.go/src/"
 #export PATH="$GOPATH/bin:$PATH"
 
 #export PATH="/home/nve3pd/.gem/ruby/2.4.0/bin:$PATH"
 #export PATH="/usr/bin/python2:$PATH"
 
-#export PATH="~/.anyenv/envs/ndenv/versions/v8.9.3/lib/node_modules:$PATH"
+export PATH="~/.anyenv/envs/ndenv/versions/v9.4.0/bin:$PATH"
+
+export PATh="/home/u_chi_ha_ra_/.nimble/bin:$PATH"
 
 #export TERM=xterm-256color # ubuntu
 #
-#export PATH="~/.bin/run_urxvt:$PATH"
+export PATH="~/bin/run_urxvt:$PATH"
 
 #eval `dircolors ~/.config/ls_color/dircolors-solarized/dircolors.ansi-universal`
 
@@ -92,5 +94,3 @@ fi
 
 zplug load --verbose
 # }}}
-
-
