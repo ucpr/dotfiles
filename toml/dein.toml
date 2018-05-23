@@ -25,8 +25,8 @@ repo = 'itchyny/lightline.vim'
 hook_add = """
   autocmd ColorScheme * highlight Normal ctermbg=none
   autocmd ColorScheme * highlight LineNr ctermbg=none
-  set background=dark
-  source ~/.config/nvim/toml/plugins/lightline.rc.vim
+  set background=light
+  source ~/.vim/toml/plugins/lightline.rc.vim
 """
 
 [[plugins]]
@@ -35,7 +35,7 @@ repo = 'ryanoasis/vim-devicons'
 [[plugins]]
 repo = 'w0rp/ale'
 hook_add = """
-  let g:ale_sign_error = '⨉'
+  let g:ale_sign_error = '✗'
   let g:ale_sign_warning = '⚠'
   let g:ale_sign_column_always = 1
   let g:ale_linters = {
@@ -53,26 +53,13 @@ repo = 'airblade/vim-gitgutter'
 repo = 'tpope/vim-fugitive'
 
 [[plugins]]
-repo = 'gosukiwi/vim-atom-dark'
-
-[[plugins]]
-repo = "tomasr/molokai"
+repo = 'Shougo/deoplete.nvim'
 hook_add = """
-  colorscheme molokai
-  highlight Normal ctermbg=none
+  source ~/.vim/toml/plugins/deoplete.rc.vim
 """
 
 [[plugins]]
-repo = 'Shougo/neocomplete.vim'
-hook_add = """
-let g:neocomplete#force_overwrite_completefunc = 1
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#enable_smart_case = 1
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-if !exists('g:neocomplete#force_omni_input_patterns')
-  let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_overwrite_completefunc = 1
-let g:neocomplete#force_omni_input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-let g:neocomplete#force_omni_input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-"""
+repo = 'thinca/vim-zenspace'
+
+[[plugins]]
+repo = 'mattn/sonictemplate-vim'
