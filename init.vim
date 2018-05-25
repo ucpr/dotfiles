@@ -39,8 +39,8 @@ set fileencodings=utf-8,iso-2022-jp,cp932,sjis,euc-jpset
 set fencs=utf-8,iso-2022-jp,enc-jp,cp932
 language en_US.UTF-8
 
-set tabstop=2 "タブ文字幅
-set shiftwidth=2 "インデント幅
+set tabstop=2
+set shiftwidth=2
 set expandtab
 set smarttab
 set smartindent
