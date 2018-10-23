@@ -3,15 +3,15 @@
 mkdir ~/.vim
 mkdir ~/.config/nvim/
 
-ln -s ./init.vim ~/.config/nvim/init.vim
-ln -s ./toml ~/.vim/toml
-ln -s ./.zshrc ~/.zshrc
-ln -s ./.bash_aliases ~/.bash_aliases
-ln -s ./.curlrc ~/.curlrc
-ln -s ./.wgetrc ~/.wgetrc
-ln -s ./.latexmkrc ~/.latexmkrc
-ln -s ./.tmux.conf ~/.tmux.conf
-ln -s ./.Xmodmap ~/.Xmodmap
+cp ./init.vim ~/.config/nvim/init.vim
+cp -r ./toml ~/.vim/toml
+cp ./.zshrc ~/.zshrc
+cp ./.bash_aliases ~/.bash_aliases
+cp ./.curlrc ~/.curlrc
+cp ./.wgetrc ~/.wgetrc
+cp ./.latexmkrc ~/.latexmkrc
+cp ./.tmux.conf ~/.tmux.conf
+cp ./.Xmodmap ~/.Xmodmap
 
 # git
 git config --global user.email "uchihara1229@gmail.com"
