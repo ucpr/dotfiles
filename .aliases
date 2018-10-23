@@ -1,6 +1,5 @@
 [ `uname` = "Linux" ] && alias open='xdg-open 2>/dev/null'
 
-alias nr="nim c --run"
 alias ssh_start="systemctl start sshd"
 alias python="python3"
 alias pbcopy='xsel --clipboard --input'
@@ -9,12 +8,25 @@ alias g++14='g++-6 -std=c++14 -O2 -Wall'
 alias la="ls -a"
 alias ll="ls -l"
 alias vim="nvim"
+alias py="python3"
 alias py-reqirements='pip freeze > requirements.txt'
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias pdf-apvlv='apvlv'
+alias sl='ls'
 
-export switch_tori="ajima"
+export LESS='-RNMS'
+export LESSOPEN='|lessfilter %s'
+
+nr() {
+  nim c -d:ssl -o:hoge --run $1
+  rm hoge
+}
 
 ggl() {
-    open "https://www.google.co.jp/search?q=${*// /%20}"
+    open "https://google.com/search?q=${*// /%20}"
 }
 
 urxvt_reload() {
@@ -22,7 +34,6 @@ urxvt_reload() {
   xrdb -merge ~/.Xresources
   }
 
-# function {{{
 set_proxy() {
   export http_proxy="http://cproxy.okinawa-ct.ac.jp:8080"
   export https_prxoy=$http_proxy
@@ -43,7 +54,7 @@ set_proxy() {
   if [ -f ~/.wgetrc.conf ]; then 
     mv ~/.wgetrc.conf ~/.wgetrc
   fi
-  echo "Proxy environment variable set."
+#  echo "Proxy environment variable set."
 }
 
 unset_proxy() {
@@ -63,15 +74,14 @@ unset_proxy() {
   if [ -f ~/.wgetrc ]; then 
     mv ~/.wgetrc ~/.wgetrc.conf
   fi
-  echo -e "Proxy environment variable removed."
+#  echo -e "Proxy environment variable removed."
 }
-# }}}
-
 
 function get_ssid() {
-    echo `nmcli dev status | grep '接続済み' | awk '{print $4}'`
+    echo `nmcli dev status | grep 'ajima' | awk '{print $4}'`
 }
 
+export switch_tori=ajima
 echo `get_ssid`
 
 if [ "`get_ssid`" = "$switch_tori" ]; then
@@ -81,3 +91,7 @@ else
     echo -e "\e[36mUnset proxy settings\e[m"
     unset_proxy
 fi
+
+#function command_not_found_handler(){
+#  img2sixel -h 600 ~/Downloads/hoge2.jpg
+#}
