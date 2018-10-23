@@ -21,11 +21,17 @@ repo = 'Xuyuanp/nerdtree-git-plugin'
 repo = 'joshdick/onedark.vim'
 
 [[plugins]]
+repo = 'morhetz/gruvbox'
+hook_add = """
+  colorscheme gruvbox
+"""
+
+[[plugins]]
 repo = 'itchyny/lightline.vim'
 hook_add = """
   autocmd ColorScheme * highlight Normal ctermbg=none
   autocmd ColorScheme * highlight LineNr ctermbg=none
-  set background=light
+  set background=dark
   source ~/.vim/toml/plugins/lightline.rc.vim
 """
 
@@ -35,7 +41,7 @@ repo = 'ryanoasis/vim-devicons'
 [[plugins]]
 repo = 'w0rp/ale'
 hook_add = """
-  let g:ale_sign_error = '✗'
+  let g:ale_sign_error = '✘'
   let g:ale_sign_warning = '⚠'
   let g:ale_sign_column_always = 1
   let g:ale_linters = {

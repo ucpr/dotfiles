@@ -3,7 +3,7 @@ let g:gitgutter_sign_modified = '➜'
 let g:gitgutter_sign_removed = '✘'
 
 let g:lightline = {
-  \'colorscheme': 'solarized',
+  \'colorscheme': 'gruvbox',
   \'active': {
   \  'left': [
   \    ['mode', 'paste'],
