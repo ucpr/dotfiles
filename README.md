@@ -1,9 +1,41 @@
 # dotfiles
+my dotfiles.
 
-### .vimrc  
+## terminal
+### require
+- zsh
+- networkmanager
+### config
+- .zshrc
+- .aliases
+  - proxyの自動切り替えが `nmcli (NetworkManager)` に依存
 
-``` bash
-$ mkdir -p ~/.vim/dein/repos/github.com/Shougo/dein.vim
+## nvim
+### require
+- neovim
+- python-neovim
+### config
+- nvim/init.vim
+- nvim/toml/*.toml
+- nvim/toml/plugins/*.rc.vim
+- nvim/LanguageClientSetting.json
 
-$ git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
-```    
+## Xのリソース設定
+### require
+- urxvt-terminal
+### config
+- .Xresources
+- .Xmodmap
+
+## curl
+- .curlrc
+
+## wget
+- .wgetrc
+
+## tmux
+- .tmux.conf
+
+## latexmk
+- .latexmkrc
+
