@@ -1,0 +1,8 @@
+[[plugins]]
+repo = 'baabelfish/nvim-nim'
+on_ft = ['nim']
+
+[[plugins]]
+repo = 'zchee/deoplete-jedi'
+depends = ['deoplete.nvim']
+on_ft = ['python']
