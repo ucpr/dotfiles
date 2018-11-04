@@ -1,5 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
-let g:netrw_dirhist_1='/home/nve3pd/.config/i3'
-let g:netrw_dirhist_2='/etc/NetworkManager/system-connections'
-let g:netrw_dirhist_3='/etc/NetworkManager/conf.d'
