@@ -16,6 +16,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias pdf-apvlv='apvlv'
 alias sl='ls'
+alias reflush_display='xrandr --output eDP1 --auto --output DP2 --auto --above eDP1 && ~/.fehbg'
 
 export LESS='-RNMS'
 export LESSOPEN='|lessfilter %s'
@@ -45,8 +46,8 @@ set_proxy() {
 #  apm config set https-proxy $http_proxy
 #  apm config set https-proxy $http_proxy
   git config --global http.proxy $http_proxy
-  npm config set proxy $http_proxy
-  npm config set https-proxy $http_proxy
+#  npm config set proxy $http_proxy
+#  npm config set https-proxy $http_proxy
   alias sudo="sudo -E"
   if [ -f ~/.curlrc.conf ]; then 
     mv ~/.curlrc.conf ~/.curlrc
@@ -64,8 +65,8 @@ unset_proxy() {
   unset HTTPS_PROXY
 
   git config --global --unset http.proxy
-  npm config delete proxy
-  npm config delete https-proxy
+#  npm config delete proxy
+#  npm config delete https-proxy
 #  apm config delete http-proxy
 #  apm config delete https-proxy
   if [ -f ~/.curlrc ]; then 
@@ -85,13 +86,10 @@ export switch_tori=ajima
 echo `get_ssid`
 
 if [ "`get_ssid`" = "$switch_tori" ]; then
-    echo -e "\e[31mSwitch to proxy for school network\e[m"
+#    echo -e "\e[31mSwitch to proxy for school network\e[m"
     set_proxy
 else
-    echo -e "\e[36mUnset proxy settings\e[m"
+#    echo -e "\e[36mUnset proxy settings\e[m"
     unset_proxy
 fi
 
-#function command_not_found_handler(){
-#  img2sixel -h 600 ~/Downloads/hoge2.jpg
-#}

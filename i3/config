@@ -35,6 +35,10 @@ gaps outer 15
 smart_gaps on
 smart_borders on
 
+# remove!!! title bar!!!! hooo!!!
+for_window [class="^.*"] border pixel 1
+new_window 1pixel
+
 # start a terminal
 bindsym $mod+Return exec urxvt
 
@@ -184,7 +188,7 @@ exec --no-startup-id volumeicon
 exec --no-startup-id fcitx
 exec --no-startup-id dropbox
 exec --no-startup-id dunst
-exec --np-startup-id ~/.config/i3/script/monitor_detect.sh
+exec --no-startup-id ~/.bin/monitor_detect
 exec --no-startup-id compton -cbm 0.75
 
 # Audio
