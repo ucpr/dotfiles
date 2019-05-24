@@ -1,5 +1,5 @@
 " dein {{{
-let s:dein_dir = expand('/home/nve3pd/.config/nvim/dein')
+let s:dein_dir = expand('/home/ucpr/.config/nvim/dein')
 let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 let s:toml_dir = s:dein_dir . '/../toml'
 

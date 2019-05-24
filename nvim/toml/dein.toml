@@ -8,42 +8,45 @@ build = 'make'
 [[plugins]]
 repo = 'cohama/lexima.vim'
 
-#[[plugins]]
-#repo = 'autozimu/LanguageClient-neovim'
-#rev = 'next'
-## on_event = 'InsertEnter'
-#depends = ['deoplete.nvim']
-#build = 'bash install.sh'
-#hook_source = '''
-#set completefunc=LanguageClient#complete
-#'''
-#hook_add = '''
-#set hidden
-#let g:LanguageClient_serverCommands = {
-#      \ 'c': ['clangd'],
-#      \ 'cpp': ['clangd'],
-#      \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-#      \ 'd': ['dls'],
-#      \ 'javascript': ['javascript-typescript-stdio'],
-#      \ 'python': ['pyls'],
-#      \ 'ruby': ['solargraph'],
-#      \ }
-#let g:LanguageClient_loadSettings = 1
-#let g:LanguageClient_hasSnippetSupport = 0
-#let g:LanguageClient_settingsPath = expand('$HOME/.config/nvim/LanguageClientSetting.json')
-#nnoremap K :call LanguageClient#textDocument_hover()<CR>
-#nnoremap gd :call LanguageClient#textDocument_definition()<CR>
-#nnoremap F :call LanguageClient#textDocument_formatting()<CR>
-#'''
-
 [[plugins]]
 repo = 'Shougo/deoplete.nvim'
 depends = ['context_filetype.vim']
 hook_add = '''
 call deoplete#enable()
 call deoplete#custom#source('LanguageClient', 'min_pattern_length', 1)
-source /home/nve3pd/.config/nvim/toml/plugins/deoplete.rc.vim
+source /home/ucpr/.config/nvim/toml/plugins/deoplete.rc.vim
 '''
+
+[[plugins]]
+repo = 'autozimu/LanguageClient-neovim'
+rev = 'next'
+# on_event = 'InsertEnter'
+depends = ['deoplete.nvim']
+build = 'bash install.sh'
+hook_source = '''
+set completefunc=LanguageClient#complete
+'''
+hook_add = '''
+set hidden
+let g:LanguageClient_serverCommands = {
+      \ 'c': ['clangd'],
+      \ 'cpp': ['clangd'],
+      \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+      \ 'd': ['dls'],
+      \ 'javascript': ['javascript-typescript-stdio'],
+      \ 'python': ['pyls'],
+      \ 'ruby': ['solargraph'],
+      \ 'go': ['bingo'],
+      \ }
+let g:LanguageClient_loadSettings = 1
+let g:LanguageClient_hasSnippetSupport = 0
+let g:LanguageClient_settingsPath = expand('$HOME/.config/nvim/LanguageClientSetting.json')
+nnoremap K :call LanguageClient#textDocument_hover()<CR>
+nnoremap gd :call LanguageClient#textDocument_definition()<CR>
+nnoremap F :call LanguageClient#textDocument_formatting()<CR>
+'''
+
+
 
 [[plugins]]
 repo = 'Shougo/context_filetype.vim'
@@ -71,7 +74,7 @@ repo = 'tpope/vim-fugitive'
 [[plugins]]
 repo = 'itchyny/lightline.vim'
 #hook_add = """
-#  source /home/nve3pd/.config/nvim/toml/plugins/lightline.rc.vim
+#  source /home/ucpr/.config/nvim/toml/plugins/lightline.rc.vim
 #"""
 
 [[plugins]]
@@ -82,3 +85,12 @@ hook_add = '''
 
 [[plugins]]
 repo = 'Xuyuanp/nerdtree-git-plugin'
+
+[[plugins]]
+repo = 'Shougo/echodoc.vim'
+
+[[plugins]]
+repo = 'majutsushi/tagbar'
+hook_add = """
+  nmap <F8> :TagbarToggle<CR>
+"""
