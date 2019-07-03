@@ -94,3 +94,9 @@ repo = 'majutsushi/tagbar'
 hook_add = """
   nmap <F8> :TagbarToggle<CR>
 """
+
+#[[plugins]]
+#repo = 'ncm2/float-preview.nvim'
+#hook_add = """
+#let g:float_preview#docked = 1
+#"""
