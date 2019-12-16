@@ -18,7 +18,6 @@ URxvt.fading:               40
 !! Font list and Spacing
 URxvt.font:                 xft:Hack Nerd Font:style=Regular:antialias=true:hinting=true:pixelsize=25,\
                             xft:Noto Color Emoji-18,\
-                            xft:devicons-18,\
                             xft:IPAGothic
 
 URxvt.letterSpace:          -1
