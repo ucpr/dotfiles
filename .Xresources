@@ -16,8 +16,11 @@ URxvt.saveLines:            3000
 URxvt.fading:               40
 
 !! Font list and Spacing
-URxvt.font:                 xft:Dejavu Sans Mono-12,\
+URxvt.font:                 xft:Hack Nerd Font:style=Regular:antialias=true:hinting=true:pixelsize=25,\
+                            xft:Noto Color Emoji-18,\
+                            xft:devicons-18,\
                             xft:IPAGothic
+
 URxvt.letterSpace:          -1
 !URxvt.lineSpace:            0
 
@@ -48,3 +51,16 @@ URxvt.scrollColor:          [90]#504945
 !URxvt.troughColor:          [90]#3C3836
 
 
+URxvt.perl-ext-common:    default,tabbed,resize-font
+
+!! tabbed (https://github.com/gryf/tabbed)
+URxvt.tabbed.tabbar-fg:   243
+URxvt.tabbed.tabbar-bg:   237
+URxvt.tabbed.tab-fg:      250
+URxvt.tabbed.tab-bg:      30
+URxvt.tabbed.new-button:  false
+URxvt.tabbed.tab-numbers: false
+
+!! resize-font (https://github.com/simmel/urxvt-resize-font)
+URxvt.keysym.C-Down:      resize-font:smaller
+URxvt.keysym.C-Up:        resize-font:bigger
