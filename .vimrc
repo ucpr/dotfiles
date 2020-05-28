@@ -7,7 +7,7 @@ set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
 call dein#begin(expand('~/.vim/dein'))
 
 call dein#load_toml('~/.vim/toml/dein.toml',{'lazy' : 0})
-call dein#load_toml('~/.vim/toml/dein_lazy.toml',{'lazy' : 1})
+"call dein#load_toml('~/.vim/toml/dein_lazy.toml',{'lazy' : 1})
 
 call dein#end()
 " }}}
@@ -57,6 +57,7 @@ set pastetoggle=<F5>
 "inoremap <Right> <Nop>
 
 syntax on
+set background=dark
 set t_Co=256
 set laststatus=2
 
@@ -73,13 +74,3 @@ autocmd FileType go setl ts=4 sw=4 noet
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 " }}}
 
-" {{{ function
-function! EasyMode ()
-  noremap <Up> <Up>
-  noremap <Down> <Down>
-  noremap <Left> <Left>
-  noremap <Right> <Right>
-endfunction
-
-command! EasyMode call EasyMode()
-"}}}
