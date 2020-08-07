@@ -1,0 +1,13 @@
+[[plugins]]
+repo = 'ap/vim-css-color'
+
+[[plugins]]
+repo = 'cespare/vim-toml'
+on_ft = ['toml']
+
+#[[plugins]]
+#repo = 'fatih/vim-go'
+#on_ft = ['go']
+#hook_add = """
+#let g:go_fmt_autosave = 1
+#"""

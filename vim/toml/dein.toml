@@ -14,15 +14,7 @@ repo = 'Shougo/context_filetype.vim'
 [[plugins]]
 repo = 'w0rp/ale'
 hook_add = """
-  let g:ale_sign_error = '✘'
-  let g:ale_sign_warning = '⚠'
-  let g:ale_sign_column_always = 1
-  let g:ale_linters = {
-\   'python': ['flake8'],
-\   'typescript': ['tsuquyomi'],
-\}
-  nmap <silent> <C-k> <Plug>(ale_previous_wrap)  # 前のエラーに
-  nmap <silent> <C-j> <Plug>(ale_next_wrap)  # 次のエラーに
+  source /home/ucpr/.vim/toml/plugins/ale.rc.vim
 """
 
 [[plugins]]
@@ -46,12 +38,6 @@ hook_add = """
   nmap <F8> :TagbarToggle<CR>
 """
 
-#[[plugins]]
-#repo = 'ncm2/float-preview.nvim'
-#hook_add = """
-#let g:float_preview#docked = 1
-#"""
-
 [[plugins]]
 repo = 'morhetz/gruvbox'
 hook_add = """
@@ -64,40 +50,8 @@ repo = 'neoclide/coc.nvim'
 # on_i = 1
 rev = 'release'
 hook_add = '''
-
-set updatetime=100
-set signcolumn=yes
-function! s:show_docmentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-autocmd CursorHold * silent call CocActionAsync('highlight')
-nmap <leader> rn <Plug>(coc-rename)
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-" "nnoremap <silent> K :call CocAction('doHover')<CR>
-nnoremap <silent> K :call <SID>show_docmentation()<CR>
-nnoremap <silent> F :call CocAction('format')<CR>
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-inoremap <silent><expr> <Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
-      \ coc#refresh()
+  source /home/ucpr/.vim/toml/plugins/coc.rc.vim
 '''
-
-[[plugins]]
-repo = 'ap/vim-css-color'
 
 [[plugins]]
 repo = 'simeji/winresizer'
@@ -107,28 +61,10 @@ hook_add = """
 """
 
 [[plugins]]
-repo = 'cespare/vim-toml'
+repo = 'easymotion/vim-easymotion'
+hook_add = """
+nmap s <Plug>(easymotion-overwin-f2)
+"""
 
 [[plugins]]
-repo = 'iberianpig/tig-explorer.vim'
-hook_add = """
-let g:tig_explorer_keymap_edit    = '<C-o>'
-let g:tig_explorer_keymap_tabedit = '<C-t>'
-let g:tig_explorer_keymap_split   = '<C-s>'
-let g:tig_explorer_keymap_vsplit  = '<C-v>'
-
-" open tig with current file
-nnoremap <Leader>T :TigOpenCurrentFile<CR>
-" open tig with Project root path
-nnoremap <Leader>t :TigOpenProjectRootDir<CR>
-" open tig grep
-nnoremap <Leader>g :TigGrep<CR>
-" resume from last grep
-nnoremap <Leader>r :TigGrepResume<CR>
-" open tig grep with the selected word
-vnoremap <Leader>g y:TigGrep<Space><C-R>"<CR>
-" open tig grep with the word under the cursor
-nnoremap <Leader>cg :<C-u>:TigGrep<Space><C-R><C-W><CR>
-" open tig blame with current file
-nnoremap <Leader>b :TigBlame<CR>
-"""
+repo = 'ntpeters/vim-better-whitespace'
