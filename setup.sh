@@ -5,7 +5,7 @@ cat << EOF
      _       _    __ _ _
   __| | ___ | |_ / _(_) | ___  ___
  / _  |/ _ \| __| |_| | |/ _ \/ __|
-| (_| | (_) | |_|  _| | |  __/\__ \
+| (_| | (_) | |_|  _| | |  __/\__ \ 
  \__,_|\___/ \__|_| |_|_|\___||___/
 
   https://github.com/ucpr/dotfiles
@@ -21,7 +21,7 @@ if [ "$?" -eq 1 ]
 then
   sudo apt update -y -q
   sudo apt upgrade -y -q
-  sudo apt install -y -q build-essential curl vim zsh git
+  sudo apt install -y -q build-essential curl zsh git
 fi
 
 # Archlinux
@@ -36,6 +36,7 @@ fi
 
 # Create symbolic link
 echo "Create symbolic link"
+mkdir ~/.config
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.Xmodmap ~/.Xmodmap
@@ -58,6 +59,10 @@ echo "Clone dein.vim"
 mkdir -p ~/.vim/dein/repos/github.com/Shougo/dein.vim
 git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
 
+if (type "vim" > /dev/null 2>&1); then
+  vim -c "call dein#install() |q"
+fi
+
 # Tmux Plugin Manager
 echo "Clone Tmux Plugin Manager"
 mkdir -p ~/.tmux/plugins
@@ -68,4 +73,3 @@ echo "Clone anyenv"
 git clone https://github.com/anyenv/anyenv ~/.anyenv
 export PATH="$HOME/.anyenv/bin:$PATH"
 anyenv init
-anyenv install --init
