@@ -1,41 +1,14 @@
 # dotfiles
 my dotfiles.
 
-## terminal
-### require
-- zsh
-- networkmanager
-### config
-- .zshrc
-- .aliases
-  - proxyの自動切り替えが `nmcli (NetworkManager)` に依存
+## Init
+```
+$ git clone https://github.com/ucpr/dotfiles ~/.dotfiles
+$ cd ~/.dotfiles
+$ ./setup.sh
+```
 
-## nvim
-### require
-- neovim
-- python-neovim
-### config
-- nvim/init.vim
-- nvim/toml/*.toml
-- nvim/toml/plugins/*.rc.vim
-- nvim/LanguageClientSetting.json
-
-## Xのリソース設定
-### require
-- urxvt-terminal
-### config
-- .Xresources
-- .Xmodmap
-
-## curl
-- .curlrc
-
-## wget
-- .wgetrc
-
-## tmux
-- .tmux.conf
-
-## latexmk
-- .latexmkrc
-
+## Caution
+- Vim
+  - If you use coc.nvim with vim, you need to install a node
+  - If you want to use coc.nvim with vim, you need to enable python3 and lua
