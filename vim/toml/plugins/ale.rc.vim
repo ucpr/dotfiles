@@ -5,5 +5,5 @@ let g:ale_linters = {
 \  'python': ['flake8'],
 \  'typescript': ['tsuquyomi'],
 \}
-nmap <silent> <C-k> <Plug>(ale_previous_wrap) 
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
