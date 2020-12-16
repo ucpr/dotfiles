@@ -1,61 +1,28 @@
 {
+  "suggest.keepCompleteopt": true,
+  "suggest.noselect": false,
+  "suggest.preferCompleteThanJumpPlaceholder": true,
   "languageserver": {
-    "ccls": {
-      "command": "ccls",
-      "filetypes": [
-        "c",
-        "cpp",
-        "objc",
-        "objcpp"
-      ],
-      "rootPatterns": [
-        ".ccls",
-        "compile_commands.json",
-        ".vim/",
-        ".git/",
-        ".hg/"
-      ],
-      "initializationOptions": {
-        "cache": {
-          "directory": "/tmp/ccls"
-        },
-        "clang": {
-          "resourceDir": "/Library/Developer/CommandLineTools/usr/lib/clang/11.0.0",
-          "extraArgs": [
-            "-isystem",
-            "/Library/Developer/CommandLineTools/usr/include/c++/v1",
-            "-I",
-            "/Library/Developer/CommandLineTools/usr/include/"
-          ]
-        }
-      }
-    },
-    "dls": {
-      "command": "~/.dub/packages/.bin/dls-latest/dls",
-      "args": [
-        "--stdio"
-      ],
-      "filetypes": [
-        "d"
-      ],
-      "trace.server": "off",
-      "rootPatterns": [
-        "dub.json",
-        "dub.sdl"
-      ],
-      "initializationOptions": {}
-    },
-    "bash": {
+   "bash": {
       "command": "bash-language-server",
       "args": [
         "start"
       ],
       "filetypes": [
-        "sh"
+        "sh",
+        "bash"
       ],
       "ignoredRootPaths": [
         "~"
       ]
+    },
+    "golang": {
+      "command": "gopls",
+      "rootPatterns": ["go.mod", ".vim/", ".git/", ".hg/"],
+      "filetypes": ["go"]
     }
-  }
+  },
+  "snippets.ultisnips.directories": [
+    "UltiSnips"
+  ]
 }
