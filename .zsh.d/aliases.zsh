@@ -12,6 +12,7 @@ alias sl='ls'
 
 alias python="python3"
 alias py="python3"
+alias p="python"
 alias py-reqirements='pip freeze > requirements.txt'
 
 alias grep='grep --color=auto'
@@ -20,7 +21,8 @@ alias egrep='egrep --color=auto'
 
 alias pdf-apvlv='apvlv'
 
-alias apv=/usr/lib/jvm/java-8-openjdk/bin/appletviewer
+alias e2j='trans en:ja'
+alias j2e='trans ja:en'
 
 ## branchをpecoで
 alias -g bp='`git branch | peco --prompt "GIT BRANCH>" | head -n 1 | sed -e "s/^\*\s*//g"`'
