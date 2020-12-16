@@ -5,9 +5,10 @@ repo = 'ap/vim-css-color'
 repo = 'cespare/vim-toml'
 on_ft = ['toml']
 
-#[[plugins]]
-#repo = 'fatih/vim-go'
-#on_ft = ['go']
-#hook_add = """
-#let g:go_fmt_autosave = 1
-#"""
+[[plugins]]
+repo = 'mattn/vim-goimports'
+on_ft = ['go']
+hook_add = """
+let g:goimports_simplify = 1
+let g:goimports = 1
+"""

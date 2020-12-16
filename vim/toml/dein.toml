@@ -12,7 +12,7 @@ repo = 'cohama/lexima.vim'
 repo = 'Shougo/context_filetype.vim'
 
 [[plugins]]
-repo = 'w0rp/ale'
+repo = 'dense-analysis/ale'
 hook_add = """
   source /home/ucpr/.vim/toml/plugins/ale.rc.vim
 """
@@ -28,12 +28,6 @@ hook_add = """
 
 [[plugins]]
 repo = 'Shougo/echodoc.vim'
-
-[[plugins]]
-repo = 'majutsushi/tagbar'
-hook_add = """
-  nmap <F8> :TagbarToggle<CR>
-"""
 
 [[plugins]]
 repo = 'morhetz/gruvbox'
