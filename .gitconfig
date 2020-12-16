@@ -1,0 +1,16 @@
+[user]
+	email = contact@ucpr.dev
+	name = ucpr
+[core]
+	editor = vim
+[color]
+	ui = true
+[alias]
+	ck = checkout
+	ss = status
+	df = diff
+	co = commit
+	br = branch
+	graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
+[fetch]
+	prune = true
