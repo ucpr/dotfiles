@@ -5,7 +5,7 @@ cat << EOF
      _       _    __ _ _
   __| | ___ | |_ / _(_) | ___  ___
  / _  |/ _ \| __| |_| | |/ _ \/ __|
-| (_| | (_) | |_|  _| | |  __/\__ \ 
+| (_| | (_) | |_|  _| | |  __/\__ \
  \__,_|\___/ \__|_| |_|_|\___||___/
 
   https://github.com/ucpr/dotfiles
@@ -38,6 +38,7 @@ fi
 echo "Create symbolic link"
 mkdir ~/.config
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
+ln -s ~/.dotfiles/.zsh.d ~/.zsh.d
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.Xmodmap ~/.Xmodmap
 ln -s ~/.dotfiles/.vimrc ~/.vimrc
@@ -48,11 +49,7 @@ ln -s ~/.dotfiles/ScreenLayout ~/.config/ScreenLayout
 ln -s ~/.dotfiles/i3 ~/.config/i3
 ln -s ~/.dotfiles/alacritty ~/.config/alacritty
 ln -s ~/.dotfiles/polybar ~/.config/polybar
-
-# Setting git
-echo "Setting git"
-git config --global user.email "contact@ucpr.dev"
-git config --global user.name "ucpr"
+ln -s ~/.dotfiles/.gitconfig ~/.gitconfig
 
 # dein.vim
 echo "Clone dein.vim"
