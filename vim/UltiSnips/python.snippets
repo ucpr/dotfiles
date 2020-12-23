@@ -1,0 +1,16 @@
+snippet logger "add init Logger" b
+from logging import getLogger, StreamHandler, DEBUG
+
+logger = getLogger(__name__)
+handler = StreamHandler()
+handler.setLevel(DEBUG)
+logger.setLevel(DEBUG)
+logger.addHandler(handler)
+logger.propagate = False
+endsnippet
+
+snippet async_test_init "async test init" b
+@pytest.mark.asyncio
+async def $1(mocker: MockFixture) -> None:
+    $2
+endsnippet

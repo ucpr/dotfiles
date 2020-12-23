@@ -30,9 +30,10 @@ hook_add = """
 repo = 'Shougo/echodoc.vim'
 
 [[plugins]]
-repo = 'morhetz/gruvbox'
+repo = 'joshdick/onedark.vim'
 hook_add = """
-  colorscheme gruvbox
+  syntax on
+  colorscheme onedark
 """
 
 [[plugins]]
