@@ -1,5 +1,0 @@
-[[plugins]]
-repo = 'morhetz/gruvbox'
-hook_add = """
-  colorscheme gruvbox
-"""

@@ -31,15 +31,15 @@ inoremap <expr> '  pumvisible() ? deoplete#close_popup() : "'"
 
 " Prams of deoplete
 let g:deoplete#enable_at_startup = 1
-let g:deoplete#auto_complete_delay = 0
-let g:deoplete#keyword_patterns = {}
-let g:deoplete#keyword_patterns._ = '[a-zA-Z_]\k*\(?'
-let g:deoplete#keyword_patterns.tex = '[^\w|\s][a-zA-Z_]\w*'
-let g:deoplete#omni#input_patterns = {}
-let g:deoplete#omni#input_patterns.python = ''
-let g:deoplete#omni#functions = {}
-let g:deoplete#enable_camel_case = 1
-let g:deoplete#skip_chars = ['(', ')']
+"let g:deoplete#auto_complete_delay = 0
+"let g:deoplete#keyword_patterns = {}
+"let g:deoplete#keyword_patterns._ = '[a-zA-Z_]\k*\(?'
+"let g:deoplete#keyword_patterns.tex = '[^\w|\s][a-zA-Z_]\w*'
+"let g:deoplete#omni#input_patterns = {}
+"let g:deoplete#omni#input_patterns.python = ''
+"let g:deoplete#omni#functions = {}
+"let g:deoplete#enable_camel_case = 1
+"let g:deoplete#skip_chars = ['(', ')']
 
 " Hidden autocomplete preview
 set completeopt-=preview

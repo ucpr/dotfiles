@@ -1,17 +1,75 @@
 [[plugins]]
-repo = 'baabelfish/nvim-nim'
-on_ft = ['nim']
+repo = 'cohama/lexima.vim'
 
 [[plugins]]
-repo = 'zchee/deoplete-jedi'
-depends = ['deoplete.nvim']
-on_ft = ['python']
+repo = 'Shougo/context_filetype.vim'
 
 [[plugins]]
-repo = 'fatih/vim-go'
+repo = 'Shougo/echodoc.vim'
+
+[[plugins]]
+repo = 'simeji/winresizer'
 hook_add = '''
-  let g:go_fmt_command = "goimports"
-
-  let g:go_def_mapping_enabled = 0
-  let g:go_doc_keywordprg_enabled = 0
+  let g:winresizer_vert_resize = 1
+  let g:winresizer_horiz_resize = 1
 '''
+
+[[plugins]]
+repo = 'easymotion/vim-easymotion'
+hook_add = '''
+nmap s <Plug>(easymotion-overwin-f2)
+'''
+
+[[plugins]]
+repo = 'ntpeters/vim-better-whitespace'
+
+[[plugins]]
+repo = 'cespare/vim-toml'
+on_ft = ['toml']
+
+[[plugins]]
+repo = 'mattn/vim-goimports'
+on_ft = ['go']
+hook_add = '''
+  let g:goimports_simplify = 1
+  let g:goimports = 1
+'''
+
+[[plugins]]
+repo = 'elzr/vim-json'
+on_ft = 'json'
+hook_add = '''
+  let g:vim_json_syntax_conceal = 0
+'''
+
+# <space>// -> ...
+[[plugins]]
+repo = 'osyo-manga/vim-over'
+hook_add = '''
+  nnoremap <silent> <Space>// :OverCommandLine<CR>%s/
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+hook_add = '''
+  imap <C-j>     <Plug>(neosnippet_expand_or_jump)
+  smap <C-j>     <Plug>(neosnippet_expand_or_jump)
+  xmap <C-j>     <Plug>(neosnippet_expand_target)
+
+  smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+    \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+
+  if has('conceal')
+    set conceallevel=2 concealcursor=i
+  endif
+
+  let g:neosnippet#enable_snipmate_compatibility = 1
+  " let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+depends = ['neosnippet']
+
+[[plugins]]
+repo = 'thinca/vim-quickrun'
