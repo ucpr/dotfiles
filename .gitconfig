@@ -1,16 +1,37 @@
 [user]
 	email = contact@ucpr.dev
 	name = ucpr
+[ghq]
+  root = ~/.ghq
+  root = ~/.go/src
+[pager]
+  diff = delta
+  log = delta
+  reflog = delta
+  show = delta
+[delta]
+  plus-style = "syntax #012800"
+  minus-style = "syntax #340001"
+  syntax-theme = Monokai Extended
+  navigate = true
+[interactive]
+  diffFilter = delta --color-only
+[commit]
+  template = ~/.gitmessage
 [core]
 	editor = vim
 [color]
 	ui = true
+  excludeFile = ""
 [alias]
 	ck = checkout
 	ss = status
 	df = diff
 	co = commit
 	br = branch
+  p = push
+  ph = push origin head
 	graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
+  ucat = !"git ls-files --others --exclude-standard | xargs bat"
 [fetch]
 	prune = true
