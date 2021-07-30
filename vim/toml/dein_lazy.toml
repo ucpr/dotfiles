@@ -1,14 +1,43 @@
 [[plugins]]
-repo = 'ap/vim-css-color'
-
-[[plugins]]
 repo = 'cespare/vim-toml'
 on_ft = ['toml']
 
 [[plugins]]
-repo = 'mattn/vim-goimports'
-on_ft = ['go']
+repo = 'ntpeters/vim-better-whitespace'
+
+[[plugins]]
+repo = 'simeji/winresizer'
 hook_add = """
-let g:goimports_simplify = 1
-let g:goimports = 1
+  let g:winresizer_vert_resize = 1
+  let g:winresizer_horiz_resize = 1
 """
+
+[[plugins]]
+repo = 'easymotion/vim-easymotion'
+hook_add = """
+nmap s <Plug>(easymotion-overwin-f2)
+"""
+
+[[plugins]]
+repo = 'Shougo/echodoc.vim'
+
+[[plugins]]
+repo = 'cohama/lexima.vim'
+
+[[plugins]]
+repo = 'junegunn/fzf'
+build = './install --bin'
+merged = '0'
+
+[[plugins]]
+repo = 'junegunn/fzf.vim'
+depends = 'fzf'
+hook_add = '''
+nnoremap <silent> ,a :<C-u>Ag<CR>
+nnoremap <silent> <C-f> :<C-u>Files<CR>
+nnoremap <silent> <C-b> :<C-u>Buffers<CR>
+nnoremap <silent> <C-m> :<C-u>History<CR>
+'''
+
+[[plugins]]
+repo = 'kyoh86/vim-go-coverage'

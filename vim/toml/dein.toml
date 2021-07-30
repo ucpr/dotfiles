@@ -1,62 +1,23 @@
 [[plugins]]
-repo = 'Shougo/dein.vim'
-
-[[plugins]]
-repo = 'Shougo/vimproc.vim'
-build = 'make'
-
-[[plugins]]
-repo = 'cohama/lexima.vim'
-
-[[plugins]]
 repo = 'Shougo/context_filetype.vim'
 
 [[plugins]]
-repo = 'dense-analysis/ale'
-hook_add = """
-  source /home/ucpr/.vim/toml/plugins/ale.rc.vim
-"""
-
-[[plugins]]
-repo = 'tpope/vim-fugitive'
+repo = 'joshdick/onedark.vim'
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
 hook_add = """
-  source /home/ucpr/.vim/toml/plugins/lightline.rc.vim
-"""
-
-[[plugins]]
-repo = 'Shougo/echodoc.vim'
-
-[[plugins]]
-repo = 'joshdick/onedark.vim'
-hook_add = """
-  syntax on
-  colorscheme onedark
+  source /Users/s11591/.vim/toml/plugins/lightline.rc.vim
 """
 
 [[plugins]]
 repo = 'neoclide/coc.nvim'
-# merge = 0
-# on_i = 1
-rev = 'release'
+merge = 0
+on_i = 1
+#rev = 'release'
 hook_add = '''
-  source /home/ucpr/.vim/toml/plugins/coc.rc.vim
+  source /Users/s11591/.vim/toml/plugins/coc.rc.vim
 '''
 
 [[plugins]]
-repo = 'simeji/winresizer'
-hook_add = """
-  let g:winresizer_vert_resize = 1
-  let g:winresizer_horiz_resize = 1
-"""
-
-[[plugins]]
-repo = 'easymotion/vim-easymotion'
-hook_add = """
-nmap s <Plug>(easymotion-overwin-f2)
-"""
-
-[[plugins]]
-repo = 'ntpeters/vim-better-whitespace'
+repo = 'vim-denops/denops.vim'

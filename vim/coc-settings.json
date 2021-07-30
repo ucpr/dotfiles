@@ -3,26 +3,16 @@
   "suggest.noselect": false,
   "suggest.preferCompleteThanJumpPlaceholder": true,
   "languageserver": {
-   "bash": {
-      "command": "bash-language-server",
-      "args": [
-        "start"
-      ],
-      "filetypes": [
-        "sh",
-        "bash"
-      ],
-      "ignoredRootPaths": [
-        "~"
-      ]
-    },
     "golang": {
       "command": "gopls",
-      "rootPatterns": ["go.mod", ".vim/", ".git/", ".hg/"],
       "filetypes": ["go"]
     }
   },
   "snippets.ultisnips.directories": [
     "UltiSnips"
-  ]
+  ],
+  "go.goplsOptions":{
+    "usePlaceholders": true,
+    "completeUnimported": true
+  }
 }

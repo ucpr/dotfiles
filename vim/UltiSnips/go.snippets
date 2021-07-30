@@ -1,0 +1,45 @@
+# testing --------------------------------------------
+snippet test_package "test packages"b
+"testing"
+"github.com/stretchr/testify/assert"
+endsnippet
+
+snippet test_func "generate table driven test func"b
+func Test$1_$2(t *testing.T) {
+	patterns := []struct {
+		name     string
+		in       $3
+		out      $4
+		injector func()
+		err      error
+	}{
+		{
+			name: "success",
+			in: $5,
+			out: $6,
+			injector: func(){$7}
+			err: nil,
+		},
+	}
+
+	for _, tt := range patterns {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			asserts := assert.New(t)
+			tt.injector()
+			// asserts.Equal(p.err, nil)
+			$8
+		})
+	}
+}
+endsnippet
+
+snippet mock_new "new mock controller"b
+mockCtrl := gomock.NewController(t)
+defer mockCtrl.Finish()
+endsnippet
+
+# general
+snippet package_main "package main" b
+package main
+endsnippet
