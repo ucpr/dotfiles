@@ -3,7 +3,6 @@
   name = ucpr
 [ghq]
   root = ~/.ghq
-  root = ~/.go/src
 [pager]
   diff = delta
   log = delta
