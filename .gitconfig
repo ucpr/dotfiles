@@ -1,6 +1,6 @@
 [user]
-	email = contact@ucpr.dev
-	name = ucpr
+  email = contact@ucpr.dev
+  name = ucpr
 [ghq]
   root = ~/.ghq
   root = ~/.go/src
@@ -19,19 +19,19 @@
 [commit]
   template = ~/.gitmessage
 [core]
-	editor = vim
+  editor = vim
 [color]
-	ui = true
+  ui = true
   excludeFile = ""
 [alias]
-	ck = checkout
-	ss = status
-	df = diff
-	co = commit
-	br = branch
+  ck = checkout
+  ss = status
+  df = diff
+  co = commit
+  br = branch
   p = push
   ph = push origin head
-	graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
+  graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
   ucat = !"git ls-files --others --exclude-standard | xargs bat"
 [fetch]
-	prune = true
+  prune = true

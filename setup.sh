@@ -37,36 +37,38 @@ fi
 # Create symbolic link
 echo "Create symbolic link"
 mkdir ~/.config
-ln -s ~/.dotfiles/.zshrc ~/.zshrc
-ln -s ~/.dotfiles/.zsh.d ~/.zsh.d
-ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
-ln -s ~/.dotfiles/.Xmodmap ~/.Xmodmap
-ln -s ~/.dotfiles/.vimrc ~/.vimrc
-ln -s ~/.dotfiles/vim ~/.vim
-ln -s ~/.dotfiles/nvim ~/.config/nvim
-ln -s ~/.dotfiles/ranger ~/.config/ranger
-ln -s ~/.dotfiles/ScreenLayout ~/.config/ScreenLayout
-ln -s ~/.dotfiles/i3 ~/.config/i3
-ln -s ~/.dotfiles/alacritty ~/.config/alacritty
-ln -s ~/.dotfiles/polybar ~/.config/polybar
-ln -s ~/.dotfiles/.gitconfig ~/.gitconfig
+ln -s `pwd`/.vimrc ~/.vimrc
+#ln -s `pwd`/vim ~/.vim
+#ln -s `pwd`/.zshrc ~/.zshrc
+#ln -s `pwd`/.zsh.d ~/.zsh.d
+#ln -s `pwd`/.tmux.conf ~/.tmux.conf
+#ln -s `pwd`/.Xmodmap ~/.Xmodmap
+#ln -s `pwd`/.vimrc ~/.vimrc
+#ln -s `pwd`/vim ~/.vim
+#ln -s `pwd`/nvim ~/.config/nvim
+#ln -s `pwd`/ranger ~/.config/ranger
+#ln -s `pwd`/ScreenLayout ~/.config/ScreenLayout
+#ln -s `pwd`/i3 ~/.config/i3
+#ln -s `pwd`/alacritty ~/.config/alacritty
+#ln -s `pwd`/polybar ~/.config/polybar
+#ln -s `pwd`/.gitconfig ~/.gitconfig
 
 # dein.vim
-echo "Clone dein.vim"
-mkdir -p ~/.vim/dein/repos/github.com/Shougo/dein.vim
-git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
-
-if (type "vim" > /dev/null 2>&1); then
-  vim -c "call dein#install() |q"
-fi
-
-# Tmux Plugin Manager
-echo "Clone Tmux Plugin Manager"
-mkdir -p ~/.tmux/plugins
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-# anyenv
-echo "Clone anyenv"
-git clone https://github.com/anyenv/anyenv ~/.anyenv
-export PATH="$HOME/.anyenv/bin:$PATH"
-anyenv init
+#echo "Clone dein.vim"
+#mkdir -p ~/.vim/dein/repos/github.com/Shougo/dein.vim
+#git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
+#
+#if (type "vim" > /dev/null 2>&1); then
+#  vim -c "call dein#install() |q"
+#fi
+#
+## Tmux Plugin Manager
+#echo "Clone Tmux Plugin Manager"
+#mkdir -p ~/.tmux/plugins
+#git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+#
+## anyenv
+#echo "Clone anyenv"
+#git clone https://github.com/anyenv/anyenv ~/.anyenv
+#export PATH="$HOME/.anyenv/bin:$PATH"
+#anyenv init
