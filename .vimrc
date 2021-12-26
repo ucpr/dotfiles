@@ -1,19 +1,39 @@
+" dein setting
 if &compatible
   set nocompatible               " Be iMproved
 endif
 
-set runtimepath+=/Users/s11591/.cache/dein/repos/github.com/Shougo/dein.vim
-" test denops
-set runtimepath^=/Users/s11591/.go/src/github.com/ucpr/denops-go-test-cover
-let g:denops#debug=1
-nnoremap <C-d><C-r> :call denops#server#restart()<CR>
+set runtimepath+=/Users/ucpr/.cache/dein/repos/github.com/Shougo/dein.vim
 
-call dein#begin('/Users/s11591/.cache/dein')
+call dein#begin('/Users/ucpr/.cache/dein')
 
-call dein#add('/Users/s11591/.cache/dein/repos/github.com/Shougo/dein.vim')
+call dein#add('/Users/ucpr/.cache/dein/repos/github.com/Shougo/dein.vim')
 
-call dein#load_toml('/Users/s11591/.vim/toml/dein.toml', {'lazy': 0})
-call dein#load_toml('/Users/s11591/.vim/toml/dein_lazy.toml', {})
+call dein#add('prabirshrestha/vim-lsp')
+call dein#add('prabirshrestha/async.vim')
+call dein#add('prabirshrestha/asyncomplete.vim')
+call dein#add('prabirshrestha/asyncomplete-lsp.vim')
+call dein#add('mattn/vim-lsp-settings')
+call dein#add('SirVer/ultisnips')
+call dein#add('thomasfaingnaert/vim-lsp-snippets')
+call dein#add('thomasfaingnaert/vim-lsp-ultisnips')
+
+call dein#add('mattn/vim-goimports')
+call dein#add('kyoh86/vim-go-coverage')
+call dein#add('mattn/vim-goaddtags')
+call dein#add('mattn/vim-goimpl')
+call dein#add('mattn/vim-gomod')
+
+call dein#add('ulwlu/elly.vim')
+
+call dein#add('Shougo/context_filetype.vim')
+call dein#add('ntpeters/vim-better-whitespace')
+call dein#add('simeji/winresizer')
+call dein#add('easymotion/vim-easymotion')
+call dein#add('Shougo/echodoc.vim')
+call dein#add('cohama/lexima.vim')
+call dein#add('markonm/traces.vim')
+call dein#add('kamykn/spelunker.vim')
 
 " Required:
 call dein#end()
@@ -22,11 +42,73 @@ call dein#end()
 filetype plugin indent on
 syntax enable
 
-" If you want to install not installed plugins on startup.
-"if dein#check_install()
-"  call dein#install()
-"endif
+" ---
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=no
+    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gs <plug>(lsp-document-symbol-search)
+    nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
 
+    let g:lsp_diagnostics_enabled = 1
+    let g:lsp_diagnostics_signs_enabled = 1
+    let g:lsp_document_highlight_enabled = 1
+    let g:lsp_document_code_action_signs_enabled = 1
+
+    let g:lsp_format_sync_timeout = 1000
+    autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+
+    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
+    function! s:check_back_space() abort
+        let col = col('.') - 1
+        return !col || getline('.')[col - 1]  =~ '\s'
+    endfunction
+    inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ asyncomplete#force_refresh()
+    inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+    inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
+endfunction
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+" For snippets
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+set completeopt+=menuone
+
+autocmd BufWritePre *.go call execute(['LspCodeActionSync source.organizeImports', 'LspDocumentFormatSync'])
+
+colorscheme elly
+set termguicolors
+
+let g:enable_spelunker_vim = 1
+let g:spelunlker_check_type = 2
+
+inoremap <C-l> <C-r>=lexima#insmode#leave(1, '<LT>C-G>U<LT>RIGHT>')<CR>
+
+let g:goimports = 1
+let g:goimports_show_loclist = 0
+" ---
+
+" general setting
 set number
 set cursorline
 set cursorcolumn
@@ -66,7 +148,6 @@ inoremap <F5> <nop>
 set pastetoggle=<F5>
 
 syntax on
-colorscheme onedark
 set background=dark
 set t_Co=256
 set laststatus=2
