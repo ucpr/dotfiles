@@ -22,6 +22,7 @@ brew "git-delta"
 brew "go"
 brew "deno"
 
+cask "google-cloud-sdk"
 cask "1password"
 cask "discord"
 cask "slack"
