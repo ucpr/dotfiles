@@ -87,6 +87,22 @@ augroup lsp_install
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
 
+let g:lsp_settings = {}
+let g:lsp_settings['gopls'] = {
+  \  'workspace_config': {
+  \    'usePlaceholders': v:true,
+  \    'analyses': {
+  \      'fillstruct': v:true,
+  \    },
+  \  },
+  \  'initialization_options': {
+  \    'usePlaceholders': v:true,
+  \    'analyses': {
+  \      'fillstruct': v:true,
+  \    },
+  \  },
+  \}
+
 " For snippets
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
@@ -98,6 +114,8 @@ autocmd BufWritePre *.go call execute(['LspCodeActionSync source.organizeImports
 
 colorscheme onedark
 set termguicolors
+
+nmap s <Plug>(easymotion-overwin-f2)
 
 let g:enable_spelunker_vim = 1
 let g:spelunlker_check_type = 2
@@ -152,6 +170,8 @@ set background=dark
 set t_Co=256
 set laststatus=2
 set showtabline=2
+
+set statusline=%f\ %y%m\ %r%h%w%=[%{&fileencoding!=''?&fileencoding:&encoding},%{&ff}]\ [Pos\ %02l,%02c]\ [%p%%/%L]
 
 set backspace=eol,indent,start
 inoremap <C-f><C-f> <ESC>

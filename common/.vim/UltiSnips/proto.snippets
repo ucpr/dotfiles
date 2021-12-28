@@ -1,0 +1,15 @@
+snippet rpc "rpc definition" b
+rpc $1($2) returns ($3) {$4}
+endsnippet
+
+snippet http "grpc gateway definition" b
+option(google.api.http) = {
+	// http_method: endpoint
+	$1: "$2"
+	// body: "*"
+};
+endsnippet
+
+snippet message "message definition" b
+message $1 {$2}
+endsnippet
