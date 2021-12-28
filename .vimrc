@@ -24,7 +24,7 @@ call dein#add('mattn/vim-goaddtags')
 call dein#add('mattn/vim-goimpl')
 call dein#add('mattn/vim-gomod')
 
-call dein#add('ulwlu/elly.vim')
+call dein#add('joshdick/onedark.vim')
 
 call dein#add('Shougo/context_filetype.vim')
 call dein#add('ntpeters/vim-better-whitespace')
@@ -96,7 +96,7 @@ set completeopt+=menuone
 
 autocmd BufWritePre *.go call execute(['LspCodeActionSync source.organizeImports', 'LspDocumentFormatSync'])
 
-colorscheme elly
+colorscheme onedark
 set termguicolors
 
 let g:enable_spelunker_vim = 1
