@@ -96,6 +96,11 @@ uncommited-staged-files() {
 zle -N uncommited-staged-files
 bindkey '^U' uncommited-staged-files
 
+gcloud-switch-project() {
+  local f=$(gcloud config configurations list | awk '{if($1 != "NAME") {print $1}}' | fzf --preview "" | xargs echo)
+  gcloud config configurations activate "${f}"
+}
+
 # zinit
 source ~/.zinit/bin/zinit.zsh
 
