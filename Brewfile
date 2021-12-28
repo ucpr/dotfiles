@@ -1,7 +1,6 @@
 tap 'homebrew/cask'
 tap 'homebrew/core'
 tap "homebrew/cask-fonts"
-tap "koekeishiya/formulae"
 cask_args appdir: "/Applications"
 
 brew "coreutils"
@@ -17,8 +16,7 @@ brew "wget"
 brew "jq"
 brew "mas"
 brew "ripgrep"
-brew "yabai"
-brew "skhd"
+brew "git-delta"
 brew "go"
 brew "deno"
 
