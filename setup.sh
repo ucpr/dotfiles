@@ -3,10 +3,10 @@
 cat << EOF
 
      _       _    __ _ _
-  __| | ___ | |_ / _(_) | ___  ___
- / _  |/ _ \| __| |_| | |/ _ \/ __|
-| (_| | (_) | |_|  _| | |  __/\__ \
- \__,_|\___/ \__|_| |_|_|\___||___/
+  __| | ___ | |_ / _(_) | ___  ___ 
+ / _  |/ _ \| __| |_| | |/ _ \/ __| 
+| (_| | (_) | |_|  _| | |  __/\__ \ 
+ \__,_|\___/ \__|_| |_|_|\___||___/ 
 
   https://github.com/ucpr/dotfiles
 
@@ -15,60 +15,82 @@ EOF
 
 # ------------------------- init ----------------------------- #
 
-# Ubuntu
-echo "$(cat /etc/issue)" | grep "Ubuntu"
-if [ "$?" -eq 1 ]
-then
-  sudo apt update -y -q
-  sudo apt upgrade -y -q
-  sudo apt install -y -q build-essential curl zsh git
+# For Linux
+if [ -e "/etc/issue" ]; then
+  # Ubuntu
+  echo "$(cat /etc/issue)" | grep "Ubuntu"
+  if [ "$?" -eq 1 ]; then
+    sudo apt update -y -q
+    sudo apt upgrade -y -q
+    sudo apt install -y -q build-essential curl zsh git
+  fi
+
+  # Archlinux
+  echo "$(cat /etc/issue)" | grep "Arch Linux"
+  if [ "$?" -eq 1 ]; then
+    sudo pacman -Syu --noconfirm
+    sudo pacman -S --noconfirm git vim zsh curl
+  fi
 fi
 
-# Archlinux
-echo "$(cat /etc/issue)" | grep "Arch Linux"
-if [ "$?" -eq 1 ]
-then
-  sudo pacman -Syu --noconfirm
-  sudo pacman -S --noconfirm git vim zsh curl
+# For Mac
+if (type "sw_vers" > /dev/null 2>&1); then
+  echo "$(sw_vers)" | grep "macOS"
+  if [ "$?" -eq 1 ]; then
+    # ここに初期化処理
+    echo ""
+  fi
 fi
+
+# ---------------------- Functions -------------------------- #
+
+create_symbolic_link() {
+  echo "Create symbolic link"
+  if [ -e ~/.config ]; then
+    echo "exist ~/.config"
+  else
+    mkdir ~/.config
+  fi
+
+  ln -s `pwd`/common/.vimrc ~/.vimrc
+  ln -s `pwd`/common/.zshrc ~/.zshrc
+  ln -s `pwd`/common/.tmux.conf ~/.tmux.conf
+  ln -s `pwd`/common/.gitconfig ~/.gitconfig
+  ln -s `pwd`/common/.gitmessage ~/.gitmessage
+
+  echo "Done"
+}
+
+install_dein_vim() {
+  echo "Clone dein.vim"
+
+  if [ -e ~/.config/vim/dein/repos/github.com/Shougo/dein.vim ]; then
+    echo "exist ~/.config/vim/dein/repos/github.com/Shougo/dein.vim "
+  else
+    mkdir -p ~/.config/vim/dein/repos/github.com/Shougo/dein.vim
+  fi
+  git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
+
+  echo "Done"
+}
 
 # ------------------------------------------------------------ #
 
-# Create symbolic link
-echo "Create symbolic link"
-mkdir ~/.config
-ln -s `pwd`/.vimrc ~/.vimrc
-#ln -s `pwd`/vim ~/.vim
-#ln -s `pwd`/.zshrc ~/.zshrc
-#ln -s `pwd`/.zsh.d ~/.zsh.d
-#ln -s `pwd`/.tmux.conf ~/.tmux.conf
-#ln -s `pwd`/.Xmodmap ~/.Xmodmap
-#ln -s `pwd`/.vimrc ~/.vimrc
-#ln -s `pwd`/vim ~/.vim
-#ln -s `pwd`/nvim ~/.config/nvim
-#ln -s `pwd`/ranger ~/.config/ranger
-#ln -s `pwd`/ScreenLayout ~/.config/ScreenLayout
-#ln -s `pwd`/i3 ~/.config/i3
-#ln -s `pwd`/alacritty ~/.config/alacritty
-#ln -s `pwd`/polybar ~/.config/polybar
-#ln -s `pwd`/.gitconfig ~/.gitconfig
+# symbolic link
+read -p "Do you wish to create symbolic links? (y/n)" yn
+case $yn in
+    [Yy]* ) create_symbolic_link;;
+    [Nn]* ) echo "Skip";;
+    * ) echo "Please answer yes or no.";;
+esac
 
 # dein.vim
-#echo "Clone dein.vim"
-#mkdir -p ~/.vim/dein/repos/github.com/Shougo/dein.vim
-#git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
-#
-#if (type "vim" > /dev/null 2>&1); then
-#  vim -c "call dein#install() |q"
-#fi
-#
-## Tmux Plugin Manager
-#echo "Clone Tmux Plugin Manager"
-#mkdir -p ~/.tmux/plugins
-#git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-#
-## anyenv
-#echo "Clone anyenv"
-#git clone https://github.com/anyenv/anyenv ~/.anyenv
-#export PATH="$HOME/.anyenv/bin:$PATH"
-#anyenv init
+read -p "Do you wish to install dein.vim? (y/n)" yn
+case $yn in
+    [Yy]* ) install_dein_vim;;
+    [Nn]* ) echo "Skip";;
+    * ) echo "Please answer yes or no.";;
+esac
+
+
+echo "ALL DONE"
