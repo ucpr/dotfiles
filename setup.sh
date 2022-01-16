@@ -64,12 +64,12 @@ create_symbolic_link() {
 install_dein_vim() {
   echo "Clone dein.vim"
 
-  if [ -e ~/.config/vim/dein/repos/github.com/Shougo/dein.vim ]; then
-    echo "exist ~/.config/vim/dein/repos/github.com/Shougo/dein.vim "
+  if [ -e ~/.cache/dein/repos/github.com/Shougo/dein.vim ]; then
+    echo "exist ~/.cache/dein/repos/github.com/Shougo/dein.vim "
   else
-    mkdir -p ~/.config/vim/dein/repos/github.com/Shougo/dein.vim
+    mkdir -p ~/.cache/dein/repos/github.com/Shougo/dein.vim
   fi
-  git clone https://github.com/Shougo/dein.vim.git ~/.vim/dein/repos/github.com/Shougo/dein.vim
+  git clone https://github.com/Shougo/dein.vim.git ~/.cache/dein/repos/github.com/Shougo/dein.vim
 
   echo "Done"
 }
