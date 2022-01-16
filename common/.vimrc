@@ -150,6 +150,7 @@ set nowrap
 set hlsearch
 set wildmenu
 
+set clipboard+=unnamed
 set encoding=utf-8
 set fileencodings=utf-8,iso-2022-jp,cp932,sjis,euc-jpset
 set fencs=utf-8,iso-2022-jp,enc-jp,cp932

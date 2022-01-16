@@ -41,6 +41,7 @@ alias j2e='trans ja:en'
 
 export GOPATH=~/.go
 export PATH=~/.go/bin:$PATH
+export PATH=$HOME/.nodebrew/current/bin:$PATH
 
 ggl() {
     open "https://google.com/search?q=${*// /%20}"
