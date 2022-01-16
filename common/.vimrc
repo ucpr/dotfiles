@@ -3,20 +3,20 @@ if &compatible
   set nocompatible               " Be iMproved
 endif
 
-set runtimepath+=/Users/ucpr/.cache/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=$HOME/.cache/dein/repos/github.com/Shougo/dein.vim
 
-call dein#begin('/Users/ucpr/.cache/dein')
+call dein#begin('$HOME/.cache/dein')
 
-call dein#add('/Users/ucpr/.cache/dein/repos/github.com/Shougo/dein.vim')
+call dein#add('$HOME/.cache/dein/repos/github.com/Shougo/dein.vim')
 
 call dein#add('prabirshrestha/vim-lsp')
 call dein#add('prabirshrestha/async.vim')
 call dein#add('prabirshrestha/asyncomplete.vim')
 call dein#add('prabirshrestha/asyncomplete-lsp.vim')
 call dein#add('mattn/vim-lsp-settings')
-call dein#add('SirVer/ultisnips')
-call dein#add('thomasfaingnaert/vim-lsp-snippets')
-call dein#add('thomasfaingnaert/vim-lsp-ultisnips')
+"call dein#add('SirVer/ultisnips')
+"call dein#add('thomasfaingnaert/vim-lsp-snippets')
+"call dein#add('thomasfaingnaert/vim-lsp-ultisnips')
 
 call dein#add('mattn/vim-goimports')
 call dein#add('kyoh86/vim-go-coverage')

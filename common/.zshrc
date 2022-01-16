@@ -43,6 +43,8 @@ export GOPATH=~/.go
 export PATH=~/.go/bin:$PATH
 export PATH=$HOME/.nodebrew/current/bin:$PATH
 
+export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+
 ggl() {
     open "https://google.com/search?q=${*// /%20}"
 }
