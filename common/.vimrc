@@ -14,10 +14,10 @@ call dein#add('prabirshrestha/async.vim')
 call dein#add('prabirshrestha/asyncomplete.vim')
 call dein#add('prabirshrestha/asyncomplete-lsp.vim')
 call dein#add('mattn/vim-lsp-settings')
-"call dein#add('SirVer/ultisnips')
-"call dein#add('thomasfaingnaert/vim-lsp-snippets')
-"call dein#add('thomasfaingnaert/vim-lsp-ultisnips')
+call dein#add('hrsh7th/vim-vsnip')
+call dein#add('hrsh7th/vim-vsnip-integ')
 
+call dein#add('golang/vscode-go')
 call dein#add('mattn/vim-goimports')
 call dein#add('kyoh86/vim-go-coverage')
 call dein#add('mattn/vim-goaddtags')
@@ -26,6 +26,7 @@ call dein#add('mattn/vim-gomod')
 
 call dein#add('joshdick/onedark.vim')
 
+call dein#add('mattn/vim-sonictemplate')
 call dein#add('Shougo/context_filetype.vim')
 call dein#add('ntpeters/vim-better-whitespace')
 call dein#add('simeji/winresizer')
@@ -103,10 +104,17 @@ let g:lsp_settings['gopls'] = {
   \  },
   \}
 
-" For snippets
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+let g:sonictemplate_vim_template_dir = [
+  \ '$HOME/.vim/template'
+\]
+
+let g:vsnip_snippet_dir = '$HOME/.vim/vsnip'
+imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+" Jump forward or backward
+imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 
 set completeopt+=menuone
 
@@ -117,14 +125,56 @@ set termguicolors
 
 nmap s <Plug>(easymotion-overwin-f2)
 
+" spelling check
 let g:enable_spelunker_vim = 1
 let g:spelunlker_check_type = 2
 
 inoremap <C-l> <C-r>=lexima#insmode#leave(1, '<LT>C-G>U<LT>RIGHT>')<CR>
 
+" setting for goimports
 let g:goimports = 1
 let g:goimports_show_loclist = 0
+let g:goimports_local = 'github.com/ucpr'
 " ---
+
+" cursor上のgo testを実行するcommand (neovim依存なので修正しないと使えない)
+"autocmd vimrc FileType go nnoremap <silent> gt :<C-u>silent call <SID>go_test_function()<CR>
+"command GoTestOnTheCursor :call s:go_test_function()
+"function! s:go_test_function() abort
+"    let test_info = json_decode(system(printf('go-test-name -pos %s -file %s', s:cursor_byte_offset(), @%)))
+"
+"    for b in nvim_list_bufs()
+"        if bufname(b) ==# 'vim-go-test-func'
+"            execute printf('bwipe! %s', b)
+"        endif
+"    endfor
+"
+"    let dir = expand('%:p:h')
+"
+"    if len(test_info.sub_test_names) > 0
+"        let cmd = printf("go test -coverprofile='/tmp/go-coverage.out' -count=1 -v -race -run='^%s$'/'^%s$' $(go list %s)", test_info.test_func_name, test_info.sub_test_names[0], dir)
+"    else
+"        let cmd = printf("go test -coverprofile='/tmp/go-coverage.out' -count=1 -v -race -run='^%s$' $(go list %s)", test_info.test_func_name, dir)
+"    endif
+"
+"    let split = s:split_type()
+"    execut printf('%s gotest', split)
+"
+"    if split ==# 'split'
+"        execute(printf('resize %s', floor(&lines * 0.3)))
+"    endif
+"
+"    call termopen(cmd)
+"    setlocal bufhidden=delete
+"    setlocal noswapfile
+"    setlocal nobuflisted
+"    file vim-go-test-func
+"    wincmd p
+"endfunction
+"
+"function! s:cursor_byte_offset() abort
+"    return line2byte(line('.')) + (col('.') - 2)
+"endfunction
 
 " general setting
 set number
