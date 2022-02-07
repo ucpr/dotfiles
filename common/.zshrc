@@ -36,14 +36,12 @@ alias sl='ls'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias e2j='trans en:ja'
-alias j2e='trans ja:en'
 
 export GOPATH=~/.go
 export PATH=~/.go/bin:$PATH
-export PATH=$HOME/.nodebrew/current/bin:$PATH
 
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+
 
 ggl() {
     open "https://google.com/search?q=${*// /%20}"
@@ -119,3 +117,6 @@ zinit ice wait'!1'; autoload -U compinit && compinit
 
 zinit ice pick"async.zsh" src"pure.zsh"
 zinit light sindresorhus/pure
+
+# set asdf.sh
+. /opt/homebrew/opt/asdf/asdf.sh
