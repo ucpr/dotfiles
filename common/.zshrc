@@ -52,10 +52,10 @@ gignore() {
 }
 
 # fzf setting
-export FZF_DEFAULT_OPTS="--no-sort --exact --cycle --multi --ansi --reverse --border --sync --bind=ctrl-t:toggle --bind=ctrl-k:kill-line --bind=?:toggle-preview --bind=down:preview-down --bind=up:preview-up"
+export FZF_DEFAULT_OPTS="--height 40% --border --reverse --no-sort --exact --cycle --multi --ansi --sync --bind=ctrl-t:toggle --bind=ctrl-k:kill-line --bind=?:toggle-preview --bind=down:preview-down --bind=up:preview-up"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
 export FZF_CTRL_T_OPTS='--preview "bat  --color=always --style=header,grid --line-range :100 {}"'
-export FZF_DEFAULT_OPTS='--bind ctrl-j:down,ctrl-k:up'
+#export FZF_DEFAULT_OPTS='--bind ctrl-j:down,ctrl-k:up'
 
 function select_cdr(){
     local selected_dir=$(cdr -l | awk '{ print $2 }' | \
@@ -87,6 +87,7 @@ ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^f' ghq-fzf
 
+# statingされていないfileをvimで楽に開けるようにする
 uncommited-staged-files() {
   local f=$(git diff --name-only --diff-filter=d | awk '{print}' | fzf --preview 'f(){ sh -c "head -n 100 $1"}; f {}' | xargs echo)
   if [ -n "$f" ]; then
@@ -97,10 +98,17 @@ uncommited-staged-files() {
 zle -N uncommited-staged-files
 bindkey '^U' uncommited-staged-files
 
+# gcloudのconfigを楽に切り替えるコマンド
 gcloud-switch-project() {
   local f=$(gcloud config configurations list | awk '{if($1 != "NAME") {print $1}}' | fzf --preview "" | xargs echo)
   gcloud config configurations activate "${f}"
 }
+
+# git logを見ながらinteractiveにgit checkoutを行う
+icheckout() {
+  git checkout $(git branch -a | tr -d " " |fzf --height 100% --prompt "CHECKOUT BRANCH>" --preview "git log --color=always {}" | head -n 1 | sed -e "s/^\*\s*//g" | perl -pe "s/remotes\/origin\///g")
+}
+
 
 # zinit
 source ~/.zinit/bin/zinit.zsh
