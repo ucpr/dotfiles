@@ -9,6 +9,11 @@ call dein#begin('$HOME/.cache/dein')
 
 call dein#add('$HOME/.cache/dein/repos/github.com/Shougo/dein.vim')
 
+"set runtimepath^=/Users/s11591/.go/src/github.com/ucpr/denops-otesuki
+"let g:denops#debug = 1
+"
+"call dein#add('vim-denops/denops.vim')
+
 call dein#add('prabirshrestha/vim-lsp')
 call dein#add('prabirshrestha/async.vim')
 call dein#add('prabirshrestha/asyncomplete.vim')
@@ -248,9 +253,16 @@ nnoremap <silent> . :bnext<CR>
 nnoremap bd :bd <CR>
 
 " move tab
-nnoremap <silent> <C-l> :tabn<CR>
-nnoremap <silent> <C-h> :tabp<CR>
+nnoremap <silent> tl :tabn<CR>
+nnoremap <silent> th :tabp<CR>
+"nnoremap <silent> <Tab> :tabn<CR>
 nnoremap <C-t> :tabnew<CR>
+
+" move window
+nnoremap <silent> <C-h> <C-w>h
+nnoremap <silent> <C-j> <C-w>j
+nnoremap <silent> <C-k> <C-w>k
+nnoremap <silent> <C-l> <C-w>l
 
 " terminal mode mapping
 tnoremap <C-@> <C-\><C-n>
