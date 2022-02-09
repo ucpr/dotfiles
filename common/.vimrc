@@ -17,7 +17,6 @@ call dein#add('mattn/vim-lsp-settings')
 call dein#add('hrsh7th/vim-vsnip')
 call dein#add('hrsh7th/vim-vsnip-integ')
 
-call dein#add('golang/vscode-go')
 call dein#add('mattn/vim-goimports')
 call dein#add('kyoh86/vim-go-coverage')
 call dein#add('mattn/vim-goaddtags')
