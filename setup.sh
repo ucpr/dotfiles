@@ -50,10 +50,12 @@ create_symbolic_link() {
     echo "exist ~/.config"
   else
     mkdir ~/.config
+    mkdir ~/.config/zsh
   fi
 
   ln -s `pwd`/common/.vimrc ~/.vimrc
   ln -s `pwd`/common/.zshrc ~/.zshrc
+  ln -s `pwd`/common/zsh/plugin.zsh ~/.config/zsh/plugin.zsh
   ln -s `pwd`/common/.tmux.conf ~/.tmux.conf
   ln -s `pwd`/common/.gitconfig ~/.gitconfig
   ln -s `pwd`/common/.gitmessage ~/.gitmessage
