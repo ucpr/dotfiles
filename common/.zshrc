@@ -34,5 +34,5 @@ zinit ice pick"async.zsh" src"pure.zsh"
 zinit light sindresorhus/pure
 
 zinit wait lucid light-mode as'null' \
-  atinit'. "/Users/s11591/.config/zsh/plugin.zsh"' \
+  atinit'. "$HOME/.config/zsh/plugin.zsh"' \
   for 'zdharma-continuum/null'
