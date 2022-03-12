@@ -105,7 +105,7 @@ let g:lsp_settings['gopls'] = {
   \    'analyses': {
   \      'fillstruct': v:true,
   \    },
-  \    'buildFlags': ["-tags=integration"],
+  \    'buildFlags': ["-tags=integration,wireinject"],
   \  },
   \}
 
