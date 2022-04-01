@@ -25,6 +25,8 @@ brew "deno"
 brew "gh"
 brew "gpg"
 brew "asdf"
+brew "ko"
+brew "act"
 
 cask "google-cloud-sdk"
 cask "1password"
@@ -38,6 +40,7 @@ cask "spotify"
 cask "iterm2"
 cask "clipy"
 cask "raycast"
+cask "zoom"
 
 cask "font-hack-nerd-font"
 
