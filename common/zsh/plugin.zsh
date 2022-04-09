@@ -93,5 +93,30 @@ icheckout() {
   git checkout $(git branch -a | tr -d " " |fzf --height 100% --prompt "CHECKOUT BRANCH>" --preview "git log --color=always {}" | head -n 1 | sed -e "s/^\*\s*//g" | perl -pe "s/remotes\/origin\///g")
 }
 
+fkill() {
+  local pid
+  if [ "$UID" != "0" ]; then
+    pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+  else
+    pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+  fi
+
+  if [ "x$pid" != "x" ]
+  then
+    echo $pid | xargs kill -${1:-9}
+  fi
+}
+
+
+
 ### asdf
-source /opt/homebrew/opt/asdf/asdf.sh
+if [ -e /opt/homebrew/opt/asdf/asdf.sh ]; then
+  source /opt/homebrew/opt/asdf/asdf.sh
+elif [ -e /usr/local/opt/asdf/asdf.sh ]; then
+  source /usr/local/opt/asdf/asdf.sh
+fi
+
+### custom configuration
+if [ ! -e ./custom.zsh ]; then
+  source $HOME/.config/zsh/custom.zsh
+fi
