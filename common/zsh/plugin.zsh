@@ -107,7 +107,16 @@ fkill() {
   fi
 }
 
+bcheckout() {
+  local f=$(git branch -a | fzf | xargs echo)
+  if [ -n "$f" ]; then
+    BUFFER="git checkout ${f}"
+    zle accept-line
+  fi
 
+}
+zle -N bcheckout
+bindkey '^B' bcheckout
 
 ### asdf
 if [ -e /opt/homebrew/opt/asdf/asdf.sh ]; then

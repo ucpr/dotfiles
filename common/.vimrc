@@ -40,6 +40,9 @@ call dein#add('cohama/lexima.vim')
 call dein#add('markonm/traces.vim')
 call dein#add('kamykn/spelunker.vim')
 
+call dein#add('junegunn/fzf', { 'dir': '.fzf', 'build': './install --all', 'rtp': '' })
+call dein#add('junegunn/fzf.vim')
+
 " Required:
 call dein#end()
 
@@ -140,6 +143,16 @@ inoremap <C-l> <C-r>=lexima#insmode#leave(1, '<LT>C-G>U<LT>RIGHT>')<CR>
 let g:goimports = 1
 let g:goimports_show_loclist = 0
 let g:goimports_local = 'github.com/ucpr'
+
+" for fzf
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+let $FZF_DEFAULT_OPTS="--preview=bat --reverse"
+let $FZF_DEFAULT_COMMAND = 'rg --files'
+
+
 " ---
 
 " cursor上のgo testを実行するcommand (neovim依存なので修正しないと使えない)
