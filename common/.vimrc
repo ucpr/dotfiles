@@ -28,6 +28,8 @@ call dein#add('mattn/vim-goaddtags')
 call dein#add('mattn/vim-goimpl')
 call dein#add('mattn/vim-gomod')
 
+call dein#add('hashivim/vim-terraform')
+
 call dein#add('joshdick/onedark.vim')
 
 call dein#add('mattn/vim-sonictemplate')

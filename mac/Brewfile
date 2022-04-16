@@ -1,6 +1,7 @@
 tap 'homebrew/cask'
 tap 'homebrew/core'
 tap "homebrew/cask-fonts"
+tap "bufbuild/buf"
 cask_args appdir: "/Applications"
 
 brew "coreutils"
@@ -27,6 +28,7 @@ brew "gpg"
 brew "asdf"
 brew "ko"
 brew "act"
+brew "buf"
 
 cask "google-cloud-sdk"
 cask "1password"
