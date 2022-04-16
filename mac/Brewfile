@@ -29,6 +29,7 @@ brew "asdf"
 brew "ko"
 brew "act"
 brew "buf"
+brew "tree"
 
 cask "google-cloud-sdk"
 cask "1password"
@@ -43,6 +44,7 @@ cask "iterm2"
 cask "clipy"
 cask "raycast"
 cask "zoom"
+cask "miro"
 
 cask "font-hack-nerd-font"
 
