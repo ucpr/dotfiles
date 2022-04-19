@@ -54,6 +54,7 @@ create_symbolic_link() {
   fi
 
   ln -s `pwd`/common/.vimrc ~/.vimrc
+  ln -s `pwd`/common/nvim ~/.config/nvim
   ln -s `pwd`/common/.zshrc ~/.zshrc
   ln -s `pwd`/common/zsh/plugin.zsh ~/.config/zsh/plugin.zsh
   ln -s `pwd`/common/.tmux.conf ~/.tmux.conf
