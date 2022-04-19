@@ -12,6 +12,8 @@ alias k="kubectl"
 alias kctx="kubectx"
 alias kns="kubens"
 alias tf="terraform"
+alias vim="nvim"
+alias v="nvim"
 
 alias ls='ls --color=auto'
 alias la="ls -a"
