@@ -1,8 +1,10 @@
-nnoremap <silent> <Leader>. :<C-u>FZFFileList<CR>
-nnoremap <silent> <Leader>, :<C-u>FZFMru<CR>
-nnoremap <silent> <Leader>l :<C-u>Lines<CR>
-nnoremap <silent> <Leader>b :<C-u>Buffers<CR>
-nnoremap <silent> <Leader>k :<C-u>Rg<CR>
+set rtp+=~/.fzf
+
+nnoremap <silent> <Space>. :<C-u>FZFFileList<CR>
+nnoremap <silent> <Space>, :<C-u>FZFMru<CR>
+nnoremap <silent> <Space>l :<C-u>Lines<CR>
+nnoremap <silent> <Space>b :<C-u>Buffers<CR>
+nnoremap <silent> <Space>k :<C-u>Rg<CR>
 command! FZFFileList call fzf#run({
            \ 'source': 'rg --files --hidden',
            \ 'sink': 'e',
@@ -32,3 +34,37 @@ function! RipgrepFzf(query, fullscreen)
 endfunction
 
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+
+nnoremap <leader>to :FZFTabOpen<CR>
+command! FZFTabOpen call s:FZFTabOpenFunc()
+
+function! s:FZFTabOpenFunc()
+    call fzf#run({
+            \ 'source':  s:GetTabList(),
+            \ 'sink':    function('s:TabListSink'),
+            \ 'options': '-m -x +s',
+            \ 'down':    '40%'})
+endfunction
+
+function! s:GetTabList()
+    let s:tabList = execute('tabs')
+    let s:textList = []
+    for tabText  in split(s:tabList, '\n')
+        let s:tabPageText = matchstr(tabText, '^Tab page')
+        if !empty(s:tabPageText)
+            let s:pageNum = matchstr(tabText, '[0-9]*$')
+        else
+            let s:textList = add(s:textList, printf('%d %s',
+                \ s:pageNum,
+                \ tabText,
+                \   ))
+        endif
+    endfor
+    return s:textList
+endfunction
+
+function! s:TabListSink(line)
+    let parts = split(a:line, '\s')
+    execute 'normal ' . parts[0] . 'gt'
+endfunction
+

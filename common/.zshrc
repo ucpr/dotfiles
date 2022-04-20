@@ -36,5 +36,3 @@ zinit light sindresorhus/pure
 zinit wait lucid light-mode as'null' \
   atinit'. "$HOME/.config/zsh/plugin.zsh"' \
   for 'zdharma-continuum/null'
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

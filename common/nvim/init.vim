@@ -14,7 +14,7 @@ call dein#add('/Users/s11591/.config/nvim/dein/repos/github.com/Shougo/dein.vim'
 
 let s:toml_dir = '/Users/s11591/.config/nvim/tomls'
 call dein#load_toml( s:toml_dir . '/dein.toml', {} )
-call dein#load_toml( s:toml_dir . '/dein_lazy.toml', {'lazy': 1} )
+call dein#load_toml( s:toml_dir . '/dein_lazy.toml', {'lazy': 0} )
 
 " Required:
 call dein#end()
@@ -27,6 +27,8 @@ syntax enable
 "if dein#check_install()
 "  call dein#install()
 "endif
+
+set rtp+=/usr/local/opt/fzf
 
 " general setting
 set number
