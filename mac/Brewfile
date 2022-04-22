@@ -30,6 +30,7 @@ brew "ko"
 brew "act"
 brew "buf"
 brew "tree"
+brew "clang-format"
 
 cask "google-cloud-sdk"
 cask "1password"

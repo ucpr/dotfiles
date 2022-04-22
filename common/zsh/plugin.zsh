@@ -126,6 +126,8 @@ if [ -e /opt/homebrew/opt/asdf/asdf.sh ]; then
   source /opt/homebrew/opt/asdf/asdf.sh
 elif [ -e /usr/local/opt/asdf/asdf.sh ]; then
   source /usr/local/opt/asdf/asdf.sh
+elif [ -e /opt/homebrew/Cellar/asdf/0.10.0/libexec/asdf.sh ]; then
+  source /opt/homebrew/Cellar/asdf/0.10.0/libexec/asdf.sh
 fi
 
 ### custom configuration
