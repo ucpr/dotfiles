@@ -1,4 +1,5 @@
-set rtp+=~/.fzf
+"set rtp+=~/.fzf
+set rtp+=/opt/homebrew/opt/fzf
 
 nnoremap <silent> <Space>. :<C-u>FZFFileList<CR>
 nnoremap <silent> <Space>, :<C-u>FZFMru<CR>
