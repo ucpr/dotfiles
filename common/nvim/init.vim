@@ -3,16 +3,16 @@ if &compatible
 endif
 
 " Required:
-set runtimepath+=/Users/s11591/.config/nvim/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=$HOME/.config/nvim/dein/repos/github.com/Shougo/dein.vim
 
 " Required:
-call dein#begin('/Users/s11591/.config/nvim/dein')
+call dein#begin('$HOME/.config/nvim/dein')
 
 " Let dein manage dein
 " Required:
-call dein#add('/Users/s11591/.config/nvim/dein/repos/github.com/Shougo/dein.vim')
+call dein#add('$HOME/.config/nvim/dein/repos/github.com/Shougo/dein.vim')
 
-let s:toml_dir = '/Users/s11591/.config/nvim/tomls'
+let s:toml_dir = '$HOME/.config/nvim/tomls'
 call dein#load_toml( s:toml_dir . '/dein.toml', {} )
 call dein#load_toml( s:toml_dir . '/dein_lazy.toml', {'lazy': 0} )
 

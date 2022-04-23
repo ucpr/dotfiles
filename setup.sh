@@ -73,6 +73,7 @@ install_dein_vim() {
     mkdir -p ~/.cache/dein/repos/github.com/Shougo/dein.vim
   fi
   git clone https://github.com/Shougo/dein.vim.git ~/.cache/dein/repos/github.com/Shougo/dein.vim
+  #git clone https://github.com/Shougo/dein.vim.git ~/.config/nvim/dein/repos/github.com/Shougo/dein.vim
 
   echo "Done"
 }

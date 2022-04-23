@@ -31,6 +31,7 @@ brew "act"
 brew "buf"
 brew "tree"
 brew "clang-format"
+brew "neovim"
 
 cask "google-cloud-sdk"
 cask "1password"
