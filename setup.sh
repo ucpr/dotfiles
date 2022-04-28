@@ -19,7 +19,7 @@ EOF
 if [ -e "/etc/issue" ]; then
   # Ubuntu
   echo "$(cat /etc/issue)" | grep "Ubuntu"
-  if [ "$?" -eq 1 ]; then
+  if [ "$?" -eq 0 ]; then
     sudo apt update -y -q
     sudo apt upgrade -y -q
     sudo apt install -y -q build-essential curl zsh git
@@ -27,7 +27,7 @@ if [ -e "/etc/issue" ]; then
 
   # Archlinux
   echo "$(cat /etc/issue)" | grep "Arch Linux"
-  if [ "$?" -eq 1 ]; then
+  if [ "$?" -eq 0 ]; then
     sudo pacman -Syu --noconfirm
     sudo pacman -S --noconfirm git vim zsh curl
   fi
@@ -36,7 +36,7 @@ fi
 # For Mac
 if (type "sw_vers" > /dev/null 2>&1); then
   echo "$(sw_vers)" | grep "macOS"
-  if [ "$?" -eq 1 ]; then
+  if [ "$?" -eq 0 ]; then
     # ここに初期化処理
     echo ""
   fi
