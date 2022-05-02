@@ -115,8 +115,10 @@ hook_add = """
 
 [[plugins]]
 repo = "ntpeters/vim-better-whitespace"
+
 [[plugins]]
 repo = "simeji/winresizer"
+
 [[plugins]]
 repo = "easymotion/vim-easymotion"
 hook_add = """
@@ -140,6 +142,9 @@ hook_add = """
 repo = "voldikss/vim-floaterm"
 hook_add = """
   let g:floaterm_autoclose = 1
+
+  nnoremap T :FloatermToggle<CR>
+  tnoremap <C-q> exit<CR>
 """
 hook_source = '''
   autocmd vimrc User FloatermOpen tnoremap <buffer> <silent> <M-t> <C-\><C-n>:FloatermToggle<CR>
