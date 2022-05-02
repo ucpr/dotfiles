@@ -47,6 +47,7 @@ cask "clipy"
 cask "raycast"
 cask "zoom"
 cask "miro"
+cask "sequel-ace"
 
 cask "font-hack-nerd-font"
 
