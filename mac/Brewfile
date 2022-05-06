@@ -48,6 +48,7 @@ cask "raycast"
 cask "zoom"
 cask "miro"
 cask "sequel-ace"
+cask "figma"
 
 cask "font-hack-nerd-font"
 
