@@ -66,7 +66,7 @@ set shiftwidth=2
 set expandtab
 set smarttab
 set smartindent
-set autochdir
+"set autochdir
 
 inoremap <F5> <nop>
 set pastetoggle=<F5>
@@ -125,3 +125,7 @@ tnoremap <C-q> exit<CR>
 "tnoremap <C-q> <C-\><C-n>:q<CR>
 " ctrl + wで保存して終了
 " noremap <C-w> :wq<CR>
+
+" split terminal
+command Sterm :split | resize 20 | term
+command Vterm :vsplit | term

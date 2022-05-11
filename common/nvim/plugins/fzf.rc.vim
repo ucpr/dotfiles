@@ -1,7 +1,7 @@
 "set rtp+=~/.fzf
 set rtp+=/opt/homebrew/opt/fzf
 
-nnoremap <silent> <Space>. :<C-u>FZFFileList<CR>
+nnoremap <silent> <Space>. :<C-u>Files<CR>
 nnoremap <silent> <Space>, :<C-u>FZFMru<CR>
 nnoremap <silent> <Space>l :<C-u>Lines<CR>
 nnoremap <silent> <Space>b :<C-u>Buffers<CR>
@@ -38,6 +38,7 @@ command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
 nnoremap <leader>to :FZFTabOpen<CR>
 command! FZFTabOpen call s:FZFTabOpenFunc()
+nnoremap <silent> <Space>t :<C-u>FZFTabOpen<CR>
 
 function! s:FZFTabOpenFunc()
     call fzf#run({

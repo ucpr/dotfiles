@@ -6,6 +6,26 @@ zinit ice wait'!0'; zinit load zsh-users/zsh-completions
 zinit ice wait'!1'; plugins=(… zsh-completions)
 zinit ice wait'!1'; autoload -U compinit && compinit
 
+### BSD to GNU
+case "$OSTYPE" in
+    darwin*)
+        (( ${+commands[gdate]} )) && alias date='gdate'
+        (( ${+commands[gls]} )) && alias ls='gls'
+        (( ${+commands[gmkdir]} )) && alias mkdir='gmkdir'
+        (( ${+commands[gcp]} )) && alias cp='gcp'
+        (( ${+commands[gmv]} )) && alias mv='gmv'
+        (( ${+commands[grm]} )) && alias rm='grm'
+        (( ${+commands[gdu]} )) && alias du='gdu'
+        (( ${+commands[ghead]} )) && alias head='ghead'
+        (( ${+commands[gtail]} )) && alias tail='gtail'
+        (( ${+commands[gsed]} )) && alias sed='gsed'
+        (( ${+commands[ggrep]} )) && alias grep='ggrep'
+        (( ${+commands[gfind]} )) && alias find='gfind'
+        (( ${+commands[gdirname]} )) && alias dirname='gdirname'
+        (( ${+commands[gxargs]} )) && alias xargs='gxargs'
+    ;;
+esac
+
 ### Aliases
 alias g="git"
 alias k="kubectl"
@@ -29,6 +49,9 @@ export PATH=~/.go/bin:$PATH
 
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 
+#export NAVI_CONFIG="$HOME/.config/navi/cheats"
+#export NAVI_CONFIG_YAML="$HOME/.config/navi/config.yaml"
+
 ### Functions
 ggl() {
     open "https://google.com/search?q=${*// /%20}"
@@ -36,6 +59,12 @@ ggl() {
 
 gignore() {
     curl -L -s https://www.gitignore.io/api/$@
+}
+
+### Hooks
+zshaddhistory() {
+  local line="${1%%$'\n'}"
+  [[ ! "$line" =~ "^(cd|jj?|la|ll|ls|rm)($| )" ]]
 }
 
 ### fzf
@@ -111,15 +140,44 @@ fkill() {
 }
 
 bcheckout() {
-  local f=$(git branch -a | fzf | xargs echo)
-  if [ -n "$f" ]; then
-    BUFFER="git checkout ${f}"
-    zle accept-line
-  fi
-
+  local tags branches target
+  branches=$(
+    git --no-pager branch --all \
+      --format="%(if)%(HEAD)%(then)%(else)%(if:equals=HEAD)%(refname:strip=3)%(then)%(else)%1B[0;34;1mbranch%09%1B[m%(refname:short)%(end)%(end)" \
+    | sed '/^$/d') || return
+  tags=$(
+    git --no-pager tag | awk '{print "\x1b[35;1mtag\x1b[m\t" $1}') || return
+  target=$(
+    (echo "$branches"; echo "$tags") |
+    fzf --no-hscroll --no-multi -n 2 \
+        --ansi --preview="git --no-pager log -150 --pretty=format:%s '..{2}'") || return
+  git checkout $(awk '{print $2}' <<<"$target" )
 }
 zle -N bcheckout
 bindkey '^B' bcheckout
+
+alias glNoGraph='git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr% C(auto)%an" "$@"'
+_gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+_viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | delta'"
+
+# fcoc_preview - checkout git commit with previews
+fcoc_preview() {
+  local commit
+  commit=$( glNoGraph |
+    fzf --no-sort --reverse --tiebreak=index --no-multi \
+        --ansi --preview="$_viewGitLogLine" ) &&
+  git checkout $(echo "$commit" | sed "s/ .*//")
+}
+
+# fshow_preview - git commit browser with previews
+fshow_preview() {
+    glNoGraph |
+        fzf --no-sort --reverse --tiebreak=index --no-multi \
+            --ansi --preview="$_viewGitLogLine" \
+                --header "enter to view, alt-y to copy hash" \
+                --bind "enter:execute:$_viewGitLogLine   | less -R" \
+                --bind "alt-y:execute:$_gitLogLineToHash | xclip"
+}
 
 ### asdf
 if [ -e /opt/homebrew/opt/asdf/asdf.sh ]; then
@@ -131,6 +189,6 @@ elif [ -e /opt/homebrew/Cellar/asdf/0.10.0/libexec/asdf.sh ]; then
 fi
 
 ### custom configuration
-if [ -e ./custom.zsh ]; then
+if [ -e $HOME/.config/zsh/custom.zsh ]; then
   source $HOME/.config/zsh/custom.zsh
 fi
