@@ -122,6 +122,7 @@ tnoremap <C-@> <C-\><C-n>
 nnoremap <C-q> :q!<CR>
 " ctrl + qでterminalでexitして抜ける
 tnoremap <C-q> exit<CR>
+tnoremap <Esc> <C-\><C-n>
 "tnoremap <C-q> <C-\><C-n>:q<CR>
 " ctrl + wで保存して終了
 " noremap <C-w> :wq<CR>
