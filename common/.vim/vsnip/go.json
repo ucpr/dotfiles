@@ -77,6 +77,15 @@
       "\t}",
       "}"
     ]
+  },
+  "empty func": {
+    "prefix": "func",
+    "description": "empty func",
+    "body": [
+      "func $1() {",
+      "\t$2",
+      "}"
+    ]
   }
 }
 
