@@ -54,6 +54,7 @@ set autoread
 set nowrap
 set hlsearch
 set wildmenu
+set mouse=a
 
 set clipboard+=unnamed
 set encoding=utf-8
