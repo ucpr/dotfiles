@@ -53,6 +53,7 @@ cask "zoom"
 cask "miro"
 cask "sequel-ace"
 cask "figma"
+cask "wireshark"
 
 cask "font-hack-nerd-font"
 
