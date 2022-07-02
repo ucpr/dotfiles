@@ -57,3 +57,4 @@ cask "figma"
 cask "font-hack-nerd-font"
 
 mas "RunCat", id: 1429033973
+mas "LINE", id: 539883307
