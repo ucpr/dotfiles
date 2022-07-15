@@ -135,7 +135,7 @@ repo = "markonm/traces.vim"
 repo = "kamykn/spelunker.vim"
 hook_add = """
   let g:enable_spelunker_vim = 1
-  let g:spelunlker_check_type = 2
+  let g:spelunker_check_type = 2
 """
 
 [[plugins]]
