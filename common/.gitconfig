@@ -34,3 +34,5 @@
   ucat = !"git ls-files --others --exclude-standard | xargs bat"
 [fetch]
   prune = true
+[pull]
+	rebase = true
