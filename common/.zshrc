@@ -23,6 +23,7 @@ setopt auto_list  # 補完候補が複数ある時に、一覧表示
 setopt ignore_eof # Ctrl+Dでzshを終了しない
 
 bindkey "^[[3~" delete-char
+bindkey -v
 
 # zinit
 source ~/.zinit/bin/zinit.zsh
