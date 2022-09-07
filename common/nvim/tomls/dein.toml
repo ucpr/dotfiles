@@ -142,6 +142,7 @@ hook_add = """
 repo = "voldikss/vim-floaterm"
 hook_add = """
   let g:floaterm_autoclose = 1
+  let g:floaterm_title = "た〜みなる(´・ω・｀)"
 
   nnoremap T :FloatermToggle<CR>
   tnoremap <C-q> exit<CR>

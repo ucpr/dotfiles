@@ -1,1 +1,41 @@
+[[plugins]]
+repo =  'nvim-treesitter/nvim-treesitter'
+if = "has('nvim')"
+hook_post_update = 'TSUpdate'
+hook_post_source = '''
+  " set syntax=hoge が自動で実行されるのを防ぐ
+  au! syntaxset
+  luafile ~/.config/nvim/plugins/treesitter.rc.lua
+'''
 
+[[plugins]]
+repo = 'nvim-treesitter/nvim-treesitter-textobjects'
+
+[[plugins]]
+repo = 'nvim-treesitter/nvim-treesitter-context'
+hook_post_source = '''
+lua <<EOF
+  require'treesitter-context'.setup{
+      enable = true,
+      max_lines = 0,
+      patterns = {
+          default = {
+              'class',
+              'function',
+              'method',
+              -- 'for',
+              -- 'while',
+              -- 'if',
+              -- 'switch',
+              -- 'case',
+          },
+          yaml = { 'block_mapping_pair', },
+          json = { 'pair', },
+      },
+      exact_patterns = {
+      },
+      zindex = 20,
+      mode = 'topline',
+  }
+EOF
+'''

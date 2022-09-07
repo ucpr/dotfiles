@@ -15,7 +15,7 @@ call dein#add('$HOME/.config/nvim/dein/repos/github.com/Shougo/dein.vim')
 call dein#add('lewis6991/impatient.nvim')
 let s:toml_dir = '$HOME/.config/nvim/tomls'
 call dein#load_toml( s:toml_dir . '/dein.toml', {} )
-call dein#load_toml( s:toml_dir . '/dein_lazy.toml', {'lazy': 0} )
+call dein#load_toml( s:toml_dir . '/dein_lazy.toml', {'lazy': 1} )
 
 " Required:
 call dein#end()
