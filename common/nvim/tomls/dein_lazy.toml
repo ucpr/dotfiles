@@ -1,41 +1,57 @@
 [[plugins]]
-repo =  'nvim-treesitter/nvim-treesitter'
-if = "has('nvim')"
-hook_post_update = 'TSUpdate'
-hook_post_source = '''
-  " set syntax=hoge が自動で実行されるのを防ぐ
-  au! syntaxset
-  luafile ~/.config/nvim/plugins/treesitter.rc.lua
+repo = 'junegunn/fzf.vim'
+hook_add = '''
+  source $HOME/.config/nvim/plugins/fzf.rc.vim
 '''
 
 [[plugins]]
-repo = 'nvim-treesitter/nvim-treesitter-textobjects'
+repo = "easymotion/vim-easymotion"
+hook_add = """
+  nmap s <Plug>(easymotion-overwin-f2)
+"""
 
 [[plugins]]
-repo = 'nvim-treesitter/nvim-treesitter-context'
-hook_post_source = '''
-lua <<EOF
-  require'treesitter-context'.setup{
-      enable = true,
-      max_lines = 0,
-      patterns = {
-          default = {
-              'class',
-              'function',
-              'method',
-              -- 'for',
-              -- 'while',
-              -- 'if',
-              -- 'switch',
-              -- 'case',
-          },
-          yaml = { 'block_mapping_pair', },
-          json = { 'pair', },
-      },
-      exact_patterns = {
-      },
-      zindex = 20,
-      mode = 'topline',
-  }
-EOF
+repo = "voldikss/vim-floaterm"
+hook_add = """
+  let g:floaterm_autoclose = 1
+  let g:floaterm_title = "た〜みなる(´・ω・｀)"
+
+  nnoremap T :FloatermToggle<CR>
+  tnoremap <C-q> exit<CR>
+"""
+hook_source = '''
+  autocmd vimrc User FloatermOpen tnoremap <buffer> <silent> <M-t> <C-\><C-n>:FloatermToggle<CR>
+  autocmd vimrc User FloatermOpen tnoremap <buffer> <silent> <C-t> <C-\><C-n>:FloatermNew<CR>
+  autocmd vimrc User FloatermOpen tnoremap <buffer> <silent> <C-k> <C-\><C-n>:FloatermPrev<CR>
+  autocmd vimrc User FloatermOpen tnoremap <buffer> <silent> <C-j> <C-\><C-n>:FloatermNext<CR>
+
+  autocmd vimrc QuitPre * FloatermKill!
 '''
+
+
+[[plugins]]
+repo = "mattn/vim-goimports"
+hook_add = """
+  let g:goimports = 1
+"""
+
+[[plugins]]
+repo = "kyoh86/vim-go-coverage"
+on_ft = ["go"]
+
+[[plugins]]
+repo = "mattn/vim-goaddtags"
+on_ft = ["go"]
+
+[[plugins]]
+repo = "mattn/vim-goimpl"
+on_ft = ["go"]
+
+[[plugins]]
+repo = "mattn/vim-gomod"
+on_ft = ["go"]
+
+[[plugins]]
+repo = "hashivim/vim-terraform"
+on_ft = ["tf"]
+
