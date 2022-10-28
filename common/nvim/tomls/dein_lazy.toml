@@ -28,13 +28,6 @@ hook_source = '''
   autocmd vimrc QuitPre * FloatermKill!
 '''
 
-
-[[plugins]]
-repo = "mattn/vim-goimports"
-hook_add = """
-  let g:goimports = 1
-"""
-
 [[plugins]]
 repo = "kyoh86/vim-go-coverage"
 on_ft = ["go"]

@@ -100,6 +100,7 @@ autocmd FileType python set tabstop=4 shiftwidth=4 expandtab
 autocmd FileType python set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 autocmd FileType c setl cindent
 autocmd FileType cpp setl cindent
+"autocmd FileType zig set tabstop=4 shiftwidth=4 expandtab
 "autocmd BufNewFile *.c 0r ~/.vim/template/c.c
 "autocmd BufNewFile *.cpp 0r ~/.vim/templates/cpp.cpp
 autocmd FileType go setl ts=4 sw=4 noet
