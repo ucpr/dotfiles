@@ -17,7 +17,7 @@
     ]
   },
   "struct": {
-    "prefix": "STR",
+    "prefix": "tys",
     "description": "struct T { ... }",
     "body": [
       "type $1 struct {",
@@ -26,7 +26,7 @@
     ]
   },
   "interface": {
-    "prefix": "IF",
+    "prefix": "tyi",
     "description": "interface I { ... }",
     "body": [
       "type $1 interface {",
@@ -54,7 +54,7 @@
   },
   "tdd func": {
     "prefix": "ftdd",
-    "description": "generate table driven test",
+    "description": "table driven test",
     "body": [
       "func Test$1(t *testing.T) {",
       "\tt.Parallel()",
