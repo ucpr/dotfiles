@@ -181,6 +181,14 @@ fshow_preview() {
                 --bind "alt-y:execute:$_gitLogLineToHash | xclip"
 }
 
+prs() {
+  gh pr view -w -- $(gh pr list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login' | fzf |grep -o -E "[0-9]+\d" | head -n1)
+}
+
+issues() {
+  gh issue view -w -- $(gh issue list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login'| fzf |grep -o -E "[0-9]+" | head -n1)
+}
+
 ### asdf
 if [ -e /opt/homebrew/opt/asdf/asdf.sh ]; then
   source /opt/homebrew/opt/asdf/asdf.sh
