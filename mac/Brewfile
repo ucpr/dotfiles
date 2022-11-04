@@ -58,6 +58,7 @@ cask "figma"
 cask "wireshark"
 cask "wezterm"
 cask "flutter"
+cask "alt-tab"
 
 cask "font-hack-nerd-font"
 
