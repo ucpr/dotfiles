@@ -38,6 +38,7 @@ brew "clang-format"
 brew "neovim"
 brew "navi"
 brew "k9s"
+brew "istioctl"
 
 cask "google-cloud-sdk"
 cask "1password"
