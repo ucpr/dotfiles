@@ -39,6 +39,7 @@ brew "neovim"
 brew "navi"
 brew "k9s"
 brew "istioctl"
+brew "k6"
 
 cask "google-cloud-sdk"
 cask "1password"
