@@ -120,6 +120,9 @@ require('jetpack.paq') {
     { 'mattn/vim-gomod', ft = "go" },
 }
 
+-- denops
+vim.fn['popup_preview#enable']()
+
 local global = vim.g
 global.enable_spelunker_vim = 1
 global.spelunker_check_type = 2
@@ -145,6 +148,9 @@ keymap.set("n", "<C-q>", ":<C-u>q!<CR>")
 keymap.set("n", "<Space>b", ":<C-u>Telescope buffers<CR>")
 keymap.set("n", "<Space>ff", ":<C-u>Telescope file_browser<CR>")
 keymap.set("n", "<Space>r", ":<C-u>Telescope live_grep_args<CR>")
+
+-- floaterm
+keymap.set("n", "T", ":<C-u>FloatermToggle<CR>")
 
 -- buffer
 keymap.set("n", ",", ":<C-u>bprev<CR>")
@@ -178,7 +184,6 @@ vim.api.nvim_create_autocmd('FileType', {
     command = "setl ts=4 sw=4 noet",
 })
 
-require("denops")
 require("nvim-lspconfig")
 require("ddc")
 require("vim-vsnip")
