@@ -84,6 +84,7 @@ require("jetpack.paq") {
   "joshdick/onedark.vim",
   "mattn/vim-sonictemplate",
   "voldikss/vim-floaterm",
+  "unblevable/quick-scope",
 
   -- denops
   "vim-denops/denops.vim",
@@ -120,16 +121,22 @@ require("jetpack.paq") {
   { "mattn/vim-goaddtags", ft = "go" },
   { "mattn/vim-goimpl", ft = "go" },
   { "mattn/vim-gomod", ft = "go" },
+  { "mattn/vim-goimports", ft = "go" },
 }
 
 -- denops
 vim.fn["popup_preview#enable"]()
 
 local global = vim.g
-global.enable_spelunker_vim = 1
-global.spelunker_check_type = 2
 global.goimports = 1
 global.sonictemplate_vim_template_dir = { "$HOME/.vim/template" }
+
+-- spelunker
+global.enable_spelunker_vim = 1
+global.spelunker_check_type = 2
+
+-- quick-scope
+global.qs_highlight_on_keys = { "f", "F" }
 
 -- floaterm
 global.floaterm_autoclose = 1
@@ -188,6 +195,11 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "*.go" },
   command = "setl ts=4 sw=4 noet",
 })
+
+vim.cmd [[
+  autocmd FileType go setl ts=4 sw=4 noet
+]]
+
 
 -- {{{ telescope
 local lga_actions = require("telescope-live-grep-args.actions")
