@@ -137,6 +137,7 @@ global.spelunker_check_type = 2
 
 -- quick-scope
 global.qs_highlight_on_keys = { "f", "F" }
+global.qs_buftype_blacklist = { "terminal", "nofile" }
 
 -- floaterm
 global.floaterm_autoclose = 1
@@ -199,7 +200,6 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.cmd [[
   autocmd FileType go setl ts=4 sw=4 noet
 ]]
-
 
 -- {{{ telescope
 local lga_actions = require("telescope-live-grep-args.actions")
