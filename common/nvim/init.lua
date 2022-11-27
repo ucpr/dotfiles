@@ -52,7 +52,8 @@ local options = {
   wrapscan = true,
 }
 
-vim.opt.clipboard:append { "unnamedplus" }
+vim.opt.completeopt:remove({ "preview" })
+vim.opt.clipboard:append({ "unnamedplus" })
 for k, v in pairs(options) do
   vim.opt[k] = v
 end
@@ -75,6 +76,7 @@ require("jetpack.paq") {
   { "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
 
   -- etc
+  "luisiacc/gruvbox-baby",
   "ntpeters/vim-better-whitespace",
   "kamykn/spelunker.vim",
   "simeji/winresizer",
@@ -107,6 +109,13 @@ require("jetpack.paq") {
   "Shougo/ddc-nvim-lsp",
   "matsui54/denops-popup-preview.vim",
 
+  -- treesitter
+  {
+    "nvim-treesitter/nvim-treesitter",
+    run = ":TSUpdate",
+  },
+  "nvim-treesitter/nvim-treesitter-context",
+
   -- lsp
   "neovim/nvim-lspconfig",
   "williamboman/mason.nvim",
@@ -126,6 +135,7 @@ require("jetpack.paq") {
 
 -- denops
 vim.fn["popup_preview#enable"]()
+vim.fn["signature_help#enable"]()
 
 local global = vim.g
 global.goimports = 1
@@ -136,25 +146,34 @@ global.enable_spelunker_vim = 1
 global.spelunker_check_type = 2
 
 -- quick-scope
-global.qs_highlight_on_keys = { "f", "F" }
+global.qs_hi_priority = 2
+global.qs_max_chars = 80
+global.qs_lazy_highlight = 1
+-- global.qs_highlight_on_keys = { "f", "F" }
 global.qs_buftype_blacklist = { "terminal", "nofile" }
+vim.cmd [[
+augroup qs_colors
+  autocmd!
+  autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+  autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
+augroup END
+]]
 
 -- floaterm
 global.floaterm_autoclose = 1
 global.floaterm_title = "🐼"
 
+-- telescope
 require("telescope").load_extension("live_grep_args")
 require("telescope").load_extension("file_browser")
 require("telescope").load_extension("fzf")
 require("telescope").load_extension("env")
 
-vim.cmd [[
-  colorscheme onedark
-]]
+vim.cmd("colorscheme gruvbox-baby")
 
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
-keymap.set("n", "<C-q>", ":<C-u>q!<CR>")
+keymap.set("n", "<C-z>", ":<C-u>q!<CR>")
 
 -- telescope
 keymap.set("n", "<Space>b", ":<C-u>Telescope buffers<CR>")
@@ -185,7 +204,7 @@ keymap.set("t", "<C-@>", "<C-\\><C-n>")
 keymap.set("t", "<C-q>", "exit<CR>")
 keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
-vim.api.nvim_create_user_command("Sterm", function() vim.cmd [[ :split | resize 20 | term ]] end, {})
+vim.api.nvim_create_user_command("Sterm", function() vim.cmd(":split | resize 20 | term ") end, {})
 vim.api.nvim_create_user_command("Vterm", function() vim.cmd [[ :vsplit | term ]] end, {})
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -200,6 +219,89 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.cmd [[
   autocmd FileType go setl ts=4 sw=4 noet
 ]]
+
+-- {{{ tree-sitter
+require 'nvim-treesitter.configs'.setup {
+  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json" },
+  sync_install = false,
+  auto_install = true,
+
+  highlight = {
+    enable = true,
+
+    -- disable = { "c", "rust" },
+    disable = function(lang, buf)
+      local max_filesize = 100 * 1024 -- 100 KB
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
+
+    additional_vim_regex_highlighting = false,
+  },
+
+  indent = {
+    enable = true,
+  }
+}
+
+require 'treesitter-context'.setup {
+  patterns = {
+    default = {
+      'class',
+      'function',
+      'method',
+      --            'for',
+      --            'while',
+      --            'if',
+      --            'switch',
+      --            'case',
+      'interface',
+      'struct',
+      --            'enum',
+    },
+
+    haskell = {
+      'adt'
+    },
+    rust = {
+      'impl_item',
+
+    },
+    terraform = {
+      'block',
+      'object_elem',
+      'attribute',
+    },
+    markdown = {
+      'section',
+    },
+    elixir = {
+      'anonymous_function',
+      'arguments',
+      'block',
+      'do_block',
+      'list',
+      'map',
+      'tuple',
+      'quoted_content',
+    },
+    json = {
+      'pair',
+    },
+    typescript = {
+      'export_statement',
+    },
+    yaml = {
+      'block_mapping_pair',
+    },
+  },
+}
+
+vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
+
+-- }}}
 
 -- {{{ telescope
 local lga_actions = require("telescope-live-grep-args.actions")
@@ -335,7 +437,7 @@ call ddc#enable()
 --}}}
 
 --{{{ nvim-lspconfig
-local nvim_lsp = require("lspconfig")
+
 local on_attach = function(client, bufnr)
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
 
@@ -364,6 +466,7 @@ end
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+local nvim_lsp = require("lspconfig")
 require("mason").setup({
   ui = {
     icons = {
@@ -376,12 +479,11 @@ require("mason").setup({
 require("mason-lspconfig").setup()
 require("mason-lspconfig").setup_handlers {
   function(server_name) -- default handler (optional)
-    require("lspconfig")[server_name].setup {
+    nvim_lsp[server_name].setup {
       on_attach = on_attach,
     }
   end
 }
-
 
 function OrgImports(wait_ms)
   local params = vim.lsp.util.make_range_params()
@@ -398,7 +500,11 @@ function OrgImports(wait_ms)
   end
 end
 
+-- なんかLSPが自動で起動しないので仮でLspStartを読み込み時に実行する
+vim.cmd [[ LspStart ]]
+
 vim.cmd [[
   autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
 ]]
+
 --}}
