@@ -169,7 +169,11 @@ require("telescope").load_extension("file_browser")
 require("telescope").load_extension("fzf")
 require("telescope").load_extension("env")
 
-vim.cmd("colorscheme gruvbox-baby")
+vim.cmd [[
+  colorscheme gruvbox-baby
+  " 検索時のハイライトの色を変更
+  hi Search guibg=peru guifg=wheat
+]]
 
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
@@ -501,7 +505,7 @@ function OrgImports(wait_ms)
 end
 
 -- なんかLSPが自動で起動しないので仮でLspStartを読み込み時に実行する
-vim.cmd [[ LspStart ]]
+-- vim.cmd [[ LspStart ]]
 
 vim.cmd [[
   autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)

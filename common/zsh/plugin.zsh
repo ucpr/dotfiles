@@ -103,7 +103,7 @@ ghq-fzf() {
   zle -R -c
 }
 zle -N ghq-fzf
-bindkey '^f' ghq-fzf
+bindkey '^p' ghq-fzf
 
 # statingされていないfileをvimで楽に開けるようにする
 uncommited-staged-files() {
@@ -181,12 +181,38 @@ fshow_preview() {
                 --bind "alt-y:execute:$_gitLogLineToHash | xclip"
 }
 
+open_tracked_files() {
+  projectRoot=$(git rev-parse --show-toplevel)
+  fname=$(git ls-files $projectRoot | fzf --preview "bat $projectRoot/{-1}")
+  if [[ $fname != "" ]] then
+    vim "$projectRoot/$fname"
+  fi
+}
+zle -N open_tracked_files
+bindkey '^f' open_tracked_files
+
+open_all_files() {
+  projectRoot=$(git rev-parse --show-toplevel)
+  fname=$(find $projectRoot/* -type f -not -path ".git/*" | sed -e "s%$projectRoot/%%" | fzf --preview "bat $projectRoot/{-1}")
+  if [[ $fname != "" ]] then
+    vim "$projectRoot/$fname"
+  fi
+}
+zle -N open_all_files
+bindkey '^a' open_all_files
+
 prs() {
-  gh pr view -w -- $(gh pr list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login' | fzf |grep -o -E "[0-9]+\d" | head -n1)
+  number=$(gh pr list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login' | fzf |grep -o -E "[1-9]+\d" | head -n1)
+  if [[ $number != "" ]] then
+    gh pr view -w -- $number
+  fi
 }
 
 issues() {
-  gh issue view -w -- $(gh issue list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login'| fzf |grep -o -E "[0-9]+" | head -n1)
+  number=$(gh issue list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login'| fzf |grep -o -E "[0-9]+" | head -n1)
+  if [[ $number != "" ]] then
+    gh issue view -w -- $number
+  fi
 }
 
 ### asdf
