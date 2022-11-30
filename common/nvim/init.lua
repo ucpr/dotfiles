@@ -1,3 +1,4 @@
+-- {{{ general options
 local options = {
   -- file encoding
   encoding = "utf-8",
@@ -64,6 +65,10 @@ local jetpackurl = "https://raw.githubusercontent.com/tani/vim-jetpack/master/pl
 if fn.filereadable(jetpackfile) == 0 then
   fn.system("curl -fsSLo " .. jetpackfile .. " --create-dirs " .. jetpackurl)
 end
+
+-- }}}
+
+-- {{{ plugin
 
 vim.cmd("packadd vim-jetpack")
 require("jetpack.paq") {
@@ -133,6 +138,10 @@ require("jetpack.paq") {
   { "mattn/vim-goimports", ft = "go" },
 }
 
+--  }}}
+
+-- {{{ plugin conf
+
 -- denops
 vim.fn["popup_preview#enable"]()
 vim.fn["signature_help#enable"]()
@@ -175,6 +184,10 @@ vim.cmd [[
   hi Search guibg=peru guifg=wheat
 ]]
 
+-- }}}
+
+-- {{{ keybind
+
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
 keymap.set("n", "<C-z>", ":<C-u>q!<CR>")
@@ -208,6 +221,10 @@ keymap.set("t", "<C-@>", "<C-\\><C-n>")
 keymap.set("t", "<C-q>", "exit<CR>")
 keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
+-- }}}
+
+-- {{{ autocmd
+
 vim.api.nvim_create_user_command("Sterm", function() vim.cmd(":split | resize 20 | term ") end, {})
 vim.api.nvim_create_user_command("Vterm", function() vim.cmd [[ :vsplit | term ]] end, {})
 
@@ -223,6 +240,8 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.cmd [[
   autocmd FileType go setl ts=4 sw=4 noet
 ]]
+
+-- }}}
 
 -- {{{ tree-sitter
 require 'nvim-treesitter.configs'.setup {
@@ -280,16 +299,6 @@ require 'treesitter-context'.setup {
     },
     markdown = {
       'section',
-    },
-    elixir = {
-      'anonymous_function',
-      'arguments',
-      'block',
-      'do_block',
-      'list',
-      'map',
-      'tuple',
-      'quoted_content',
     },
     json = {
       'pair',
