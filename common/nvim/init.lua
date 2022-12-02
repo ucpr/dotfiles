@@ -33,6 +33,7 @@ local options = {
     extends = "»",
     precedes = "«",
   },
+  termguicolors = true,
 
   cmdheight = 0,
   laststatus = 2,
@@ -92,6 +93,7 @@ require("jetpack.paq") {
   "mattn/vim-sonictemplate",
   "voldikss/vim-floaterm",
   "unblevable/quick-scope",
+  "ruanyl/vim-gh-line",
 
   -- denops
   "vim-denops/denops.vim",
@@ -190,7 +192,7 @@ vim.cmd [[
 
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
-keymap.set("n", "<C-z>", ":<C-u>q!<CR>")
+keymap.set("n", "<C-c>", ":<C-u>q!<CR>")
 
 -- telescope
 keymap.set("n", "<Space>b", ":<C-u>Telescope buffers<CR>")
@@ -317,6 +319,7 @@ vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
 -- }}}
 
 -- {{{ telescope
+
 local lga_actions = require("telescope-live-grep-args.actions")
 require("telescope").setup {
   extensions = {
@@ -491,10 +494,21 @@ require("mason").setup({
 })
 require("mason-lspconfig").setup()
 require("mason-lspconfig").setup_handlers {
-  function(server_name) -- default handler (optional)
-    nvim_lsp[server_name].setup {
-      on_attach = on_attach,
-    }
+  function(server_name)
+    if server_name == "gopls" then
+      nvim_lsp[server_name].setup {
+        on_attach = on_attach,
+        settings = {
+          gopls = {
+            env = { GOFLAGS = "-tags=integration,wireinject" },
+          },
+        },
+      }
+    else
+      nvim_lsp[server_name].setup {
+        on_attach = on_attach,
+      }
+    end
   end
 }
 
@@ -512,9 +526,6 @@ function OrgImports(wait_ms)
     end
   end
 end
-
--- なんかLSPが自動で起動しないので仮でLspStartを読み込み時に実行する
--- vim.cmd [[ LspStart ]]
 
 vim.cmd [[
   autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
