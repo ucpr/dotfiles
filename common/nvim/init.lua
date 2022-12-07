@@ -65,9 +65,9 @@ end
 
 local ensure_packer = function()
   local fn = vim.fn
-  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
   if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
     vim.cmd [[packadd packer.nvim]]
     return true
   end
@@ -77,6 +77,13 @@ end
 local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
+  use {
+    "lewis6991/impatient.nvim",
+    config = function()
+      require('impatient')
+      require('impatient').enable_profile()
+    end
+  }
 
   -- telescope
   use "nvim-lua/plenary.nvim"
@@ -84,7 +91,7 @@ require('packer').startup(function(use)
   use "nvim-telescope/telescope-file-browser.nvim"
   use "nvim-telescope/telescope-live-grep-args.nvim"
   use "LinArcX/telescope-env.nvim"
-  use {"nvim-telescope/telescope-fzf-native.nvim", run = "make"}
+  use { "nvim-telescope/telescope-fzf-native.nvim", run = "make" }
 
   -- etc
   use "luisiacc/gruvbox-baby"
@@ -119,7 +126,7 @@ require('packer').startup(function(use)
   use "matsui54/denops-popup-preview.vim"
 
   -- treesitter
-  use {"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"}
+  use { "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" }
   use "nvim-treesitter/nvim-treesitter-context"
 
   -- lsp
@@ -132,11 +139,11 @@ require('packer').startup(function(use)
   use "hrsh7th/vim-vsnip-integ"
 
   -- go
-  use {"kyoh86/vim-go-coverage", ft = "go"}
-  use {"mattn/vim-goaddtags", ft = "go"}
-  use {"mattn/vim-goimpl", ft = "go"}
-  use {"mattn/vim-gomod", ft = "go"}
-  use {"mattn/vim-goimports", ft = "go"}
+  use { "kyoh86/vim-go-coverage", ft = "go" }
+  use { "mattn/vim-goaddtags", ft = "go" }
+  use { "mattn/vim-goimpl", ft = "go" }
+  use { "mattn/vim-gomod", ft = "go" }
+  use { "mattn/vim-goimports", ft = "go" }
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
