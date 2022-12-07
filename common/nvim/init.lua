@@ -60,7 +60,7 @@ for k, v in pairs(options) do
   vim.opt[k] = v
 end
 
-global_options = {
+local global_options = {
   loaded_gzip            = 1,
   loaded_tar             = 1,
   loaded_tarPlugin       = 1,
@@ -105,55 +105,423 @@ require('packer').startup(function(use)
 
   -- telescope
   use "nvim-lua/plenary.nvim"
-  use "nvim-telescope/telescope.nvim"
-  use "nvim-telescope/telescope-file-browser.nvim"
-  use "nvim-telescope/telescope-live-grep-args.nvim"
-  use "LinArcX/telescope-env.nvim"
-  use { "nvim-telescope/telescope-fzf-native.nvim", run = "make" }
+  use {
+    "nvim-telescope/telescope.nvim",
+    requires = {
+      {
+        "nvim-telescope/telescope-file-browser.nvim",
+        config = function()
+          require("telescope").load_extension("file_browser")
+        end,
+      },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        config = function()
+          require("telescope").load_extension("live_grep_args")
+        end
+      },
+      {
+        "LinArcX/telescope-env.nvim",
+        config = function()
+          require("telescope").load_extension("env")
+        end
+      },
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        run = "make",
+        config = function()
+          require("telescope").load_extension("fzf")
+        end
+      },
+    },
+    config = function()
+      local lga_actions = require("telescope-live-grep-args.actions")
+      require("telescope").setup {
+        extensions = {
+          fzf = {
+            fuzzy = true, -- false will only do exact matching
+            override_generic_sorter = true, -- override the generic sorter
+            override_file_sorter = true, -- override the file sorter
+            case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+          },
+          file_browser = {
+            hijack_netrw = true,
+            mappings = {
+              ["i"] = {
+                -- your custom insert mode mappings
+              },
+              ["n"] = {
+                -- your custom normal mode mappings
+              },
+            },
+          },
+          live_grep_args = {
+            auto_quoting = true, -- enable/disable auto-quoting
+            -- define mappings, e.g.
+            mappings = { -- extend mappings
+              i = {
+                ["<C-k>"] = lga_actions.quote_prompt(),
+                ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+              },
+            },
+          },
+        },
+      }
+    end
+  }
 
   -- etc
-  use "luisiacc/gruvbox-baby"
-  use "ntpeters/vim-better-whitespace"
-  use "kamykn/spelunker.vim"
-  use "simeji/winresizer"
-  use "markonm/traces.vim"
+  use {
+    "luisiacc/gruvbox-baby",
+    config = function()
+      vim.cmd [[
+        colorscheme gruvbox-baby
+        " 検索時のハイライトの色を変更
+        hi Search guibg=peru guifg=wheat
+      ]]
+    end
+  }
+  use { "ntpeters/vim-better-whitespace", opt = true }
+  use {
+    "kamykn/spelunker.vim",
+    setup = function()
+      vim.g.enable_spelunker_vim = 1
+      vim.g.spelunker_check_type = 2
+    end
+  }
+  use { "simeji/winresizer", opt = true }
+  use { "markonm/traces.vim", opt = true }
   use "cohama/lexima.vim"
   use "Shougo/context_filetype.vim"
-  use "joshdick/onedark.vim"
-  use "mattn/vim-sonictemplate"
-  use "voldikss/vim-floaterm"
-  use "unblevable/quick-scope"
-  use "ruanyl/vim-gh-line"
+  use {
+    "mattn/vim-sonictemplate",
+    cmd = {
+      "Template",
+    },
+    setup = function()
+      vim.g.sonictemplate_vim_template_dir = { "$HOME/.vim/template" }
+    end
+  }
+  use {
+    "voldikss/vim-floaterm",
+    cmd = {
+      "FloatermToggle",
+    },
+    setup = function()
+      vim.g.floaterm_autoclose = 1
+      vim.g.floaterm_title = "🐼"
+    end
+  }
+  use {
+    "unblevable/quick-scope",
+    config = function()
+      vim.cmd [[
+        augroup qs_colors
+          autocmd!
+          autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+          autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
+        augroup END
+      ]]
+    end,
+    setup = function()
+      vim.g.qs_hi_priority = 2
+      vim.g.qs_max_chars = 80
+      vim.g.qs_lazy_highlight = 0
+      vim.g.qs_buftype_blacklist = { "terminal", "nofile" }
+    end,
+  }
 
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
-  use "matsui54/denops-signature_help"
+  use {
+    "matsui54/denops-signature_help",
+    config = function()
+      vim.fn["signature_help#enable"]()
+    end
+  }
+  use {
+    "matsui54/denops-popup-preview.vim",
+    config = function()
+      vim.fn["popup_preview#enable"]()
+    end
+  }
 
   -- ddc
-  --use {"Shougo/ddc.vim", event = { "InsertEnter", "CursorHold", "CmdlineEnter" }}
-  use "Shougo/ddc.vim"
-  use "Shougo/ddc-ui-native"
-  use "Shougo/pum.vim"
-  use "Shougo/ddc-around"
-  use "LumaKernel/ddc-file"
-  use "Shougo/ddc-matcher_head"
-  use "Shougo/ddc-sorter_rank"
-  use "Shougo/ddc-converter_remove_overlap"
-  use "Shougo/ddc-nvim-lsp"
-  use "matsui54/denops-popup-preview.vim"
-
+  --use {"Shougo/ddc.vim", }
+  use {
+    "Shougo/ddc.vim",
+    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
+    requires = {
+      "Shougo/ddc-ui-native",
+      "Shougo/pum.vim",
+      "Shougo/ddc-around",
+      "LumaKernel/ddc-file",
+      "Shougo/ddc-matcher_head",
+      "Shougo/ddc-sorter_rank",
+      "Shougo/ddc-converter_remove_overlap",
+      "Shougo/ddc-nvim-lsp",
+    },
+    config = function()
+      vim.cmd [[
+        call ddc#custom#patch_global("ui", "native")
+        call ddc#custom#patch_global("sources", [
+            \ "around",
+            \ "file",
+            \ "vsnip",
+            \ "nvim-lsp"
+            \ ])
+        call ddc#custom#patch_global("sourceOptions", {
+            \ "_": {
+            \   "matchers": ["matcher_head"],
+            \   "sorters": ["sorter_rank"],
+            \   "converters": ["converter_remove_overlap"],
+            \ },
+            \ "around": {"mark": "Around"},
+            \ "file": {
+            \   "mark": "file",
+            \   "isVolatile": v:true,
+            \   "forceCompletionPattern": "\S/\S*",
+            \ },
+            \ "vsnip": {
+            \   "mark": "vsnip",
+            \   "minAutoCompleteLength": 1,
+            \ },
+            \ "nvim-lsp": {
+            \   "mark": "LSP",
+            \   "forceCompletionPattern": "\.\w*|:\w*|->\w*",
+            \ },
+            \ })
+        
+        call ddc#custom#patch_global("sourceParams", {
+           \ "around": {"maxSize": 500},
+           \ })
+        
+        " Use Customized labels
+        call ddc#custom#patch_global("sourceParams", {
+           \ "nvim-lsp": { "kindLabels": { "Class": "c" } },
+           \ })
+        
+        " pum.vim setting
+        call ddc#custom#patch_global("completionMenu", "pum.vim")
+        inoremap <silent><expr> <TAB>
+        \ pumvisible() ? "<C-n>" :
+        \ (col(".") <= 1 <Bar><Bar> getline(".")[col(".") - 2] =~# "\s") ?
+        \ "<TAB>" : ddc#map#manual_complete()
+        
+        " <S-TAB>: completion back.
+        inoremap <expr><S-TAB>  pumvisible() ? "<C-p>" : "<C-h>"
+        
+        inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
+        inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
+        inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
+        inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
+        inoremap <C-e> <Cmd>call pum#map#cancel()<CR>
+        
+        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        call ddc#enable()
+      ]]
+    end
+  }
   -- treesitter
-  use { "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" }
-  use "nvim-treesitter/nvim-treesitter-context"
+  use {
+    "nvim-treesitter/nvim-treesitter",
+    run = ":TSUpdate",
+    config = function()
+      require 'nvim-treesitter.configs'.setup {
+        ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json", "vim" },
+        sync_install = false,
+        auto_install = true,
+        highlight = {
+          enable = true,
+          -- disable = { "c", "rust" },
+          disable = function(lang, buf)
+            local max_filesize = 100 * 1024 -- 100 KB
+            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+            if ok and stats and stats.size > max_filesize then
+              return true
+            end
+          end,
+          additional_vim_regex_highlighting = false,
+        },
+        indent = {
+          enable = true,
+        }
+      }
+      vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
+    end,
+    requires = {
+      "nvim-treesitter/nvim-treesitter-context",
+      config = function()
+        require 'treesitter-context'.setup {
+          patterns = {
+            default = {
+              'class',
+              'function',
+              'method',
+              --            'for',
+              --            'while',
+              --            'if',
+              --            'switch',
+              --            'case',
+              'interface',
+              'struct',
+              --            'enum',
+            },
+
+            haskell = {
+              'adt'
+            },
+            rust = {
+              'impl_item',
+
+            },
+            terraform = {
+              'block',
+              'object_elem',
+              'attribute',
+            },
+            markdown = {
+              'section',
+            },
+            json = {
+              'pair',
+            },
+            typescript = {
+              'export_statement',
+            },
+            yaml = {
+              'block_mapping_pair',
+            },
+          },
+        }
+      end
+    }
+  }
+  --use "nvim-treesitter/nvim-treesitter-context"
 
   -- lsp
-  use "neovim/nvim-lspconfig"
+  use {
+    "neovim/nvim-lspconfig",
+    config = function()
+      local on_attach = function(client, bufnr)
+        local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+
+        local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+        local opts = { noremap = true, silent = true }
+        buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+        buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+        buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+        buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+        buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+        buf_set_keymap("n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
+        buf_set_keymap("n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
+        buf_set_keymap("n", "<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", opts)
+        buf_set_keymap("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+        buf_set_keymap("n", "<space>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+        buf_set_keymap("n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+        buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+        buf_set_keymap("n", "<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
+        buf_set_keymap("n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
+        buf_set_keymap("n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
+        buf_set_keymap("n", "<space>q", "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>", opts)
+        buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+      end
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+      local nvim_lsp = require("lspconfig")
+      require("mason").setup({
+        ui = {
+          icons = {
+            package_installed = "✓",
+            package_pending = "➜",
+            package_uninstalled = "✗"
+          }
+        }
+      })
+      require("mason-lspconfig").setup()
+      require("mason-lspconfig").setup_handlers {
+        function(server_name)
+          if server_name == "gopls" then
+            nvim_lsp[server_name].setup {
+              on_attach = on_attach,
+              settings = {
+                gopls = {
+                  env = { GOFLAGS = "-tags=integration,wireinject" },
+                },
+              },
+            }
+          else
+            nvim_lsp[server_name].setup {
+              on_attach = on_attach,
+            }
+          end
+        end
+      }
+
+      function OrgImports(wait_ms)
+        local params = vim.lsp.util.make_range_params()
+        params.context = { only = { "source.organizeImports" } }
+        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
+        for _, res in pairs(result or {}) do
+          for _, r in pairs(res.result or {}) do
+            if r.edit then
+              vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
+            else
+              vim.lsp.buf.execute_command(r.command)
+            end
+          end
+        end
+      end
+
+      vim.cmd [[
+        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+      ]]
+    end
+  }
   use "williamboman/mason.nvim"
   use "williamboman/mason-lspconfig.nvim"
 
   -- snip
-  use "hrsh7th/vim-vsnip"
+  use {
+    "hrsh7th/vim-vsnip",
+    config = function()
+      vim.cmd [[
+        let g:vsnip_snippet_dir = "$HOME/.vim/vsnip"
+        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        
+        "function s:trigger_completedone()
+        "  let info = pum#complete_info()
+        "  let complete_item = info.items[info.selected]
+        "  call vsnip_integ#on_complete_done(complete_item)
+        "  if vsnip#available(1)
+        "    return "\<Plug>(vsnip-expand-or-jump)"
+        "  else
+        "    return "\<Tab>"
+        "  "return "\<Ignore>"
+        "endfunction
+        "
+        "imap <expr> <Tab> <SID>trigger_completedone()
+        "smap <expr> <Tab> <SID>trigger_completedone()
+        " imap <expr> <Tab>   vsnip#available(1)  ? "<Plug>(vsnip-expand-or-jump)" : "<Tab>"
+        " smap <expr> <Tab>   vsnip#available(1)  ? "<Plug>(vsnip-expand-or-jump)" : "<Tab>"
+        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        
+        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        let g:vsnip_filetypes = {}
+        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+        ]]
+    end
+  }
   use "hrsh7th/vim-vsnip-integ"
 
   -- go
@@ -161,7 +529,13 @@ require('packer').startup(function(use)
   use { "mattn/vim-goaddtags", ft = "go" }
   use { "mattn/vim-goimpl", ft = "go" }
   use { "mattn/vim-gomod", ft = "go" }
-  use { "mattn/vim-goimports", ft = "go" }
+  use {
+    "mattn/vim-goimports",
+    ft = "go",
+    setup = function()
+      vim.g.goimports = 1
+    end,
+  }
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
@@ -171,50 +545,6 @@ require('packer').startup(function(use)
 end)
 
 --- }}}
-
--- {{{ plugin conf
-vim.fn["popup_preview#enable"]()
-vim.fn["signature_help#enable"]()
-
-local global = vim.g
-global.goimports = 1
-global.sonictemplate_vim_template_dir = { "$HOME/.vim/template" }
-
--- spelunker
-global.enable_spelunker_vim = 1
-global.spelunker_check_type = 2
-
--- quick-scope
-global.qs_hi_priority = 2
-global.qs_max_chars = 80
-global.qs_lazy_highlight = 1
--- global.qs_highlight_on_keys = { "f", "F" }
-global.qs_buftype_blacklist = { "terminal", "nofile" }
-vim.cmd [[
-augroup qs_colors
-  autocmd!
-  autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
-  autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
-augroup END
-]]
-
--- floaterm
-global.floaterm_autoclose = 1
-global.floaterm_title = "🐼"
-
--- telescope
-require("telescope").load_extension("live_grep_args")
-require("telescope").load_extension("file_browser")
-require("telescope").load_extension("fzf")
-require("telescope").load_extension("env")
-
-vim.cmd [[
-  colorscheme gruvbox-baby
-  " 検索時のハイライトの色を変更
-  hi Search guibg=peru guifg=wheat
-]]
-
--- }}}
 
 -- {{{ keybind
 
@@ -272,291 +602,3 @@ vim.cmd [[
 ]]
 
 -- }}}
-
--- {{{ tree-sitter
-require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json", "vim" },
-  sync_install = false,
-  auto_install = true,
-
-  highlight = {
-    enable = true,
-
-    -- disable = { "c", "rust" },
-    disable = function(lang, buf)
-      local max_filesize = 100 * 1024 -- 100 KB
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
-    end,
-
-    additional_vim_regex_highlighting = false,
-  },
-
-  indent = {
-    enable = true,
-  }
-}
-
-require 'treesitter-context'.setup {
-  patterns = {
-    default = {
-      'class',
-      'function',
-      'method',
-      --            'for',
-      --            'while',
-      --            'if',
-      --            'switch',
-      --            'case',
-      'interface',
-      'struct',
-      --            'enum',
-    },
-
-    haskell = {
-      'adt'
-    },
-    rust = {
-      'impl_item',
-
-    },
-    terraform = {
-      'block',
-      'object_elem',
-      'attribute',
-    },
-    markdown = {
-      'section',
-    },
-    json = {
-      'pair',
-    },
-    typescript = {
-      'export_statement',
-    },
-    yaml = {
-      'block_mapping_pair',
-    },
-  },
-}
-
-vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
-
--- }}}
-
--- {{{ telescope
-
-local lga_actions = require("telescope-live-grep-args.actions")
-require("telescope").setup {
-  extensions = {
-    fzf = {
-      fuzzy = true, -- false will only do exact matching
-      override_generic_sorter = true, -- override the generic sorter
-      override_file_sorter = true, -- override the file sorter
-      case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-    },
-    file_browser = {
-      hijack_netrw = true,
-      mappings = {
-        ["i"] = {
-          -- your custom insert mode mappings
-        },
-        ["n"] = {
-          -- your custom normal mode mappings
-        },
-      },
-    },
-    live_grep_args = {
-      auto_quoting = true, -- enable/disable auto-quoting
-      -- define mappings, e.g.
-      mappings = { -- extend mappings
-        i = {
-          ["<C-k>"] = lga_actions.quote_prompt(),
-          ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
-        },
-      },
-    },
-  },
-}
--- }}}
-
--- {{{ vim-vsnip
-vim.cmd [[
-let g:vsnip_snippet_dir = "$HOME/.vim/vsnip"
-autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-
-"function s:trigger_completedone()
-"  let info = pum#complete_info()
-"  let complete_item = info.items[info.selected]
-"  call vsnip_integ#on_complete_done(complete_item)
-"  if vsnip#available(1)
-"    return "\<Plug>(vsnip-expand-or-jump)"
-"  else
-"    return "\<Tab>"
-"  "return "\<Ignore>"
-"endfunction
-"
-"imap <expr> <Tab> <SID>trigger_completedone()
-"smap <expr> <Tab> <SID>trigger_completedone()
-" imap <expr> <Tab>   vsnip#available(1)  ? "<Plug>(vsnip-expand-or-jump)" : "<Tab>"
-" smap <expr> <Tab>   vsnip#available(1)  ? "<Plug>(vsnip-expand-or-jump)" : "<Tab>"
-imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-
-imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-let g:vsnip_filetypes = {}
-
-autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-]]
--- }}}
-
---{{{ ddc.vim
-vim.cmd [[
-call ddc#custom#patch_global("ui", "native")
-call ddc#custom#patch_global("sources", [
-    \ "around",
-    \ "file",
-    \ "vsnip",
-    \ "nvim-lsp"
-    \ ])
-call ddc#custom#patch_global("sourceOptions", {
-    \ "_": {
-    \   "matchers": ["matcher_head"],
-    \   "sorters": ["sorter_rank"],
-    \   "converters": ["converter_remove_overlap"],
-    \ },
-    \ "around": {"mark": "Around"},
-    \ "file": {
-    \   "mark": "file",
-    \   "isVolatile": v:true,
-    \   "forceCompletionPattern": "\S/\S*",
-    \ },
-    \ "vsnip": {
-    \   "mark": "vsnip",
-    \   "minAutoCompleteLength": 1,
-    \ },
-    \ "nvim-lsp": {
-    \   "mark": "LSP",
-    \   "forceCompletionPattern": "\.\w*|:\w*|->\w*",
-    \ },
-    \ })
-
-call ddc#custom#patch_global("sourceParams", {
-   \ "around": {"maxSize": 500},
-   \ })
-
-" Use Customized labels
-call ddc#custom#patch_global("sourceParams", {
-   \ "nvim-lsp": { "kindLabels": { "Class": "c" } },
-   \ })
-
-" pum.vim setting
-call ddc#custom#patch_global("completionMenu", "pum.vim")
-inoremap <silent><expr> <TAB>
-\ pumvisible() ? "<C-n>" :
-\ (col(".") <= 1 <Bar><Bar> getline(".")[col(".") - 2] =~# "\s") ?
-\ "<TAB>" : ddc#map#manual_complete()
-
-" <S-TAB>: completion back.
-inoremap <expr><S-TAB>  pumvisible() ? "<C-p>" : "<C-h>"
-
-inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
-inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
-inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
-inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-inoremap <C-e> <Cmd>call pum#map#cancel()<CR>
-
-autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-
-call ddc#enable()
-]]
-
---}}}
-
---{{{ nvim-lspconfig
-
-local on_attach = function(client, bufnr)
-  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-
-  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-  local opts = { noremap = true, silent = true }
-  buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-  buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-  buf_set_keymap("n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
-  buf_set_keymap("n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
-  buf_set_keymap("n", "<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", opts)
-  buf_set_keymap("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-  buf_set_keymap("n", "<space>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-  buf_set_keymap("n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-  buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-  buf_set_keymap("n", "<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
-  buf_set_keymap("n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
-  buf_set_keymap("n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
-  buf_set_keymap("n", "<space>q", "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>", opts)
-  buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
-end
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-
-local nvim_lsp = require("lspconfig")
-require("mason").setup({
-  ui = {
-    icons = {
-      package_installed = "✓",
-      package_pending = "➜",
-      package_uninstalled = "✗"
-    }
-  }
-})
-require("mason-lspconfig").setup()
-require("mason-lspconfig").setup_handlers {
-  function(server_name)
-    if server_name == "gopls" then
-      nvim_lsp[server_name].setup {
-        on_attach = on_attach,
-        settings = {
-          gopls = {
-            env = { GOFLAGS = "-tags=integration,wireinject" },
-          },
-        },
-      }
-    else
-      nvim_lsp[server_name].setup {
-        on_attach = on_attach,
-      }
-    end
-  end
-}
-
-function OrgImports(wait_ms)
-  local params = vim.lsp.util.make_range_params()
-  params.context = { only = { "source.organizeImports" } }
-  local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
-  for _, res in pairs(result or {}) do
-    for _, r in pairs(res.result or {}) do
-      if r.edit then
-        vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
-      else
-        vim.lsp.buf.execute_command(r.command)
-      end
-    end
-  end
-end
-
-vim.cmd [[
-  autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-]]
-
---}}
