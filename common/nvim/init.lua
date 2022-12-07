@@ -59,92 +59,95 @@ vim.opt.clipboard:append({ "unnamedplus" })
 for k, v in pairs(options) do
   vim.opt[k] = v
 end
-
-local fn = vim.fn
-local jetpackfile = fn.stdpath("data") .. "/site/pack/jetpack/opt/vim-jetpack/plugin/jetpack.vim"
-local jetpackurl = "https://raw.githubusercontent.com/tani/vim-jetpack/master/plugin/jetpack.vim"
-if fn.filereadable(jetpackfile) == 0 then
-  fn.system("curl -fsSLo " .. jetpackfile .. " --create-dirs " .. jetpackurl)
-end
-
 -- }}}
 
 -- {{{ plugin
 
-vim.cmd("packadd vim-jetpack")
-require("jetpack.paq") {
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
+
+local packer_bootstrap = ensure_packer()
+require('packer').startup(function(use)
+  use 'wbthomason/packer.nvim'
+
   -- telescope
-  "nvim-lua/plenary.nvim",
-  "nvim-telescope/telescope.nvim",
-  "nvim-telescope/telescope-file-browser.nvim",
-  "nvim-telescope/telescope-live-grep-args.nvim",
-  "LinArcX/telescope-env.nvim",
-  { "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
+  use "nvim-lua/plenary.nvim"
+  use "nvim-telescope/telescope.nvim"
+  use "nvim-telescope/telescope-file-browser.nvim"
+  use "nvim-telescope/telescope-live-grep-args.nvim"
+  use "LinArcX/telescope-env.nvim"
+  use {"nvim-telescope/telescope-fzf-native.nvim", run = "make"}
 
   -- etc
-  "luisiacc/gruvbox-baby",
-  "ntpeters/vim-better-whitespace",
-  "kamykn/spelunker.vim",
-  "simeji/winresizer",
-  "markonm/traces.vim",
-  "cohama/lexima.vim",
-  "Shougo/context_filetype.vim",
-  "joshdick/onedark.vim",
-  "mattn/vim-sonictemplate",
-  "voldikss/vim-floaterm",
-  "unblevable/quick-scope",
-  "ruanyl/vim-gh-line",
+  use "luisiacc/gruvbox-baby"
+  use "ntpeters/vim-better-whitespace"
+  use "kamykn/spelunker.vim"
+  use "simeji/winresizer"
+  use "markonm/traces.vim"
+  use "cohama/lexima.vim"
+  use "Shougo/context_filetype.vim"
+  use "joshdick/onedark.vim"
+  use "mattn/vim-sonictemplate"
+  use "voldikss/vim-floaterm"
+  use "unblevable/quick-scope"
+  use "ruanyl/vim-gh-line"
 
   -- denops
-  "vim-denops/denops.vim",
-  "yuki-yano/fuzzy-motion.vim",
-  "matsui54/denops-signature_help",
+  use "vim-denops/denops.vim"
+  use "yuki-yano/fuzzy-motion.vim"
+  use "matsui54/denops-signature_help"
 
   -- ddc
-  {
-    "Shougo/ddc.vim",
-    events = { "InsertEnter", "CursorHold", "CmdlineEnter" },
-
-  },
-  "Shougo/ddc-ui-native",
-  "Shougo/pum.vim",
-  "Shougo/ddc-around",
-  "LumaKernel/ddc-file",
-  "Shougo/ddc-matcher_head",
-  "Shougo/ddc-sorter_rank",
-  "Shougo/ddc-converter_remove_overlap",
-  "Shougo/ddc-nvim-lsp",
-  "matsui54/denops-popup-preview.vim",
+  --use {"Shougo/ddc.vim", event = { "InsertEnter", "CursorHold", "CmdlineEnter" }}
+  use "Shougo/ddc.vim"
+  use "Shougo/ddc-ui-native"
+  use "Shougo/pum.vim"
+  use "Shougo/ddc-around"
+  use "LumaKernel/ddc-file"
+  use "Shougo/ddc-matcher_head"
+  use "Shougo/ddc-sorter_rank"
+  use "Shougo/ddc-converter_remove_overlap"
+  use "Shougo/ddc-nvim-lsp"
+  use "matsui54/denops-popup-preview.vim"
 
   -- treesitter
-  {
-    "nvim-treesitter/nvim-treesitter",
-    run = ":TSUpdate",
-  },
-  "nvim-treesitter/nvim-treesitter-context",
+  use {"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"}
+  use "nvim-treesitter/nvim-treesitter-context"
 
   -- lsp
-  "neovim/nvim-lspconfig",
-  "williamboman/mason.nvim",
-  "williamboman/mason-lspconfig.nvim",
+  use "neovim/nvim-lspconfig"
+  use "williamboman/mason.nvim"
+  use "williamboman/mason-lspconfig.nvim"
 
   -- snip
-  "hrsh7th/vim-vsnip",
-  "hrsh7th/vim-vsnip-integ",
+  use "hrsh7th/vim-vsnip"
+  use "hrsh7th/vim-vsnip-integ"
 
   -- go
-  { "kyoh86/vim-go-coverage", ft = "go" },
-  { "mattn/vim-goaddtags", ft = "go" },
-  { "mattn/vim-goimpl", ft = "go" },
-  { "mattn/vim-gomod", ft = "go" },
-  { "mattn/vim-goimports", ft = "go" },
-}
+  use {"kyoh86/vim-go-coverage", ft = "go"}
+  use {"mattn/vim-goaddtags", ft = "go"}
+  use {"mattn/vim-goimpl", ft = "go"}
+  use {"mattn/vim-gomod", ft = "go"}
+  use {"mattn/vim-goimports", ft = "go"}
 
---  }}}
+  -- Automatically set up your configuration after cloning packer.nvim
+  -- Put this at the end after all plugins
+  if packer_bootstrap then
+    require('packer').sync()
+  end
+end)
+
+--- }}}
 
 -- {{{ plugin conf
-
--- denops
 vim.fn["popup_preview#enable"]()
 vim.fn["signature_help#enable"]()
 
@@ -247,7 +250,7 @@ vim.cmd [[
 
 -- {{{ tree-sitter
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json" },
+  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json", "vim" },
   sync_install = false,
   auto_install = true,
 
