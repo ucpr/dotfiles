@@ -59,6 +59,24 @@ vim.opt.clipboard:append({ "unnamedplus" })
 for k, v in pairs(options) do
   vim.opt[k] = v
 end
+
+global_options = {
+  loaded_gzip            = 1,
+  loaded_tar             = 1,
+  loaded_tarPlugin       = 1,
+  loaded_zip             = 1,
+  loaded_zipPlugin       = 1,
+  loaded_rrhelper        = 1,
+  loaded_2html_plugin    = 1,
+  loaded_vimball         = 1,
+  loaded_vimballPlugin   = 1,
+  loaded_getscript       = 1,
+  loaded_getscriptPlugin = 1,
+}
+for k, v in pairs(global_options) do
+  vim.g[k] = v
+end
+
 -- }}}
 
 -- {{{ plugin
