@@ -261,6 +261,7 @@ require('packer').startup(function(use)
       "Shougo/ddc-sorter_rank",
       "Shougo/ddc-converter_remove_overlap",
       "Shougo/ddc-nvim-lsp",
+      "Shougo/ddc-source-zsh",
     },
     config = function()
       vim.cmd [[
@@ -269,7 +270,8 @@ require('packer').startup(function(use)
             \ "around",
             \ "file",
             \ "vsnip",
-            \ "nvim-lsp"
+            \ "nvim-lsp",
+            \ "zsh",
             \ ])
         call ddc#custom#patch_global("sourceOptions", {
             \ "_": {
@@ -291,6 +293,7 @@ require('packer').startup(function(use)
             \   "mark": "LSP",
             \   "forceCompletionPattern": "\.\w*|:\w*|->\w*",
             \ },
+            \ "zsh": { "mark": "Z" },
             \ })
         
         call ddc#custom#patch_global("sourceParams", {
