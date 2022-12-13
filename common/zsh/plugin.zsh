@@ -6,6 +6,11 @@ zinit ice wait'!0'; zinit load zsh-users/zsh-completions
 zinit ice wait'!1'; plugins=(… zsh-completions)
 zinit ice wait'!1'; autoload -U compinit && compinit
 
+zmodload zsh/zpty
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey "^O" edit-command-line
+
 ### BSD to GNU
 case "$OSTYPE" in
     darwin*)
