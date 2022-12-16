@@ -107,6 +107,9 @@ require('packer').startup(function(use)
   use "nvim-lua/plenary.nvim"
   use {
     "nvim-telescope/telescope.nvim",
+    cmd = {
+      "Telescope",
+    },
     requires = {
       {
         "nvim-telescope/telescope-file-browser.nvim",
@@ -134,6 +137,12 @@ require('packer').startup(function(use)
         end
       },
     },
+    setup = function()
+      vim.keymap.set("n", "<Space>b", ":<C-u>Telescope buffers<CR>")
+      vim.keymap.set("n", "<Space>fb", ":<C-u>Telescope file_browser<CR>")
+      vim.keymap.set("n", "<Space>ff", ":<C-u>Telescope find_files<CR>")
+      vim.keymap.set("n", "<Space>lg", ":<C-u>Telescope live_grep_args<CR>")
+    end,
     config = function()
       local lga_actions = require("telescope-live-grep-args.actions")
       require("telescope").setup {
@@ -203,13 +212,19 @@ require('packer').startup(function(use)
     end
   }
   use {
-    "voldikss/vim-floaterm",
-    cmd = {
-      "FloatermToggle",
-    },
+    "numToStr/FTerm.nvim",
+    module = { "FTerm" },
     setup = function()
-      vim.g.floaterm_autoclose = 1
-      vim.g.floaterm_title = "🐼"
+      vim.keymap.set("n", "T", '<C-\\><C-n><CMD>lua require("FTerm").toggle()<CR>')
+    end,
+    config = function()
+      require 'FTerm'.setup({
+        border     = 'double',
+        dimensions = {
+          height = 0.9,
+          width = 0.9,
+        },
+      })
     end
   }
   use {
@@ -246,6 +261,7 @@ require('packer').startup(function(use)
       vim.fn["popup_preview#enable"]()
     end
   }
+  use "lambdalisue/guise.vim"
 
   -- ddc
   --use {"Shougo/ddc.vim", }
@@ -401,7 +417,6 @@ require('packer').startup(function(use)
       end
     }
   }
-  --use "nvim-treesitter/nvim-treesitter-context"
 
   -- lsp
   use {
@@ -554,15 +569,6 @@ end)
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
 keymap.set("n", "<C-c>", ":<C-u>q!<CR>")
-
--- telescope
-keymap.set("n", "<Space>b", ":<C-u>Telescope buffers<CR>")
-keymap.set("n", "<Space>fb", ":<C-u>Telescope file_browser<CR>")
-keymap.set("n", "<Space>ff", ":<C-u>Telescope find_files<CR>")
-keymap.set("n", "<Space>lg", ":<C-u>Telescope live_grep_args<CR>")
-
--- floaterm
-keymap.set("n", "T", ":<C-u>FloatermToggle<CR>")
 
 -- buffer
 keymap.set("n", ",", ":<C-u>bprev<CR>")
