@@ -95,13 +95,13 @@ end
 local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
-  use {
-    "lewis6991/impatient.nvim",
-    config = function()
-      require('impatient')
-      require('impatient').enable_profile()
-    end
-  }
+  --  use {
+  --    "lewis6991/impatient.nvim",
+  --    config = function()
+  --      require('impatient')
+  --      require('impatient').enable_profile()
+  --    end
+  --  }
 
   -- telescope
   use "nvim-lua/plenary.nvim"
@@ -510,22 +510,6 @@ require('packer').startup(function(use)
       vim.cmd [[
         let g:vsnip_snippet_dir = "$HOME/.vim/vsnip"
         autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        
-        "function s:trigger_completedone()
-        "  let info = pum#complete_info()
-        "  let complete_item = info.items[info.selected]
-        "  call vsnip_integ#on_complete_done(complete_item)
-        "  if vsnip#available(1)
-        "    return "\<Plug>(vsnip-expand-or-jump)"
-        "  else
-        "    return "\<Tab>"
-        "  "return "\<Ignore>"
-        "endfunction
-        "
-        "imap <expr> <Tab> <SID>trigger_completedone()
-        "smap <expr> <Tab> <SID>trigger_completedone()
-        " imap <expr> <Tab>   vsnip#available(1)  ? "<Plug>(vsnip-expand-or-jump)" : "<Tab>"
-        " smap <expr> <Tab>   vsnip#available(1)  ? "<Plug>(vsnip-expand-or-jump)" : "<Tab>"
         imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
         smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
         
