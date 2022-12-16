@@ -107,45 +107,59 @@ require('packer').startup(function(use)
   use "nvim-lua/plenary.nvim"
   use {
     "nvim-telescope/telescope.nvim",
-    cmd = {
-      "Telescope",
-    },
+    module = { "telescope" },
     requires = {
       {
         "nvim-telescope/telescope-file-browser.nvim",
-        config = function()
-          require("telescope").load_extension("file_browser")
-        end,
+        opt = true,
       },
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
-        config = function()
-          require("telescope").load_extension("live_grep_args")
-        end
+        opt = true,
       },
       {
         "LinArcX/telescope-env.nvim",
-        config = function()
-          require("telescope").load_extension("env")
-        end
+        opt = true,
       },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         run = "make",
-        config = function()
-          require("telescope").load_extension("fzf")
-        end
+        opt = true,
       },
     },
+    wants = {
+      "telescope-fzf-native.nvim",
+      "telescope-file-browser.nvim",
+      "telescope-live-grep-args.nvim",
+      "telescope-env.nvim",
+    },
     setup = function()
-      vim.keymap.set("n", "<Space>b", ":<C-u>Telescope buffers<CR>")
-      vim.keymap.set("n", "<Space>fb", ":<C-u>Telescope file_browser<CR>")
-      vim.keymap.set("n", "<Space>ff", ":<C-u>Telescope find_files<CR>")
-      vim.keymap.set("n", "<Space>lg", ":<C-u>Telescope live_grep_args<CR>")
+      local function builtin(name)
+        return function(opt)
+          return function()
+            return require("telescope.builtin")[name](opt or {})
+          end
+        end
+      end
+
+      local function extensions(name, prop)
+        return function(opt)
+          return function()
+            local telescope = require "telescope"
+            telescope.load_extension(name)
+            return telescope.extensions[name][prop](opt or {})
+          end
+        end
+      end
+
+      vim.keymap.set("n", "<Space>b", builtin("buffers") {})
+      vim.keymap.set("n", "<Space>fb", extensions("file_browser", "file_browser") {})
+      vim.keymap.set("n", "<Space>ff", builtin("find_files") {})
+      vim.keymap.set("n", "<Space>lg", extensions("live_grep_args", "live_grep_args") {})
     end,
     config = function()
-      local lga_actions = require("telescope-live-grep-args.actions")
-      require("telescope").setup {
+      local telescope = require "telescope"
+      telescope.setup {
         extensions = {
           fzf = {
             fuzzy = true, -- false will only do exact matching
@@ -155,27 +169,13 @@ require('packer').startup(function(use)
           },
           file_browser = {
             hijack_netrw = true,
-            mappings = {
-              ["i"] = {
-                -- your custom insert mode mappings
-              },
-              ["n"] = {
-                -- your custom normal mode mappings
-              },
-            },
           },
           live_grep_args = {
             auto_quoting = true, -- enable/disable auto-quoting
-            -- define mappings, e.g.
-            mappings = { -- extend mappings
-              i = {
-                ["<C-k>"] = lga_actions.quote_prompt(),
-                ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
-              },
-            },
           },
         },
       }
+      telescope.load_extension "fzf"
     end
   }
 
