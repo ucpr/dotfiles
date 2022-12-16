@@ -374,14 +374,8 @@ require('packer').startup(function(use)
               'class',
               'function',
               'method',
-              --            'for',
-              --            'while',
-              --            'if',
-              --            'switch',
-              --            'case',
               'interface',
               'struct',
-              --            'enum',
             },
 
             haskell = {
@@ -424,8 +418,6 @@ require('packer').startup(function(use)
       {
         "williamboman/mason.nvim",
         module = { "lspconfig" },
-        config = function()
-        end,
       }
     },
     config = function()
@@ -560,7 +552,7 @@ end)
 
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
-keymap.set("n", "<C-c>", ":<C-u>q!<CR>")
+keymap.set("n", "<C-q>", ":<C-u>q!<CR>")
 
 -- buffer
 keymap.set("n", ",", ":<C-u>bprev<CR>")
