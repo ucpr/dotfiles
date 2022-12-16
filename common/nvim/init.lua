@@ -195,7 +195,7 @@ require('packer').startup(function(use)
   use { "markonm/traces.vim", opt = true }
   use {
     "cohama/lexima.vim",
-    events = { "InsertEnter" },
+    event = { "InsertEnter" },
   }
   use "Shougo/context_filetype.vim"
   use {
@@ -510,7 +510,7 @@ require('packer').startup(function(use)
   -- snip
   use {
     "hrsh7th/vim-vsnip",
-    events = { "InsertEnter" },
+    event = { "InsertEnter" },
     config = function()
       vim.cmd [[
         let g:vsnip_snippet_dir = "$HOME/.vim/vsnip"
@@ -531,7 +531,7 @@ require('packer').startup(function(use)
   }
   use {
     "hrsh7th/vim-vsnip-integ",
-    events = { "InsertEnter" },
+    event = { "InsertEnter" },
   }
 
   -- go
