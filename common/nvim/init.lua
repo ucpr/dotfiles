@@ -95,13 +95,6 @@ end
 local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
-  --  use {
-  --    "lewis6991/impatient.nvim",
-  --    config = function()
-  --      require('impatient')
-  --      require('impatient').enable_profile()
-  --    end
-  --  }
 
   -- telescope
   use "nvim-lua/plenary.nvim"
@@ -162,20 +155,20 @@ require('packer').startup(function(use)
       telescope.setup {
         extensions = {
           fzf = {
-            fuzzy = true, -- false will only do exact matching
-            override_generic_sorter = true, -- override the generic sorter
-            override_file_sorter = true, -- override the file sorter
-            case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
           },
           file_browser = {
             hijack_netrw = true,
           },
           live_grep_args = {
-            auto_quoting = true, -- enable/disable auto-quoting
+            auto_quoting = true,
           },
         },
       }
-      telescope.load_extension "fzf"
+      telescope.load_extension("fzf")
     end
   }
 
@@ -200,7 +193,10 @@ require('packer').startup(function(use)
   }
   use { "simeji/winresizer", opt = true }
   use { "markonm/traces.vim", opt = true }
-  use "cohama/lexima.vim"
+  use {
+    "cohama/lexima.vim",
+    events = { "InsertEnter" },
+  }
   use "Shougo/context_filetype.vim"
   use {
     "mattn/vim-sonictemplate",
@@ -421,6 +417,17 @@ require('packer').startup(function(use)
   -- lsp
   use {
     "neovim/nvim-lspconfig",
+    requires = {
+      {
+        "williamboman/mason-lspconfig.nvim",
+      },
+      {
+        "williamboman/mason.nvim",
+        module = { "lspconfig" },
+        config = function()
+        end,
+      }
+    },
     config = function()
       local on_attach = function(client, bufnr)
         local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
@@ -479,7 +486,6 @@ require('packer').startup(function(use)
           end
         end
       }
-
       function OrgImports(wait_ms)
         local params = vim.lsp.util.make_range_params()
         params.context = { only = { "source.organizeImports" } }
@@ -500,12 +506,11 @@ require('packer').startup(function(use)
       ]]
     end
   }
-  use "williamboman/mason.nvim"
-  use "williamboman/mason-lspconfig.nvim"
 
   -- snip
   use {
     "hrsh7th/vim-vsnip",
+    events = { "InsertEnter" },
     config = function()
       vim.cmd [[
         let g:vsnip_snippet_dir = "$HOME/.vim/vsnip"
@@ -524,7 +529,10 @@ require('packer').startup(function(use)
         ]]
     end
   }
-  use "hrsh7th/vim-vsnip-integ"
+  use {
+    "hrsh7th/vim-vsnip-integ",
+    events = { "InsertEnter" },
+  }
 
   -- go
   use { "kyoh86/vim-go-coverage", ft = "go" }
