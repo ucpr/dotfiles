@@ -42,6 +42,7 @@ brew "k9s"
 brew "istioctl"
 brew "k6"
 brew "fd"
+brew "translate-shell"
 
 cask "google-cloud-sdk"
 cask "1password"
