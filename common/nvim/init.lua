@@ -174,12 +174,10 @@ require('packer').startup(function(use)
 
   -- etc
   use {
-    "luisiacc/gruvbox-baby",
+    "sainnhe/everforest",
     config = function()
       vim.cmd [[
-        colorscheme gruvbox-baby
-        " 検索時のハイライトの色を変更
-        hi Search guibg=peru guifg=wheat
+        colorscheme everforest
       ]]
     end
   }
