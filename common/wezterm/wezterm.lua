@@ -2,7 +2,7 @@ local wezterm = require "wezterm";
 
 local keys = {
   { key = "n", mods = "ALT", action = "ShowLauncher" },
-  { key = "t", mods = "ALT", action = "ShowTabNavigator" },
+  -- { key = "t", mods = "ALT", action = "ShowTabNavigator" },
 
   { key = "s", mods = "ALT", action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" } },
   { key = "v", mods = "ALT", action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" } },
@@ -21,7 +21,18 @@ for i = 1, 9 do
 end
 
 return {
-  color_scheme = "OneDark (Gogh)",
+  -- color_scheme = "OneDark (Gogh)",
+  colors = {
+    foreground = "#d3c6aa",
+    background = "#2b3339",
+    cursor_bg = "#d3c6aa",
+    cursor_border = "#d3c6aa",
+    cursor_fg = "#2b3339",
+    selection_bg = "#d3c6aa",
+    selection_fg = "#2b3339",
+    ansi = { "#4b565c", "#e67e80", "#a7c080", "#dbbc7f", "#7fbbb3", "#d699b6", "#83c092", "#d3c6aa" },
+    brights = { "#4b565c", "#e67e80", "#a7c080", "#dbbc7f", "#7fbbb3", "#d699b6", "#83c092", "#d3c6aa" },
+  },
 
   use_ime = true,
 
@@ -37,8 +48,8 @@ return {
 
   keys = keys,
 
-  window_background_opacity = 0.85,
-  use_fancy_tab_bar = false,
+  window_background_opacity = 0.9,
+  -- use_fancy_tab_bar = false,
   -- window_decorations = "NONE",
---  disable_default_key_bindings = true,
+  -- disable_default_key_bindings = true,
 }
