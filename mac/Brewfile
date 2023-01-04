@@ -2,6 +2,7 @@ tap 'homebrew/cask'
 tap 'homebrew/core'
 tap "homebrew/cask-fonts"
 tap "bufbuild/buf"
+tap "ktr0731/evans"
 cask_args appdir: "/Applications"
 
 brew "coreutils"
@@ -43,6 +44,7 @@ brew "istioctl"
 brew "k6"
 brew "fd"
 brew "translate-shell"
+brew "ktr0731/evans/evans"
 
 cask "google-cloud-sdk"
 cask "1password"
