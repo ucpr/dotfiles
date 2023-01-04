@@ -8,31 +8,20 @@
       "}"
     ]
   },
-  "ims": {
+  "multiple imports": {
     "prefix": "ims",
-    "body": [
-      "import (",
-      "\t$1",
-      ")"
-    ]
+    "body": "import (\n\t\"${1:package}\"\n)",
+    "description": "Snippet for a import block"
   },
-  "struct": {
-    "prefix": "tys",
-    "description": "struct T { ... }",
-    "body": [
-      "type $1 struct {",
-      "\t$2",
-      "}"
-    ]
+  "multiple constants": {
+    "prefix": "cos",
+    "body": "const (\n\t${1:name} = ${2:value}\n)",
+    "description": "Snippet for a constant block"
   },
-  "interface": {
-    "prefix": "tyi",
-    "description": "interface I { ... }",
-    "body": [
-      "type $1 interface {",
-      "\t$2",
-      "}"
-    ]
+  "variables declaration": {
+    "prefix": "vars",
+    "body": "var (\n\t${1:name} ${2:type} = ${3:value}\n)",
+    "description": "Snippet for a variable"
   },
   "error return": {
     "prefix": "rerr",
@@ -87,14 +76,10 @@
       "}"
     ]
   },
-  "anonymous function goroutine": {
-    "prefix": "gof",
-    "description": "",
-    "body": [
-      "go func(){",
-      "\t$2",
-      "}"
-    ]
+  "goroutine anonymous function": {
+    "prefix": "go",
+    "body": "go func($1) {\n\t$0\n}($2)",
+    "description": "Snippet for anonymous goroutine declaration"
   },
   "graceful shutdown": {
     "prefix": "shutdown",
@@ -112,5 +97,35 @@
     "body": [
       "var _ ${1:interface} = (*${2:struct})(nil)"
     ]
+  },
+  "type function declaration": {
+    "prefix": "tyf",
+    "body": "type ${1:name} func($3) $4",
+    "description": "Snippet for a type function declaration"
+  },
+  "type interface declaration": {
+    "prefix": "tyi",
+    "body": "type ${1:name} interface {\n\t$0\n}",
+    "description": "Snippet for a type interface"
+  },
+  "type struct declaration": {
+    "prefix": "tys",
+    "body": "type ${1:name} struct {\n\t$0\n}",
+    "description": "Snippet for a struct declaration"
+  },
+  "switch statement": {
+    "prefix": "switch",
+    "body": "switch ${1:expression} {\ncase ${2:condition}:\n\t$0\n}",
+    "description": "Snippet for switch statement"
+  },
+  "make(...)": {
+    "prefix": "make",
+    "body": "make(${1:type}, ${2:0})",
+    "description": "Snippet for make statement"
+  },
+  "new(...)": {
+    "prefix": "new",
+    "body": "new(${1:type})",
+    "description": "Snippet for new statement"
   }
 }
