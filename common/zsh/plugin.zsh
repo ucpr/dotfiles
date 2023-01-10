@@ -221,15 +221,12 @@ issues() {
 }
 
 ### asdf
-if [ -e /opt/homebrew/opt/asdf/asdf.sh ]; then
-  source /opt/homebrew/opt/asdf/asdf.sh
-elif [ -e /usr/local/opt/asdf/asdf.sh ]; then
-  source /usr/local/opt/asdf/asdf.sh
-elif [ -e /opt/homebrew/Cellar/asdf/0.10.0/libexec/asdf.sh ]; then
-  source /opt/homebrew/Cellar/asdf/0.10.0/libexec/asdf.sh
+if [ -e /usr/local/opt/asdf/libexec/asdf.sh ]; then
+  source /usr/local/opt/asdf/libexec/asdf.sh
 fi
 
 ### custom configuration
 if [ -e $HOME/.config/zsh/custom.zsh ]; then
   source $HOME/.config/zsh/custom.zsh
 fi
+
