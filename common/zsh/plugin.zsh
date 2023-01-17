@@ -56,6 +56,9 @@ export PATH=~/.go/bin:$PATH
 
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 
+export VISUAL=nvim
+export EDITOR=nvim
+
 #export NAVI_CONFIG="$HOME/.config/navi/cheats"
 #export NAVI_CONFIG_YAML="$HOME/.config/navi/config.yaml"
 
