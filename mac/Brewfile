@@ -68,6 +68,7 @@ cask "wezterm"
 # cask "flutter"
 cask "notion"
 cask "spectacle"
+cask "karabiner-elements"
 
 cask "font-hack-nerd-font"
 
