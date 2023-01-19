@@ -1,6 +1,7 @@
 [user]
   email = contact@ucpr.dev
   name = ucpr
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGP9SST4B4yB0dzvlphF8/Vae1mbedOb+F91AxjayAbG
 [ghq]
   root = ~/.ghq
 [pager]
@@ -17,6 +18,8 @@
   diffFilter = delta --color-only
 [commit]
   template = ~/.gitmessage
+  verbose = true
+  gpgsign = true
 [core]
   editor = vim
 [color]
@@ -36,3 +39,11 @@
   prune = true
 [pull]
 	rebase = true
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
