@@ -9,7 +9,6 @@ brew "coreutils"
 brew "findutils"
 brew "gnu-sed"
 brew "grep"
-brew "vim"
 brew "git"
 brew "ghq"
 #brew "kubernetes-cli"
@@ -64,7 +63,7 @@ cask "sequel-ace"
 cask "figma"
 cask "wireshark"
 cask "wezterm"
-cask "flutter"
+# cask "flutter"
 cask "alt-tab"
 cask "notion"
 
@@ -72,5 +71,5 @@ cask "font-hack-nerd-font"
 
 mas "RunCat", id: 1429033973
 mas "LINE", id: 539883307
-mas "Xcode", id: 497799835
+# mas "Xcode", id: 497799835
 mas "meetingbar", id: 1532419400
