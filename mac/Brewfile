@@ -14,7 +14,6 @@ brew "ghq"
 #brew "kubernetes-cli"
 brew "kubectx"
 brew "fzf"
-brew "tfenv"
 brew "bat"
 brew "curl", link: true
 brew "wget"

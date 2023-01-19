@@ -33,6 +33,7 @@
   br = branch
   p = push
   ph = push origin head
+  pl = pull
   graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
   ucat = !"git ls-files --others --exclude-standard | xargs bat"
 [fetch]

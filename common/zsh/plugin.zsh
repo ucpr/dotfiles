@@ -225,8 +225,8 @@ issues() {
 }
 
 ### asdf
-if [ -e /usr/local/opt/asdf/libexec/asdf.sh ]; then
-  source /usr/local/opt/asdf/libexec/asdf.sh
+if [ -e /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
+  source /opt/homebrew/opt/asdf/libexec/asdf.sh
 fi
 
 ### custom configuration
