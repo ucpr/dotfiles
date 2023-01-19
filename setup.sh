@@ -46,38 +46,20 @@ fi
 
 create_symbolic_link() {
   echo "Create symbolic link"
-  if [ -e ~/.config ]; then
-    echo "exist ~/.config"
-  else
-    mkdir ~/.config
-    mkdir ~/.config/zsh
-  fi
 
-  ln -s `pwd`/common/.vimrc ~/.vimrc
+  [[ -nf ~/.config ]] && mkdir ~/.config
+  [[ -nf ~/.config/zsh ]] && mkdir ~/.config/zsh
+  [[ -nf ~/.config/wezterm ]] && mkdir ~/.config/wezterm
+
+  ln -s `pwd`/common/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
   ln -s `pwd`/common/nvim ~/.config/nvim
   ln -s `pwd`/common/.zshrc ~/.zshrc
   ln -s `pwd`/common/zsh/plugin.zsh ~/.config/zsh/plugin.zsh
-  ln -s `pwd`/common/.tmux.conf ~/.tmux.conf
   ln -s `pwd`/common/.gitconfig ~/.gitconfig
   ln -s `pwd`/common/.gitmessage ~/.gitmessage
 
   echo "Done"
 }
-
-install_dein_vim() {
-  echo "Clone dein.vim"
-
-  if [ -e ~/.cache/dein/repos/github.com/Shougo/dein.vim ]; then
-    echo "exist ~/.cache/dein/repos/github.com/Shougo/dein.vim "
-  else
-    mkdir -p ~/.cache/dein/repos/github.com/Shougo/dein.vim
-  fi
-  git clone https://github.com/Shougo/dein.vim.git ~/.cache/dein/repos/github.com/Shougo/dein.vim
-  #git clone https://github.com/Shougo/dein.vim.git ~/.config/nvim/dein/repos/github.com/Shougo/dein.vim
-
-  echo "Done"
-}
-
 # ------------------------------------------------------------ #
 
 # symbolic link
@@ -87,14 +69,5 @@ case $yn in
     [Nn]* ) echo "Skip";;
     * ) echo "Please answer yes or no.";;
 esac
-
-# dein.vim
-read -p "Do you wish to install dein.vim? (y/n)" yn
-case $yn in
-    [Yy]* ) install_dein_vim;;
-    [Nn]* ) echo "Skip";;
-    * ) echo "Please answer yes or no.";;
-esac
-
 
 echo "ALL DONE"
