@@ -36,7 +36,7 @@ return {
 
   use_ime = true,
 
-  font = wezterm.font "Hack",
+  font = wezterm.font "Hack Nerd Font",
   font_size = 15.0,
 
   window_padding = {
