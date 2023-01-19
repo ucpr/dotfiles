@@ -51,6 +51,7 @@ alias egrep='egrep --color=auto'
 alias python='python3'
 
 ### Export
+source "$HOME/.config/op/plugins.sh"
 export GOPATH=~/.go
 export PATH=~/.go/bin:$PATH
 

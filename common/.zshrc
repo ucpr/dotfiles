@@ -26,7 +26,8 @@ bindkey "^[[3~" delete-char
 bindkey -v
 
 # zinit
-source ~/.zinit/bin/zinit.zsh
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+source "${ZINIT_HOME}/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
@@ -37,3 +38,4 @@ zinit light sindresorhus/pure
 zinit wait lucid light-mode as'null' \
   atinit'. "$HOME/.config/zsh/plugin.zsh"' \
   for 'zdharma-continuum/null'
+### End of Zinit's installer chunk
