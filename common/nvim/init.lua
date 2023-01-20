@@ -503,7 +503,7 @@ require('packer').startup(function(use)
     event = { "InsertEnter" },
     config = function()
       vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.vim/vsnip"
+        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
         autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
         imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
         smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
