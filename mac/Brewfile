@@ -68,6 +68,7 @@ cask "wezterm"
 cask "notion"
 cask "spectacle"
 cask "karabiner-elements"
+cask "google-drive"
 
 cask "font-hack-nerd-font"
 
