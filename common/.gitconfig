@@ -21,7 +21,7 @@
   verbose = true
   gpgsign = true
 [core]
-  editor = vim
+	editor = nvim
 [color]
   ui = true
   excludeFile = ""
