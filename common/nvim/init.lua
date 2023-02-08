@@ -153,6 +153,12 @@ require('packer').startup(function(use)
     config = function()
       local telescope = require "telescope"
       telescope.setup {
+        defaults = {
+          file_ignore_patterns = {
+            "vendor", "vendor/*", "./vendor", "./vendor/*",
+            "node_modules",
+          },
+        },
         extensions = {
           fzf = {
             fuzzy = true,
