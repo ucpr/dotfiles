@@ -190,7 +190,7 @@ require('packer').startup(function(use)
   use { "ntpeters/vim-better-whitespace", opt = true }
   use {
     "kamykn/spelunker.vim",
-    setup = function()
+    config = function()
       vim.g.enable_spelunker_vim = 1
       vim.g.spelunker_check_type = 2
     end
@@ -348,7 +348,7 @@ require('packer').startup(function(use)
     run = ":TSUpdate",
     config = function()
       require 'nvim-treesitter.configs'.setup {
-        ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json", "vim" },
+        ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json", "vim", "hcl" },
         sync_install = false,
         auto_install = true,
         highlight = {
