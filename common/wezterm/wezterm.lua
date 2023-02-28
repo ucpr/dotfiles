@@ -2,7 +2,6 @@ local wezterm = require "wezterm";
 
 local keys = {
   { key = "n", mods = "ALT", action = "ShowLauncher" },
-  -- { key = "t", mods = "ALT", action = "ShowTabNavigator" },
 
   { key = "s", mods = "ALT", action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" } },
   { key = "v", mods = "ALT", action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" } },
@@ -21,7 +20,6 @@ for i = 1, 9 do
 end
 
 return {
-  -- color_scheme = "OneDark (Gogh)",
   colors = {
     foreground = "#d3c6aa",
     background = "#2b3339",
@@ -49,7 +47,4 @@ return {
   keys = keys,
 
   window_background_opacity = 0.9,
-  -- use_fancy_tab_bar = false,
-  -- window_decorations = "NONE",
-  -- disable_default_key_bindings = true,
 }
