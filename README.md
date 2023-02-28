@@ -1,5 +1,5 @@
 # dotfiles
-my dotfiles.
+my dotfiles
 
 ## Init
 ```
