@@ -47,4 +47,5 @@ return {
   keys = keys,
 
   window_background_opacity = 0.9,
+  front_end = "WebGpu",
 }
