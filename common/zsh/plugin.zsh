@@ -50,6 +50,9 @@ alias egrep='egrep --color=auto'
 
 alias python='python3'
 
+alias propen='gh pr view --web'
+alias prcreate='gh pr create -a @me -f -d && gh pr view --web'
+
 ### Export
 source "$HOME/.config/op/plugins.sh"
 export GOPATH=~/.go
