@@ -475,6 +475,28 @@ require('packer').startup(function(use)
                 },
               },
             }
+            --           elseif server_name == "denols" then
+            --             nvim_lsp[server_name].setup({
+            --               root_dir = lspconfig.util.root_pattern("deno.json"),
+            --               init_options = {
+            --                 lint = true,
+            --                 unstable = true,
+            --                 suggest = {
+            --                   imports = {
+            --                     hosts = {
+            --                       ["https://deno.land"] = true,
+            --                       ["https://cdn.nest.land"] = true,
+            --                       ["https://crux.land"] = true,
+            --                     },
+            --                   },
+            --                 },
+            --               },
+            --             })
+            --           elseif server_name == "tsserver" then
+            --             nvim_lsp[server_name].setup({
+            --               root_dir = lspconfig.util.root_pattern("package.json"),
+            --               autostart = false,
+            --             })
           else
             nvim_lsp[server_name].setup {
               on_attach = on_attach,

@@ -46,6 +46,6 @@ return {
 
   keys = keys,
 
-  window_background_opacity = 0.9,
-  front_end = "WebGpu",
+  window_background_opacity = 0.8,
+  -- front_end = "WebGpu",
 }
