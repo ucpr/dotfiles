@@ -472,6 +472,7 @@ require('packer').startup(function(use)
               settings = {
                 gopls = {
                   env = { GOFLAGS = "-tags=integration,wireinject" },
+                  gofumpt = true,
                 },
               },
             }
