@@ -245,6 +245,27 @@ require('packer').startup(function(use)
       vim.g.qs_buftype_blacklist = { "terminal", "nofile" }
     end,
   }
+  use {
+    "nvim-tree/nvim-tree.lua",
+    cmd = "NvimTreeToggle",
+    setup = function()
+      vim.keymap.set("n", "<C-e>", '<C-\\><C-n><CMD>NvimTreeToggle<CR>')
+    end,
+    config = function()
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+
+      require("nvim-tree").setup({
+        sort_by = "case_sensitive",
+        renderer = {
+          group_empty = true,
+        },
+        filters = {
+          dotfiles = true,
+        },
+      })
+    end
+  }
 
   -- denops
   use "vim-denops/denops.vim"
@@ -252,6 +273,29 @@ require('packer').startup(function(use)
   use "lambdalisue/guise.vim"
 
   -- nvim-cmp
+
+  use {
+    'hrsh7th/vim-vsnip',
+    -- event = { 'InsertEnter' },
+    config = function()
+      vim.cmd [[
+        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        
+        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        let g:vsnip_filetypes = {}
+        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+        ]]
+    end
+  }
+
   use {
     "hrsh7th/nvim-cmp",
     config = function()
@@ -354,6 +398,8 @@ require('packer').startup(function(use)
           ["<C-n>"] = cmp.mapping.select_next_item(),
           ['<C-l>'] = cmp.mapping.complete(),
           ['<C-e>'] = cmp.mapping.abort(),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ["<CR>"] = cmp.mapping.confirm { select = true },
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
@@ -421,9 +467,6 @@ require('packer').startup(function(use)
         'hrsh7th/cmp-path', event = { 'InsertEnter' }
       },
       {
-        'hrsh7th/cmp-vsnip', event = { 'InsertEnter' }
-      },
-      {
         'hrsh7th/cmp-cmdline', event = { 'ModeChanged' }
       },
       {
@@ -439,33 +482,11 @@ require('packer').startup(function(use)
         'onsails/lspkind.nvim', event = { 'InsertEnter' }
       },
       {
-        'hrsh7th/vim-vsnip',
-        event = { 'InsertEnter' },
-        config = function()
-          vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        
-        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        let g:vsnip_filetypes = {}
-        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-        ]]
-        end
+        'hrsh7th/cmp-vsnip',
       },
-      {
-        'hrsh7th/vim-vsnip-integ', event = { 'InsertEnter' }
-      },
-      {
-        "hrsh7th/cmp-vsnip",
-        event = { "InsertEnter" },
-      },
+      -- {
+      --   'hrsh7th/vim-vsnip-integ', event = { 'InsertEnter' }
+      -- },
       {
         "github/copilot.vim",
         event = { "InsertEnter" },
@@ -658,13 +679,6 @@ require('packer').startup(function(use)
         autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
       ]]
     end
-  }
-
-  -- snip
-  use {
-    "hrsh7th/vim-vsnip",
-    event = { "InsertEnter" },
-
   }
 
   -- go
