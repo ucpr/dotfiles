@@ -249,98 +249,117 @@ require('packer').startup(function(use)
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
-  use {
-    "matsui54/denops-signature_help",
-    config = function()
-      vim.fn["signature_help#enable"]()
-    end
-  }
-  use {
-    "matsui54/denops-popup-preview.vim",
-    config = function()
-      vim.fn["popup_preview#enable"]()
-    end
-  }
   use "lambdalisue/guise.vim"
 
-  -- ddc
-  --use {"Shougo/ddc.vim", }
+  -- nvim-cmp
   use {
-    "Shougo/ddc.vim",
-    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
-    requires = {
-      "Shougo/ddc-ui-native",
-      "Shougo/pum.vim",
-      "Shougo/ddc-around",
-      "LumaKernel/ddc-file",
-      "Shougo/ddc-matcher_head",
-      "Shougo/ddc-sorter_rank",
-      "Shougo/ddc-converter_remove_overlap",
-      "Shougo/ddc-nvim-lsp",
-      "Shougo/ddc-source-zsh",
-    },
+    "hrsh7th/nvim-cmp",
     config = function()
-      vim.cmd [[
-        call ddc#custom#patch_global("ui", "native")
-        call ddc#custom#patch_global("sources", [
-            \ "around",
-            \ "file",
-            \ "vsnip",
-            \ "nvim-lsp",
-            \ "zsh",
-            \ ])
-        call ddc#custom#patch_global("sourceOptions", {
-            \ "_": {
-            \   "matchers": ["matcher_head"],
-            \   "sorters": ["sorter_rank"],
-            \   "converters": ["converter_remove_overlap"],
-            \ },
-            \ "around": {"mark": "Around"},
-            \ "file": {
-            \   "mark": "file",
-            \   "isVolatile": v:true,
-            \   "forceCompletionPattern": "\S/\S*",
-            \ },
-            \ "vsnip": {
-            \   "mark": "vsnip",
-            \   "minAutoCompleteLength": 1,
-            \ },
-            \ "nvim-lsp": {
-            \   "mark": "LSP",
-            \   "forceCompletionPattern": "\.\w*|:\w*|->\w*",
-            \ },
-            \ "zsh": { "mark": "Z" },
-            \ })
-        
-        call ddc#custom#patch_global("sourceParams", {
-           \ "around": {"maxSize": 500},
-           \ })
-        
-        " Use Customized labels
-        call ddc#custom#patch_global("sourceParams", {
-           \ "nvim-lsp": { "kindLabels": { "Class": "c" } },
-           \ })
-        
-        " pum.vim setting
-        call ddc#custom#patch_global("completionMenu", "pum.vim")
-        inoremap <silent><expr> <TAB>
-        \ pumvisible() ? "<C-n>" :
-        \ (col(".") <= 1 <Bar><Bar> getline(".")[col(".") - 2] =~# "\s") ?
-        \ "<TAB>" : ddc#map#manual_complete()
-        
-        " <S-TAB>: completion back.
-        inoremap <expr><S-TAB>  pumvisible() ? "<C-p>" : "<C-h>"
-        
-        inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
-        inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
-        inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
-        inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-        inoremap <C-e> <Cmd>call pum#map#cancel()<CR>
-        
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        call ddc#enable()
-      ]]
-    end
+      vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+      vim.keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.formatting()<CR>')
+      vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
+      vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
+      vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
+      vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
+      vim.keymap.set('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
+      vim.keymap.set('n', 'gn', '<cmd>lua vim.lsp.buf.rename()<CR>')
+      vim.keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+      vim.keymap.set('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>')
+      vim.keymap.set('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>')
+      vim.keymap.set('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
+      -- LSP handlers
+      vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+        vim.lsp.diagnostic.on_publish_diagnostics, { virtual_text = false }
+      )
+      local cmp = require("cmp")
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body)
+          end,
+        },
+        sources = {
+          { name = "nvim_lsp" },
+          { name = "buffer" },
+          { name = "path" },
+          { name = 'copilot' },
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+          ['<C-l>'] = cmp.mapping.complete(),
+          ['<C-e>'] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            else
+              fallback()
+            end
+          end,
+          ['<S-Tab>'] = function(fallback)
+            if cmp.visivle() then
+              cmp.select_prev_item()
+            else
+              fallback()
+            end
+          end,
+        }),
+        experimental = {
+          ghost_text = true,
+        },
+      })
+
+      -- Set configuration for specific filetype.
+      cmp.setup.filetype('gitcommit', {
+        sources = cmp.config.sources({
+          { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+        }, {
+          { name = 'buffer' },
+        })
+      })
+
+      -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline({ '/', '?' }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' }
+        }
+      })
+
+      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' }
+        }, {
+          { name = 'cmdline' }
+        })
+      })
+    end,
+    requires = {
+      {
+        "hrsh7th/cmp-nvim-lsp",
+      },
+      {
+        "hrsh7th/vim-vsnip",
+      },
+      {
+        "hrsh7th/cmp-path",
+      },
+      {
+        "hrsh7th/cmp-buffer",
+      },
+      {
+        "hrsh7th/cmp-cmdline",
+      },
+      {
+        "github/copilot.vim",
+      },
+      {
+        "hrsh7th/cmp-copilot"
+      },
+    },
   }
   -- treesitter
   use {
@@ -450,7 +469,7 @@ require('packer').startup(function(use)
         buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
       end
 
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local capabilities = require('cmp_nvim_lsp').default_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
       local nvim_lsp = require("lspconfig")
