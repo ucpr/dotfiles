@@ -386,11 +386,11 @@ require('packer').startup(function(use)
         },
 
         sources = {
-          { name = "nvim_lsp" },
-          { name = 'vsnip' },
-          { name = "buffer" },
-          { name = "path" },
-          { name = 'copilot' },
+          { name = "nvim_lsp", qs_hi_priority = 10 },
+          { name = 'vsnip', qs_hi_priority = 9 },
+          { name = "path", qs_hi_priority = 8 },
+          { name = "buffer", qs_hi_priority = 7 },
+          { name = 'copilot', qs_hi_priority = 6 },
         },
 
         mapping = cmp.mapping.preset.insert({
