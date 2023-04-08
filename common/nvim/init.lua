@@ -271,6 +271,20 @@ require('packer').startup(function(use)
       vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
         vim.lsp.diagnostic.on_publish_diagnostics, { virtual_text = false }
       )
+
+      local has_words_before = function()
+        unpack = unpack or table.unpack
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      end
+
+      local feedkey = function(key, mode)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+      end
+
+      local icn = icons()
+      local kind_icons = icn.kind
+
       local cmp = require("cmp")
       cmp.setup({
         snippet = {
@@ -278,33 +292,89 @@ require('packer').startup(function(use)
             vim.fn["vsnip#anonymous"](args.body)
           end,
         },
+
+        formatting = {
+          fields = { "kind", "abbr", "menu" },
+          format = function(entry, vim_item)
+            -- Kind icons
+            vim_item.kind = kind_icons[vim_item.kind]
+
+            if entry.source.name == "copilot" then
+              vim_item.kind = icn.git.Octoface
+              vim_item.kind_hl_group = "CmpItemKindCopilot"
+            end
+
+            if entry.source.name == "emoji" then
+              vim_item.kind = icn.misc.Smiley
+              vim_item.kind_hl_group = "CmpItemKindEmoji"
+            end
+
+            if entry.source.name == "crates" then
+              vim_item.kind = icn.misc.Package
+              vim_item.kind_hl_group = "CmpItemKindCrate"
+            end
+
+            if entry.source.name == "lab.quick_data" then
+              vim_item.kind = icn.misc.CircuitBoard
+              vim_item.kind_hl_group = "CmpItemKindConstant"
+            end
+
+            -- NOTE: order matters
+            vim_item.menu = ({
+              nvim_lsp = "",
+              nvim_lua = "",
+              luasnip = "",
+              buffer = "",
+              path = "",
+              emoji = "",
+            })[entry.source.name]
+            return vim_item
+          end,
+        },
+
+        window = {
+          completion = cmp.config.window.bordered({
+            border = 'double'
+          }),
+          documentation = cmp.config.window.bordered({
+            border = 'double'
+          }),
+        },
+
         sources = {
           { name = "nvim_lsp" },
+          { name = 'vsnip' },
           { name = "buffer" },
           { name = "path" },
           { name = 'copilot' },
         },
+
         mapping = cmp.mapping.preset.insert({
           ["<C-p>"] = cmp.mapping.select_prev_item(),
           ["<C-n>"] = cmp.mapping.select_next_item(),
           ['<C-l>'] = cmp.mapping.complete(),
           ['<C-e>'] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm { select = false },
-          ['<Tab>'] = function(fallback)
+          ["<CR>"] = cmp.mapping.confirm { select = true },
+          ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_next_item()
+            elseif vim.fn["vsnip#available"](1) == 1 then
+              feedkey("<Plug>(vsnip-expand-or-jump)", "")
+            elseif has_words_before() then
+              cmp.complete()
             else
-              fallback()
+              fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
             end
-          end,
-          ['<S-Tab>'] = function(fallback)
-            if cmp.visivle() then
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function()
+            if cmp.visible() then
               cmp.select_prev_item()
-            else
-              fallback()
+            elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+              feedkey("<Plug>(vsnip-jump-prev)", "")
             end
-          end,
+          end, { "i", "s" }),
         }),
+
         experimental = {
           ghost_text = true,
         },
@@ -338,27 +408,72 @@ require('packer').startup(function(use)
       })
     end,
     requires = {
+      -- {
+      --  'hrsh7th/nvim-cmp', event = { 'InsertEnter', 'CmdlineEnter' }
+      -- },
       {
-        "hrsh7th/cmp-nvim-lsp",
+        'hrsh7th/cmp-nvim-lsp',
       },
       {
-        "hrsh7th/vim-vsnip",
+        'hrsh7th/cmp-buffer', event = { 'InsertEnter' }
       },
       {
-        "hrsh7th/cmp-path",
+        'hrsh7th/cmp-path', event = { 'InsertEnter' }
       },
       {
-        "hrsh7th/cmp-buffer",
+        'hrsh7th/cmp-vsnip', event = { 'InsertEnter' }
       },
       {
-        "hrsh7th/cmp-cmdline",
+        'hrsh7th/cmp-cmdline', event = { 'ModeChanged' }
+      },
+      {
+        'hrsh7th/cmp-nvim-lsp-signature-help', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-nvim-lsp-document-symbol', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-calc', event = { 'InsertEnter' }
+      },
+      {
+        'onsails/lspkind.nvim', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/vim-vsnip',
+        event = { 'InsertEnter' },
+        config = function()
+          vim.cmd [[
+        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        
+        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        let g:vsnip_filetypes = {}
+        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+        ]]
+        end
+      },
+      {
+        'hrsh7th/vim-vsnip-integ', event = { 'InsertEnter' }
+      },
+      {
+        "hrsh7th/cmp-vsnip",
+        event = { "InsertEnter" },
       },
       {
         "github/copilot.vim",
+        event = { "InsertEnter" },
       },
-      {
-        "hrsh7th/cmp-copilot"
-      },
+      -- {
+      --   "hrsh7th/cmp-copilot",
+      --   event = { "InsertEnter" },
+      -- },
     },
   }
   -- treesitter
@@ -549,27 +664,7 @@ require('packer').startup(function(use)
   use {
     "hrsh7th/vim-vsnip",
     event = { "InsertEnter" },
-    config = function()
-      vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        
-        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        let g:vsnip_filetypes = {}
-        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-        ]]
-    end
-  }
-  use {
-    "hrsh7th/vim-vsnip-integ",
-    event = { "InsertEnter" },
+
   }
 
   -- go
@@ -711,4 +806,227 @@ function go_test()
   ]]
 end
 
+-- }}}
+
+-- {{{ icons
+
+vim.g.use_nerd_icons = false
+function icons()
+  if vim.fn.has "mac" == 1 or vim.g.use_nerd_icons then
+    return {
+      kind = {
+        Text = "",
+        -- Method = "m",
+        -- Function = "",
+        -- Constructor = "",
+        Method = "",
+        Function = "",
+        Constructor = "",
+        Field = "",
+        -- Variable = "",
+        Variable = "",
+        Class = "",
+        Interface = "",
+        -- Module = "",
+        Module = "",
+        Property = "",
+        Unit = "",
+        Value = "",
+        Enum = "",
+        -- Keyword = "",
+        Keyword = "",
+        Snippet = "",
+        -- Snippet = "",
+        Color = "",
+        File = "",
+        Reference = "",
+        Folder = "",
+        EnumMember = "",
+        Constant = "",
+        Struct = "",
+        Event = "",
+        Operator = "",
+        TypeParameter = "",
+      },
+      type = {
+        Array = "",
+        Number = "",
+        String = "",
+        Boolean = "蘒",
+        Object = "",
+      },
+      documents = {
+        File = "",
+        Files = "",
+        Folder = "",
+        OpenFolder = "",
+      },
+      git = {
+        Add = "",
+        Mod = "",
+        Remove = "",
+        Ignore = "",
+        Rename = "",
+        Diff = "",
+        Repo = "",
+        Octoface = "",
+      },
+      ui = {
+        ArrowClosed = "",
+        ArrowOpen = "",
+        Lock = "",
+        Circle = "",
+        BigCircle = "",
+        BigUnfilledCircle = "",
+        Close = "",
+        NewFile = "",
+        Search = "",
+        Lightbulb = "",
+        Project = "",
+        Dashboard = "",
+        History = "",
+        Comment = "",
+        Bug = "",
+        Code = "",
+        Telescope = "",
+        Gear = "",
+        Package = "",
+        List = "",
+        SignIn = "",
+        SignOut = "",
+        Check = "",
+        Fire = "",
+        Note = "",
+        BookMark = "",
+        Pencil = "",
+        -- ChevronRight = "",
+        ChevronRight = ">",
+        Table = "",
+        Calendar = "",
+        CloudDownload = "",
+      },
+      diagnostics = {
+        Error = "",
+        Warning = "",
+        Information = "",
+        Question = "",
+        Hint = "",
+      },
+      misc = {
+        Robot = "ﮧ",
+        Squirrel = "",
+        Tag = "",
+        Watch = "",
+        Smiley = "ﲃ",
+        Package = "",
+        CircuitBoard = "",
+      },
+    }
+  else
+    --   פּ ﯟ   蘒練 some other good icons
+    return {
+      kind = {
+        Text = " ",
+        Method = " ",
+        Function = " ",
+        Constructor = " ",
+        Field = " ",
+        Variable = " ",
+        Class = " ",
+        Interface = " ",
+        Module = " ",
+        Property = " ",
+        Unit = " ",
+        Value = " ",
+        Enum = " ",
+        Keyword = " ",
+        Snippet = " ",
+        Color = " ",
+        File = " ",
+        Reference = " ",
+        Folder = " ",
+        EnumMember = " ",
+        Constant = " ",
+        Struct = " ",
+        Event = " ",
+        Operator = " ",
+        TypeParameter = " ",
+        Misc = " ",
+      },
+      type = {
+        Array = " ",
+        Number = " ",
+        String = " ",
+        Boolean = " ",
+        Object = " ",
+      },
+      documents = {
+        File = " ",
+        Files = " ",
+        Folder = " ",
+        OpenFolder = " ",
+      },
+      git = {
+        Add = " ",
+        Mod = " ",
+        Remove = " ",
+        Ignore = " ",
+        Rename = " ",
+        Diff = " ",
+        Repo = " ",
+        Octoface = " ",
+      },
+      ui = {
+        ArrowClosed = "",
+        ArrowOpen = "",
+        Lock = " ",
+        Circle = " ",
+        BigCircle = " ",
+        BigUnfilledCircle = " ",
+        Close = " ",
+        NewFile = " ",
+        Search = " ",
+        Lightbulb = " ",
+        Project = " ",
+        Dashboard = " ",
+        History = " ",
+        Comment = " ",
+        Bug = " ",
+        Code = " ",
+        Telescope = " ",
+        Gear = " ",
+        Package = " ",
+        List = " ",
+        SignIn = " ",
+        SignOut = " ",
+        NoteBook = " ",
+        Check = " ",
+        Fire = " ",
+        Note = " ",
+        BookMark = " ",
+        Pencil = " ",
+        ChevronRight = "",
+        Table = " ",
+        Calendar = " ",
+        CloudDownload = " ",
+      },
+      diagnostics = {
+        Error = " ",
+        Warning = " ",
+        Information = " ",
+        Question = " ",
+        Hint = " ",
+      },
+      misc = {
+        Robot = " ",
+        Squirrel = " ",
+        Tag = " ",
+        Watch = " ",
+        Smiley = " ",
+        Package = " ",
+        CircuitBoard = " ",
+      },
+    }
+  end
+end
 -- }}}
