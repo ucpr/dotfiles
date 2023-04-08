@@ -245,102 +245,257 @@ require('packer').startup(function(use)
       vim.g.qs_buftype_blacklist = { "terminal", "nofile" }
     end,
   }
+  use {
+    "nvim-tree/nvim-tree.lua",
+    cmd = "NvimTreeToggle",
+    setup = function()
+      vim.keymap.set("n", "<C-e>", '<C-\\><C-n><CMD>NvimTreeToggle<CR>')
+    end,
+    config = function()
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+
+      require("nvim-tree").setup({
+        sort_by = "case_sensitive",
+        renderer = {
+          group_empty = true,
+        },
+        filters = {
+          dotfiles = true,
+        },
+      })
+    end
+  }
 
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
-  use {
-    "matsui54/denops-signature_help",
-    config = function()
-      vim.fn["signature_help#enable"]()
-    end
-  }
-  use {
-    "matsui54/denops-popup-preview.vim",
-    config = function()
-      vim.fn["popup_preview#enable"]()
-    end
-  }
   use "lambdalisue/guise.vim"
 
-  -- ddc
-  --use {"Shougo/ddc.vim", }
+  -- nvim-cmp
+
   use {
-    "Shougo/ddc.vim",
-    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
-    requires = {
-      "Shougo/ddc-ui-native",
-      "Shougo/pum.vim",
-      "Shougo/ddc-around",
-      "LumaKernel/ddc-file",
-      "Shougo/ddc-matcher_head",
-      "Shougo/ddc-sorter_rank",
-      "Shougo/ddc-converter_remove_overlap",
-      "Shougo/ddc-nvim-lsp",
-      "Shougo/ddc-source-zsh",
-    },
+    'hrsh7th/vim-vsnip',
+    -- event = { 'InsertEnter' },
     config = function()
       vim.cmd [[
-        call ddc#custom#patch_global("ui", "native")
-        call ddc#custom#patch_global("sources", [
-            \ "around",
-            \ "file",
-            \ "vsnip",
-            \ "nvim-lsp",
-            \ "zsh",
-            \ ])
-        call ddc#custom#patch_global("sourceOptions", {
-            \ "_": {
-            \   "matchers": ["matcher_head"],
-            \   "sorters": ["sorter_rank"],
-            \   "converters": ["converter_remove_overlap"],
-            \ },
-            \ "around": {"mark": "Around"},
-            \ "file": {
-            \   "mark": "file",
-            \   "isVolatile": v:true,
-            \   "forceCompletionPattern": "\S/\S*",
-            \ },
-            \ "vsnip": {
-            \   "mark": "vsnip",
-            \   "minAutoCompleteLength": 1,
-            \ },
-            \ "nvim-lsp": {
-            \   "mark": "LSP",
-            \   "forceCompletionPattern": "\.\w*|:\w*|->\w*",
-            \ },
-            \ "zsh": { "mark": "Z" },
-            \ })
-        
-        call ddc#custom#patch_global("sourceParams", {
-           \ "around": {"maxSize": 500},
-           \ })
-        
-        " Use Customized labels
-        call ddc#custom#patch_global("sourceParams", {
-           \ "nvim-lsp": { "kindLabels": { "Class": "c" } },
-           \ })
-        
-        " pum.vim setting
-        call ddc#custom#patch_global("completionMenu", "pum.vim")
-        inoremap <silent><expr> <TAB>
-        \ pumvisible() ? "<C-n>" :
-        \ (col(".") <= 1 <Bar><Bar> getline(".")[col(".") - 2] =~# "\s") ?
-        \ "<TAB>" : ddc#map#manual_complete()
-        
-        " <S-TAB>: completion back.
-        inoremap <expr><S-TAB>  pumvisible() ? "<C-p>" : "<C-h>"
-        
-        inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
-        inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
-        inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
-        inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-        inoremap <C-e> <Cmd>call pum#map#cancel()<CR>
-        
+        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
         autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        call ddc#enable()
-      ]]
+        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        
+        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        let g:vsnip_filetypes = {}
+        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+        ]]
     end
+  }
+
+  use {
+    "hrsh7th/nvim-cmp",
+    config = function()
+      vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+      vim.keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.format { async = true }<CR>')
+      vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
+      vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
+      vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
+      vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
+      vim.keymap.set('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
+      vim.keymap.set('n', 'gn', '<cmd>lua vim.lsp.buf.rename()<CR>')
+      vim.keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+      vim.keymap.set('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>')
+      vim.keymap.set('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>')
+      vim.keymap.set('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
+      -- LSP handlers
+      vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+        vim.lsp.diagnostic.on_publish_diagnostics, { virtual_text = false }
+      )
+
+      local has_words_before = function()
+        unpack = unpack or table.unpack
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      end
+
+      local feedkey = function(key, mode)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+      end
+
+      local icn = icons()
+      local kind_icons = icn.kind
+
+      local cmp = require("cmp")
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body)
+          end,
+        },
+
+        formatting = {
+          fields = { "kind", "abbr", "menu" },
+          format = function(entry, vim_item)
+            -- Kind icons
+            vim_item.kind = kind_icons[vim_item.kind]
+
+            if entry.source.name == "copilot" then
+              vim_item.kind = icn.git.Octoface
+              vim_item.kind_hl_group = "CmpItemKindCopilot"
+            end
+
+            if entry.source.name == "emoji" then
+              vim_item.kind = icn.misc.Smiley
+              vim_item.kind_hl_group = "CmpItemKindEmoji"
+            end
+
+            if entry.source.name == "crates" then
+              vim_item.kind = icn.misc.Package
+              vim_item.kind_hl_group = "CmpItemKindCrate"
+            end
+
+            if entry.source.name == "lab.quick_data" then
+              vim_item.kind = icn.misc.CircuitBoard
+              vim_item.kind_hl_group = "CmpItemKindConstant"
+            end
+
+            -- NOTE: order matters
+            vim_item.menu = ({
+              nvim_lsp = "",
+              nvim_lua = "",
+              luasnip = "",
+              buffer = "",
+              path = "",
+              emoji = "",
+            })[entry.source.name]
+            return vim_item
+          end,
+        },
+
+        window = {
+          completion = cmp.config.window.bordered({
+            border = 'double'
+          }),
+          documentation = cmp.config.window.bordered({
+            border = 'double'
+          }),
+        },
+
+        sources = {
+          { name = "nvim_lsp" },
+          { name = 'vsnip' },
+          { name = "buffer" },
+          { name = "path" },
+          { name = 'copilot' },
+        },
+
+        mapping = cmp.mapping.preset.insert({
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+          ['<C-l>'] = cmp.mapping.complete(),
+          ['<C-e>'] = cmp.mapping.abort(),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+          ["<CR>"] = cmp.mapping.confirm { select = true },
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif vim.fn["vsnip#available"](1) == 1 then
+              feedkey("<Plug>(vsnip-expand-or-jump)", "")
+            elseif has_words_before() then
+              cmp.complete()
+            else
+              fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+              feedkey("<Plug>(vsnip-jump-prev)", "")
+            end
+          end, { "i", "s" }),
+        }),
+
+        experimental = {
+          ghost_text = true,
+        },
+      })
+
+      -- Set configuration for specific filetype.
+      cmp.setup.filetype('gitcommit', {
+        sources = cmp.config.sources({
+          { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+        }, {
+          { name = 'buffer' },
+        })
+      })
+
+      -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline({ '/', '?' }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' }
+        }
+      })
+
+      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' }
+        }, {
+          { name = 'cmdline' }
+        })
+      })
+    end,
+    requires = {
+      -- {
+      --  'hrsh7th/nvim-cmp', event = { 'InsertEnter', 'CmdlineEnter' }
+      -- },
+      {
+        'hrsh7th/cmp-nvim-lsp',
+      },
+      {
+        'hrsh7th/cmp-buffer', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-path', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-cmdline', event = { 'ModeChanged' }
+      },
+      {
+        'hrsh7th/cmp-nvim-lsp-signature-help', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-nvim-lsp-document-symbol', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-calc', event = { 'InsertEnter' }
+      },
+      {
+        'onsails/lspkind.nvim', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-vsnip',
+      },
+      -- {
+      --   'hrsh7th/vim-vsnip-integ', event = { 'InsertEnter' }
+      -- },
+      {
+        "github/copilot.vim",
+        event = { "InsertEnter" },
+      },
+      -- {
+      --   "hrsh7th/cmp-copilot",
+      --   event = { "InsertEnter" },
+      -- },
+    },
   }
   -- treesitter
   use {
@@ -450,7 +605,7 @@ require('packer').startup(function(use)
         buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
       end
 
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local capabilities = require('cmp_nvim_lsp').default_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
       local nvim_lsp = require("lspconfig")
@@ -524,33 +679,6 @@ require('packer').startup(function(use)
         autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
       ]]
     end
-  }
-
-  -- snip
-  use {
-    "hrsh7th/vim-vsnip",
-    event = { "InsertEnter" },
-    config = function()
-      vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        
-        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        let g:vsnip_filetypes = {}
-        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-        ]]
-    end
-  }
-  use {
-    "hrsh7th/vim-vsnip-integ",
-    event = { "InsertEnter" },
   }
 
   -- go
@@ -690,6 +818,230 @@ function go_test()
     file vim-go-test-func
     wincmd p
   ]]
+end
+
+-- }}}
+
+-- {{{ icons
+
+vim.g.use_nerd_icons = false
+function icons()
+  if vim.fn.has "mac" == 1 or vim.g.use_nerd_icons then
+    return {
+      kind = {
+        Text = "",
+        -- Method = "m",
+        -- Function = "",
+        -- Constructor = "",
+        Method = "",
+        Function = "",
+        Constructor = "",
+        Field = "",
+        -- Variable = "",
+        Variable = "",
+        Class = "",
+        Interface = "",
+        -- Module = "",
+        Module = "",
+        Property = "",
+        Unit = "",
+        Value = "",
+        Enum = "",
+        -- Keyword = "",
+        Keyword = "",
+        Snippet = "",
+        -- Snippet = "",
+        Color = "",
+        File = "",
+        Reference = "",
+        Folder = "",
+        EnumMember = "",
+        Constant = "",
+        Struct = "",
+        Event = "",
+        Operator = "",
+        TypeParameter = "",
+      },
+      type = {
+        Array = "",
+        Number = "",
+        String = "",
+        Boolean = "蘒",
+        Object = "",
+      },
+      documents = {
+        File = "",
+        Files = "",
+        Folder = "",
+        OpenFolder = "",
+      },
+      git = {
+        Add = "",
+        Mod = "",
+        Remove = "",
+        Ignore = "",
+        Rename = "",
+        Diff = "",
+        Repo = "",
+        Octoface = "",
+      },
+      ui = {
+        ArrowClosed = "",
+        ArrowOpen = "",
+        Lock = "",
+        Circle = "",
+        BigCircle = "",
+        BigUnfilledCircle = "",
+        Close = "",
+        NewFile = "",
+        Search = "",
+        Lightbulb = "",
+        Project = "",
+        Dashboard = "",
+        History = "",
+        Comment = "",
+        Bug = "",
+        Code = "",
+        Telescope = "",
+        Gear = "",
+        Package = "",
+        List = "",
+        SignIn = "",
+        SignOut = "",
+        Check = "",
+        Fire = "",
+        Note = "",
+        BookMark = "",
+        Pencil = "",
+        -- ChevronRight = "",
+        ChevronRight = ">",
+        Table = "",
+        Calendar = "",
+        CloudDownload = "",
+      },
+      diagnostics = {
+        Error = "",
+        Warning = "",
+        Information = "",
+        Question = "",
+        Hint = "",
+      },
+      misc = {
+        Robot = "ﮧ",
+        Squirrel = "",
+        Tag = "",
+        Watch = "",
+        Smiley = "ﲃ",
+        Package = "",
+        CircuitBoard = "",
+      },
+    }
+  else
+    --   פּ ﯟ   蘒練 some other good icons
+    return {
+      kind = {
+        Text = " ",
+        Method = " ",
+        Function = " ",
+        Constructor = " ",
+        Field = " ",
+        Variable = " ",
+        Class = " ",
+        Interface = " ",
+        Module = " ",
+        Property = " ",
+        Unit = " ",
+        Value = " ",
+        Enum = " ",
+        Keyword = " ",
+        Snippet = " ",
+        Color = " ",
+        File = " ",
+        Reference = " ",
+        Folder = " ",
+        EnumMember = " ",
+        Constant = " ",
+        Struct = " ",
+        Event = " ",
+        Operator = " ",
+        TypeParameter = " ",
+        Misc = " ",
+      },
+      type = {
+        Array = " ",
+        Number = " ",
+        String = " ",
+        Boolean = " ",
+        Object = " ",
+      },
+      documents = {
+        File = " ",
+        Files = " ",
+        Folder = " ",
+        OpenFolder = " ",
+      },
+      git = {
+        Add = " ",
+        Mod = " ",
+        Remove = " ",
+        Ignore = " ",
+        Rename = " ",
+        Diff = " ",
+        Repo = " ",
+        Octoface = " ",
+      },
+      ui = {
+        ArrowClosed = "",
+        ArrowOpen = "",
+        Lock = " ",
+        Circle = " ",
+        BigCircle = " ",
+        BigUnfilledCircle = " ",
+        Close = " ",
+        NewFile = " ",
+        Search = " ",
+        Lightbulb = " ",
+        Project = " ",
+        Dashboard = " ",
+        History = " ",
+        Comment = " ",
+        Bug = " ",
+        Code = " ",
+        Telescope = " ",
+        Gear = " ",
+        Package = " ",
+        List = " ",
+        SignIn = " ",
+        SignOut = " ",
+        NoteBook = " ",
+        Check = " ",
+        Fire = " ",
+        Note = " ",
+        BookMark = " ",
+        Pencil = " ",
+        ChevronRight = "",
+        Table = " ",
+        Calendar = " ",
+        CloudDownload = " ",
+      },
+      diagnostics = {
+        Error = " ",
+        Warning = " ",
+        Information = " ",
+        Question = " ",
+        Hint = " ",
+      },
+      misc = {
+        Robot = " ",
+        Squirrel = " ",
+        Tag = " ",
+        Watch = " ",
+        Smiley = " ",
+        Package = " ",
+        CircuitBoard = " ",
+      },
+    }
+  end
 end
 
 -- }}}
