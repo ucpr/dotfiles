@@ -1,7 +1,6 @@
 tap 'homebrew/cask'
 tap 'homebrew/core'
 tap "homebrew/cask-fonts"
-tap "bufbuild/buf"
 tap "ktr0731/evans"
 cask_args appdir: "/Applications"
 
@@ -18,6 +17,7 @@ brew "bat"
 brew "curl", link: true
 brew "wget"
 brew "jq"
+brew "yq"
 brew "gawk"
 brew "mas"
 brew "ripgrep"
@@ -30,7 +30,6 @@ brew "gpg"
 brew "asdf"
 brew "ko"
 brew "act"
-brew "buf"
 # brew "protoc"
 brew "tree"
 brew "clang-format"
@@ -46,6 +45,7 @@ brew "ktr0731/evans/evans"
 # brew "bazel"
 brew "bazelisk"
 brew "awscli"
+brew "kustomize"
 
 cask "google-cloud-sdk"
 cask "1password"
