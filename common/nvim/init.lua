@@ -4,7 +4,6 @@ local options = {
   encoding = "utf-8",
   fileencodings = "utf-8,iso-2022-jp,cp932,sjis,euc-jpset",
   fencs = "utf-8,iso-2022-jp,enc-jp,cp932",
-
   -- etc
   confirm = true,
   hidden = true,
@@ -18,7 +17,6 @@ local options = {
   mouse = "a",
   pastetoggle = "<F5>",
   helplang = "ja",
-
   -- theme
   title = false,
   number = true,
@@ -34,19 +32,16 @@ local options = {
     precedes = "«",
   },
   termguicolors = true,
-
   cmdheight = 0,
   laststatus = 2,
   showtabline = 2,
   statusline = '%f %y%m %r%h%w%=[%{&fileencoding!=""?&fileencoding:&encoding},%{&ff}] [Pos %02l,%02c] [%p%%/%L]',
-
   -- syntax
   tabstop = 2,
   shiftwidth = 2,
   smarttab = true,
   smartindent = true,
   expandtab = true,
-
   -- search
   hlsearch = true,
   ignorecase = true,
@@ -283,7 +278,7 @@ require('packer').startup(function(use)
         autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
         imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
         smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        
+
         imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
         smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
         imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
@@ -336,7 +331,6 @@ require('packer').startup(function(use)
             vim.fn["vsnip#anonymous"](args.body)
           end,
         },
-
         formatting = {
           fields = { "kind", "abbr", "menu" },
           format = function(entry, vim_item)
@@ -375,7 +369,6 @@ require('packer').startup(function(use)
             return vim_item
           end,
         },
-
         window = {
           completion = cmp.config.window.bordered({
             border = 'double'
@@ -384,15 +377,14 @@ require('packer').startup(function(use)
             border = 'double'
           }),
         },
-
         sources = {
-          { name = "nvim_lsp", priority = 10 },
-          { name = 'vsnip', priority = 9 },
-          { name = "path", priority = 8 },
-          { name = "buffer", priority = 7 },
-          { name = 'copilot', priority = 6 },
+          { name = "nvim_lsp",                priority = 10 },
+          { name = 'vsnip',                   priority = 9 },
+          { name = "path",                    priority = 8 },
+          { name = "buffer",                  priority = 7 },
+          { name = "nvim_lsp_signature_help", priority = 6 },
+          { name = 'copilot',                 priority = 5 },
         },
-
         mapping = cmp.mapping.preset.insert({
           ["<C-p>"] = cmp.mapping.select_prev_item(),
           ["<C-n>"] = cmp.mapping.select_next_item(),
@@ -420,7 +412,6 @@ require('packer').startup(function(use)
             end
           end, { "i", "s" }),
         }),
-
         experimental = {
           ghost_text = true,
         },
@@ -536,7 +527,6 @@ require('packer').startup(function(use)
               'interface',
               'struct',
             },
-
             haskell = {
               'adt'
             },
