@@ -390,7 +390,7 @@ require('packer').startup(function(use)
           { name = "path",                    priority = 8 },
           { name = "buffer",                  priority = 7 },
           { name = "nvim_lsp_signature_help", priority = 6 },
-          { name = 'copilot',                 priority = 5 },
+          -- { name = 'copilot',                 priority = 5 },
         },
         mapping = cmp.mapping.preset.insert({
           ["<C-p>"] = cmp.mapping.select_prev_item(),
@@ -501,6 +501,11 @@ require('packer').startup(function(use)
             "<C-c>",
             'copilot#Accept()',
             { silent = true, expr = true, script = true, replace_keycodes = false }
+          )
+          keymap.set(
+            "i",
+            "<C-x>",
+            '<Plug>(copilot-dismiss)'
           )
           -- keymap("i", "<C-j>", "<Plug>(copilot-next)")
           -- keymap("i", "<C-k>", "<Plug>(copilot-previous)")
