@@ -499,12 +499,31 @@ require('packer').startup(function(use)
       {
         'hrsh7th/cmp-vsnip',
       },
-      -- {
-      --   'hrsh7th/vim-vsnip-integ', event = { 'InsertEnter' }
-      -- },
       {
         "github/copilot.vim",
         event = { "InsertEnter" },
+        setup = function()
+          vim.g.copilot_filetypes = {
+            gitcommit = true,
+            markdown = true,
+            yaml = true,
+            text = true,
+          }
+          vim.g.copilot_no_tab_map = true
+        end,
+        config = function()
+          local keymap = vim.keymap
+          keymap.set(
+            "i",
+            "<C-c>",
+            'copilot#Accept()',
+            { silent = true, expr = true, script = true, replace_keycodes = false }
+          )
+          -- keymap("i", "<C-j>", "<Plug>(copilot-next)")
+          -- keymap("i", "<C-k>", "<Plug>(copilot-previous)")
+          -- keymap("i", "<C-o>", "<Plug>(copilot-dismiss)")
+          -- keymap("i", "<C-s>", "<Plug>(copilot-suggest)")
+        end,
       },
       -- {
       --   "hrsh7th/cmp-copilot",
