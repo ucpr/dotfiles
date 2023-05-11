@@ -793,7 +793,7 @@ keymap.set("t", "<C-q>", "exit<CR>")
 keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
 -- custom script
-keymap.set("n", "gt", ":<C-u>lua go_test()<CR>")
+keymap.set("n", "got", ":<C-u>lua go_test()<CR>")
 
 -- }}}
 
