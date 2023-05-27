@@ -294,6 +294,7 @@ require('packer').startup(function(use)
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
   use "lambdalisue/guise.vim"
+  use "lambdalisue/gin.vim"
 
   -- nvim-cmp
 
@@ -854,12 +855,6 @@ require('packer').startup(function(use)
         end,
       },
     },
-  }
-
-  -- figutive
-  use {
-    "tpope/vim-fugitive",
-    event = "InsertEnter",
   }
 
   -- go
