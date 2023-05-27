@@ -285,6 +285,10 @@ require('packer').startup(function(use)
       })
     end
   }
+  use {
+    "almo7aya/openingh.nvim",
+    cmd = { "OpenInGHFile", "OpenInGHRepo" },
+  }
 
   -- denops
   use "vim-denops/denops.vim"
