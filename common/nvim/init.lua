@@ -289,12 +289,14 @@ require('packer').startup(function(use)
     "almo7aya/openingh.nvim",
     cmd = { "OpenInGHFile", "OpenInGHRepo" },
   }
-
+  use {
+    "tpope/vim-fugitive",
+    event = "InsertEnter",
+  }
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
   use "lambdalisue/guise.vim"
-  use "lambdalisue/gin.vim"
 
   -- nvim-cmp
 
