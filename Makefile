@@ -2,8 +2,9 @@ IMPORT_MAP ?= --import-map=import_map.json
 PERMISSIONS ?= --allow-env --allow-read --allow-write --allow-run
 
 .PHONY: healthcheck
+healthcheck: OPTS ?=
 healthcheck:
-	cd cli && deno run $(IMPORT_MAP) $(PERMISSIONS) main.ts healthcheck
+	cd cli && deno run $(IMPORT_MAP) $(PERMISSIONS) main.ts healthcheck $(OPTS)
 
 .PHONY: setup
 setup:
