@@ -1,6 +1,2 @@
-nvim/dein
-vim/dein
-Brewfile.lock.json
-common/.vim/.netrwhist
-common/nvim/dein
-common/nvim/plugin/packer_compiled.lua
+brew/Brewfile.lock.json
+nvim/plugin/packer_compiled.lua
