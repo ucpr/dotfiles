@@ -65,8 +65,4 @@ const linkMap: LinkMap = new Map([
   }],
 ]);
 
-export { 
-  home,
-  dotfilesDir,
-  linkMap,
-};
+export { dotfilesDir, home, linkMap };
