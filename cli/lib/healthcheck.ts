@@ -24,7 +24,7 @@ async function healthcheck(linkMap: LinkMap, options: HealthCheckOptions) {
     if (!await checkSymlinksForCI(linkMap)) {
       throw new HealthCheckError("configurations are not healthy");
     }
-    return
+    return;
   }
 
   const header = ["Name", "Target", "Symlink", "Status", "Reason"];
