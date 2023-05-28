@@ -1,8 +1,10 @@
-name: Deno CI
+name: Configuration Tester
 
 on:
   push:
   pull_request:
+  schedule:
+    - cron:  '* */1 * * *'
 
 jobs:
   test:
@@ -19,11 +21,7 @@ jobs:
        uses: denoland/setup-deno@v1.1.2
        with:
          deno-version: ${{ matrix.version }}
-     - name: Check format
-       working-directory: ./cli
-       run: deno fmt --check
-     - name: Check lint
-       working-directory: ./cli
-       run: deno lint
-     - name: Run
-       run: make logo
+     - name: Run setup
+       run: make setup
+     - name: Run healthcheck
+       run: make OPTS=--ci healthcheck
