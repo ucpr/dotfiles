@@ -9,9 +9,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         version: [vx.x.x]
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        working-directory: ./cli
     steps:
      - name: Checkout repo
        uses: actions/checkout@v3.5.2
@@ -20,8 +17,10 @@ jobs:
        with:
          deno-version: ${{ matrix.version }}
      - name: Check format
+       working-directory: ./cli
        run: deno fmt --check
      - name: Check lint
+       working-directory: ./cli
        run: deno lint
      - name: Run
        run: make setup
