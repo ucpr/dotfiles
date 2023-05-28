@@ -3,6 +3,7 @@
 </div>
 
 [![Deno CI](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml)
+[![Configuration Tester](https://github.com/ucpr/dotfiles/actions/workflows/configuration-tester.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/configuration-tester.yaml)
 
 ## requirements
 
