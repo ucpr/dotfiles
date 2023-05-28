@@ -35,6 +35,16 @@ const linkMap: Map<string, config> = new Map([
     symlink: join(home, ".k9s"),
     platform: "common",
   }],
+  ["gitconfig", {
+    target: join(Deno.cwd(), "git/.gitconfig"),
+    symlink: join(home, ".gitconfig"),
+    platform: "common",
+  }],
+  ["gitmessage", {
+    target: join(Deno.cwd(), "git/.gitmessage"),
+    symlink: join(home, ".gitmessage"),
+    platform: "common",
+  }],
 ]);
 
 function logo() {
