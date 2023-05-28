@@ -1,0 +1,30 @@
+name: Deno CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        version: [vx.x.x]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+     - name: Checkout repo
+       uses: actions/checkout@v3.5.2
+
+     - name: Setup Deno
+       uses: denoland/setup-deno@v1.1.2
+       with:
+         deno-version: ${{ matrix.version }}
+
+     - name: Check format
+       run: deno fmt --check
+
+     - name: Check lint
+       run: deno lint
+
+     - name: Run
+       run: make link
