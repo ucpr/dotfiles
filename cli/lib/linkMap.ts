@@ -8,9 +8,11 @@ interface config {
   platform: platform;
 }
 
+export type LinkMap = Map<string, config>;
+
 const home = Deno.env.get("HOME") || "~/";
 const currentDir = Deno.cwd();
-const linkMap: Map<string, config> = new Map([
+const linkMap: LinkMap = new Map([
   ["neovim", {
     target: join(currentDir, "nvim"),
     symlink: join(home, ".config", "nvim"),
@@ -48,48 +50,4 @@ const linkMap: Map<string, config> = new Map([
   }],
 ]);
 
-function logo() {
-  console.log(`
-
-     _       _    __ _ _
-  __| | ___ | |_ / _(_) | ___  ___ 
- / _  |/ _ \\| __| |_| | |/ _ \\/ __| 
-| (_| | (_) | |_|  _| | |  __/\\__ \\ 
- \\__,_|\\___/ \\__|_| |_|_|\\___||___/ 
-
-  https://github.com/ucpr/dotfiles
-
-`);
-}
-
-async function initialize() {
-  if (!await exists(join(home, ".config"))) {
-    await Deno.mkdir(join(home, ".config"));
-  }
-}
-
-async function exists(path: string): Promise<boolean> {
-  try {
-    const file = await Deno.stat(path);
-    return file.isFile || file.isDirectory;
-  } catch (_err) {
-    return false;
-  }
-}
-
-if (import.meta.main) {
-  logo();
-
-  console.log("initializing...");
-  await initialize();
-
-  for (const [key, value] of linkMap) {
-    console.log(`Linking ${key}...`);
-    if (await exists(value.symlink)) {
-      console.log(`${key} symlink already exists, skipping...`);
-      continue;
-    }
-    await Deno.symlink(value.target, value.symlink);
-    console.log(`Linked ${key}!`);
-  }
-}
+export { linkMap };
