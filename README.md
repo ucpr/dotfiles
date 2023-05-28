@@ -1,11 +1,18 @@
-# dotfiles
+<div align="center">
+  <h1>dotfiles</h1>
+</div>
 
-my dotfiles
+[![Deno CI](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml)
 
-## Init
+## requirements
+
+- brew
+- deno
+
+## setup
 
 ```
-$ git clone https://github.com/ucpr/dotfiles ~/.dotfiles
-$ cd ~/.dotfiles
-$ ./setup.sh
+$ git clone https://github.com/ucpr/dotfiles
+$ cd ~/dotfiles
+$ make link
 ```
