@@ -14,5 +14,5 @@
 ```
 $ git clone https://github.com/ucpr/dotfiles
 $ cd ~/dotfiles
-$ make link
+$ make setup
 ```
