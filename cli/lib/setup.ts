@@ -1,4 +1,5 @@
-import { LinkMap } from "lib/linkMap.ts";
+import { join } from "std/path/mod.ts";
+import { home, LinkMap } from "lib/linkMap.ts";
 import { exists } from "lib/file.ts";
 
 async function initializeDirs() {

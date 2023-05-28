@@ -1,4 +1,4 @@
-import { join } from "https://deno.land/std/path/mod.ts";
+import { join } from "std/path/mod.ts";
 
 type platform = "linux" | "darwin" | "common";
 
@@ -65,4 +65,8 @@ const linkMap: LinkMap = new Map([
   }],
 ]);
 
-export { linkMap };
+export { 
+  home,
+  dotfilesDir,
+  linkMap,
+};
