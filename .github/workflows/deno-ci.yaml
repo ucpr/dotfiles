@@ -24,4 +24,4 @@ jobs:
      - name: Check lint
        run: deno lint
      - name: Run
-       run: make link
+       run: make setup
