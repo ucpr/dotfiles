@@ -119,6 +119,7 @@ require('packer').startup(function(use)
       "telescope-fzf-native.nvim",
       "telescope-file-browser.nvim",
       "telescope-live-grep-args.nvim",
+      "telescope-fzf-native.nvim",
       "telescope-env.nvim",
     },
     setup = function()
@@ -571,44 +572,92 @@ require('packer').startup(function(use)
       vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
     end,
     requires = {
-      "nvim-treesitter/nvim-treesitter-context",
-      config = function()
-        require 'treesitter-context'.setup {
-          patterns = {
-            default = {
-              'class',
-              'function',
-              'method',
-              'interface',
-              'struct',
-            },
-            haskell = {
-              'adt'
-            },
-            rust = {
-              'impl_item',
+      {
+        "m-demare/hlargs.nvim",
+        config = function()
+          require('hlargs').setup()
+        end
+      },
+      {
+        "nvim-treesitter/nvim-treesitter-context",
+        config = function()
+          require 'treesitter-context'.setup {
+            patterns = {
+              default = {
+                'class',
+                'function',
+                'method',
+                'interface',
+                'struct',
+              },
+              haskell = {
+                'adt'
+              },
+              rust = {
+                'impl_item',
 
+              },
+              terraform = {
+                'block',
+                'object_elem',
+                'attribute',
+              },
+              markdown = {
+                'section',
+              },
+              json = {
+                'pair',
+              },
+              typescript = {
+                'export_statement',
+              },
+              yaml = {
+                'block_mapping_pair',
+              },
             },
-            terraform = {
-              'block',
-              'object_elem',
-              'attribute',
-            },
-            markdown = {
-              'section',
-            },
-            json = {
-              'pair',
-            },
-            typescript = {
-              'export_statement',
-            },
-            yaml = {
-              'block_mapping_pair',
-            },
-          },
-        }
-      end
+          }
+        end
+      },
+      {
+        "haringsrob/nvim_context_vt",
+        opt = true,
+        config = function()
+          require('nvim_context_vt').setup({
+            enabled = true,
+            prefix = '',
+            highlight = 'CustomContextVt',
+            disable_ft = { 'markdown' },
+            disable_virtual_lines = false,
+            disable_virtual_lines_ft = { 'yaml' },
+            min_rows = 1,
+            min_rows_ft = {},
+            custom_parser = function(node, ft, opts)
+              local utils = require('nvim_context_vt.utils')
+
+              if node:type() == 'function' then
+                return nil
+              end
+
+              return '--> ' .. utils.get_node_text(node)[1]
+            end,
+
+            custom_validator = function(node, ft, opts)
+              local default_validator = require('nvim_context_vt.utils').default_validator
+              if default_validator(node, ft) then
+                if node:type() == 'function' then
+                  return false
+                end
+              end
+
+              return true
+            end,
+
+            custom_resolver = function(nodes, ft, opts)
+              return nodes[#nodes]
+            end,
+          })
+        end,
+      },
     }
   }
 
