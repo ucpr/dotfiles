@@ -1,0 +1,23 @@
+name: Lint
+on:
+  push:
+  pull_request:
+
+jobs:
+  run-secretlint:
+    name: "Secretlint only on changed files"
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.2
+      - name: setup get-diff-action
+        uses: technote-space/get-diff-action@v6.1.2
+      - name: Run secretlint command on docker
+        uses: addnab/docker-run-action@v3
+        with:
+          image: secretlint/secretlint:v5.1.1
+          options: >
+            -v ${{ github.workspace }}:${{ github.workspace }}
+            -w=${{ github.workspace }}
+            --rm
+          run: secretlint ${{ env.GIT_DIFF_FILTERED }} # run only on changed files
