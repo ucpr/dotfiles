@@ -8,8 +8,8 @@ export interface HealthCheckOptions {
 
 type TableBody = Array<Array<string>>;
 
-const healthyText = "✅";
-const unhealthyText = "❌";
+const healthyText = "✔";
+const unhealthyText = "✗";
 
 class HealthCheckError extends Error {
   constructor(message: string) {
