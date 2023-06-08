@@ -1272,3 +1272,8 @@ function icons()
 end
 
 -- }}}
+
+--vim.cmd [[
+--  set runtimepath^=~/.ghq/github.com/ucpr/denops-covcolor
+--  let g:denops#debug = 1
+--]]
