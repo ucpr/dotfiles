@@ -35,6 +35,7 @@
   ph = push origin head
   phf = push -f origin head
   pl = pull
+  plr = pull --rebase origin $(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
   graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
   ucat = !"git ls-files --others --exclude-standard | xargs bat"
 [fetch]
