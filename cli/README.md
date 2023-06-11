@@ -36,6 +36,12 @@ This command is used to check if the settings are normal.
 $ deno run main.ts healthcheck
 ```
 
+#### Options
+
+| option | description                                                                                                                               |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `--ci` | No status is displayed on the Console; if there is a problem with the dotfiles settings, the exit code is set to 1 and the program exits. |
+
 ### setup
 
 This command sets up dotfiles. If they are already set up, they will be skipped.
