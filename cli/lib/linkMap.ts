@@ -39,7 +39,7 @@ const linkMap: LinkMap = new Map([
     platform: "common",
   }],
   [".zshrc", {
-    target: join(dotfilesDir, ".zshrc"),
+    target: join(dotfilesDir, "zsh/.zshrc"),
     symlink: join(home, ".zshrc"),
     platform: "common",
   }],
