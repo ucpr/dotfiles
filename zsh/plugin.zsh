@@ -100,7 +100,8 @@ bindkey '^p' ghq-fzf
 
 # statingされていないfileをvimで楽に開けるようにする
 uncommited-staged-files() {
-  local f=$(git diff --name-only --diff-filter=d | awk '{print}' | fzf --preview 'f(){ sh -c "head -n 100 $1"}; f {}' | xargs echo)
+  # local f=$(git diff --name-only --diff-filter=d | awk '{print}' | fzf --preview 'f(){ sh -c "head -n 100 $1"}; f {}' | xargs echo)
+  local f=$(git status -s --no-renames | grep -v "D" | awk '{$1=$1};1' | cut -d " " -f 2 | fzf --preview 'f(){ sh -c "head -n 100 $1"}; f {}' | xargs echo)
   if [ -n "$f" ]; then
     BUFFER="vim ${f}"
     zle accept-line
