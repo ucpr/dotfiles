@@ -215,7 +215,7 @@ require('packer').startup(function(use)
       vim.g.spelunker_check_type = 2
     end
   }
-  use { "simeji/winresizer", opt = true }
+  use { "simeji/winresizer" }
   use { "markonm/traces.vim", opt = true }
   use {
     "cohama/lexima.vim",
@@ -269,7 +269,7 @@ require('packer').startup(function(use)
     "nvim-tree/nvim-tree.lua",
     cmd = "NvimTreeToggle",
     setup = function()
-      vim.keymap.set("n", "<C-e>", '<C-\\><C-n><CMD>NvimTreeToggle<CR>')
+      --vim.keymap.set("n", "<C->", '<C-\\><C-n><CMD>NvimTreeToggle<CR>')
     end,
     config = function()
       vim.g.loaded_netrw = 1
