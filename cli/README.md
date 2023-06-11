@@ -1,10 +1,10 @@
 <div align="center">
   <h1>dotfiles client</h1>
 
-  [![Deno CI](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml)
-  [![Configuration Tester](https://github.com/ucpr/dotfiles/actions/workflows/configuration-tester.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/configuration-tester.yaml)
-</div>
+[![Deno CI](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/deno-ci.yaml)
+[![Configuration Tester](https://github.com/ucpr/dotfiles/actions/workflows/configuration-tester.yaml/badge.svg)](https://github.com/ucpr/dotfiles/actions/workflows/configuration-tester.yaml)
 
+</div>
 
 ## Requirements
 
