@@ -38,9 +38,9 @@ const linkMap: LinkMap = new Map([
     symlink: join(home, ".config", "wezterm"),
     platform: "common",
   }],
-  [".zshrc", {
-    target: join(dotfilesDir, "zsh/.zshrc"),
-    symlink: join(home, ".zshrc"),
+  [".zshenv", {
+    target: join(dotfilesDir, "zsh/.zshenv"),
+    symlink: join(home, ".zshenv"),
     platform: "common",
   }],
   ["zsh", {
