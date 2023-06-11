@@ -1,12 +1,11 @@
 ### Zinit
-# ref: https://github.com/zdharma/zinit#loading-and-unloading
-zinit ice wait'!1'; zinit load zdharma-continuum/fast-syntax-highlighting
-zinit ice wait'!1'; zinit load momo-lab/zsh-replace-multiple-dots
-zinit ice wait'!0'; zinit load zsh-users/zsh-autosuggestions
-zinit ice wait'!0'; zinit load zsh-users/zsh-completions
+zinit wait lucid blockf light-mode for \
+    @'zsh-users/zsh-autosuggestions' \
+    @'zsh-users/zsh-completions' \
+    @'zdharma-continuum/fast-syntax-highlighting' \
+    @'momo-lab/zsh-replace-multiple-dots'
 zinit ice wait'!1'; plugins=(… zsh-completions)
 zinit ice wait'!1'; autoload -U compinit && compinit
-
 zmodload zsh/zpty
 autoload -Uz edit-command-line
 zle -N edit-command-line
@@ -37,24 +36,26 @@ alias prcreate='gh pr create -a @me -f -d && gh pr view --web'
 ### Export
 source "$HOME/.config/op/plugins.sh"
 export GOPATH=~/.go
-export PATH=~/.go/bin:$PATH
-
-export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
-
 export VISUAL=nvim
 export EDITOR=nvim
+
+export path=(
+    "$GOPATH/bin"(N-/)
+    "/usr/local/opt/coreutils/libexec/gnubin"
+    "$path[@]"
+)
 
 #export NAVI_CONFIG="$HOME/.config/navi/cheats"
 #export NAVI_CONFIG_YAML="$HOME/.config/navi/config.yaml"
 
 ### Functions
 ggl() {
-    open "https://google.com/search?q=${*// /%20}"
+  open "https://google.com/search?q=${*// /%20}"
 }
 
-gignore() {
-    curl -L -s https://www.gitignore.io/api/$@
+gitignore() {
+  curl -L -s https://www.gitignore.io/api/$@
 }
 
 ### Hooks
@@ -67,19 +68,6 @@ zshaddhistory() {
 export FZF_DEFAULT_OPTS="--height 40% --border --reverse --no-sort --exact --cycle --multi --ansi --sync --bind=ctrl-t:toggle --bind=ctrl-k:kill-line --bind=?:toggle-preview --bind=down:preview-down --bind=up:preview-up"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
 export FZF_CTRL_T_OPTS='--preview "bat  --color=always --style=header,grid --line-range :100 {}"'
-#export FZF_DEFAULT_OPTS='--bind ctrl-j:down,ctrl-k:up'
-
-function select_cdr(){
-    local selected_dir=$(cdr -l | awk '{ print $2 }' | \
-      fzf --preview 'f() { sh -c "ls -hFGl $1" }; f {}')
-    if [ -n "$selected_dir" ]; then
-        BUFFER="cd ${selected_dir}"
-        zle accept-line
-    fi
-    zle clear-screen
-}
-zle -N select_cdr
-bindkey '^@' select_cdr
 
 select-history() {
   BUFFER=$(history -n -r 1 | fzf --no-sort +m --query "$LBUFFER" --prompt="History > ")
@@ -88,6 +76,7 @@ select-history() {
 zle -N select-history
 bindkey '^r' select-history
 
+# ghq 管理のリポジトリをfzfで選択してcdする
 ghq-fzf() {
   local src=$(ghq list | fzf --preview "ls -laTp $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
   if [ -n "$src" ]; then
@@ -136,6 +125,7 @@ fkill() {
   fi
 }
 
+# git checkout を interactive に行う
 bcheckout() {
   local tags branches target
   branches=$(
