@@ -1,7 +1,6 @@
 ### Zinit
 # ref: https://github.com/zdharma/zinit#loading-and-unloading
 zinit ice wait'!1'; zinit load zdharma-continuum/fast-syntax-highlighting
-zinit ice wait'!1'; zinit load momo-lab/zsh-replace-multiple-dots
 zinit ice wait'!0'; zinit load zsh-users/zsh-autosuggestions
 zinit ice wait'!0'; zinit load zsh-users/zsh-completions
 zinit ice wait'!1'; plugins=(… zsh-completions)
