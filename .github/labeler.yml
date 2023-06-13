@@ -1,0 +1,6 @@
+dotfiles-cli:
+  - "cli/**/*"
+neovim:
+  - "nvim/**/*"
+zsh:
+  - "zsh/**/*"
