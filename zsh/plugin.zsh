@@ -209,10 +209,8 @@ issues() {
   fi
 }
 
-### asdf
-if [ -e /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
-  source /opt/homebrew/opt/asdf/libexec/asdf.sh
-fi
+### rtx
+eval "$(rtx activate zsh)"
 
 ### custom configuration
 if [ -e $HOME/.config/zsh/custom.zsh ]; then
