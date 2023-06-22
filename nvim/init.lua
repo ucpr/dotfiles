@@ -298,6 +298,16 @@ require('packer').startup(function(use)
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
   use "lambdalisue/guise.vim"
+  use {
+    "vim-skk/skkeleton",
+    event = { 'InsertEnter' },
+    config = function()
+      vim.cmd [[
+        call skkeleton#config({ 'globalJisyo': '~/.skk/SKK-JISYO.L' })
+        " command! EnableSKK call skkeleton#enable()
+      ]]
+    end,
+  }
 
   -- nvim-cmp
 
