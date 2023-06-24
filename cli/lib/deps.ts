@@ -1,13 +1,14 @@
 import { GzipStream } from "compress";
 
-const skkJisyoUrl = "https://skk-dev.github.io/dict/SKK-JISYO.L";
+const skkJisyoUrl = "https://skk-dev.github.io/dict/SKK-JISYO.L.gz";
 
 class Skk {
   skkDir: string;
   jisyoFileName: string;
 
   constructor() {
-    this.skkDir = "~/.skk";
+    const home = Deno.env.get("HOME") || "~/";
+    this.skkDir = `${home}/.skk`;
     this.jisyoFileName = "SKK-JISYO.L";
   }
 
@@ -46,13 +47,13 @@ class Skk {
 }
 
 export class Deps {
-  static async nvim() {
-    // setup skk
+  async nvim() {
+    // setup SKK
     const skk = new Skk();
     await skk.setup();
   }
 
-  static async all() {
+  async all() {
     await this.nvim();
   }
 }

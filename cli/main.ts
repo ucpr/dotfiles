@@ -4,7 +4,7 @@ import {
   HealthCheckError,
   HealthCheckOptions,
 } from "lib/healthcheck.ts";
-import { setup } from "lib/setup.ts";
+import { setup, SetupOptions } from "lib/setup.ts";
 import { logo } from "lib/logo.ts";
 import { linkMap } from "lib/linkMap.ts";
 
@@ -21,8 +21,10 @@ const cmd = new Command()
     logo();
   })
   .command("setup", "Setup the dotfiles")
-  .action(async () => {
-    await setup(linkMap);
+  .throwErrors()
+  .option("--with-deps", "setup with dependencies")
+  .action(async (options: SetupOptions) => {
+    await setup(linkMap, options);
   })
   .command("healthcheck", "Check the health of the dotfiles")
   .throwErrors()
