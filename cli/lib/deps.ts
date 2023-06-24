@@ -1,4 +1,5 @@
 import { GzipStream } from "compress";
+import { exists } from "lib/file.ts";
 
 const skkJisyoUrl = "https://skk-dev.github.io/dict/SKK-JISYO.L";
 
@@ -26,8 +27,22 @@ class Skk {
     return data;
   }
 
+  async createJisyoFile() {
+    if (await exists(this.skkDir)) {
+      throw new Error("SKK directory is not found.");
+    }
+    if (!await exists(this.jisyoFilePath())) {
+      const file = await Deno.open(this.jisyoFilePath(), {
+        createNew: true,
+        write: true,
+      });
+      file.close();
+    }
+  }
+
   // uncompress SKK-JISYO.L.gz to SKK-JISYO.L
   async uncompress(gzData: Uint8Array) {
+    await this.createJisyoFile();
     const tmpFilePath = await Deno.makeTempFile({
       prefix: "dotfiles_skk_",
       suffix: ".gz",
@@ -46,13 +61,13 @@ class Skk {
 }
 
 export class Deps {
-  static async nvim() {
-    // setup skk
+  async nvim() {
+    // setup SKK
     const skk = new Skk();
     await skk.setup();
   }
 
-  static async all() {
+  async all() {
     await this.nvim();
   }
 }
