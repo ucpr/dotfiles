@@ -300,12 +300,21 @@ require('packer').startup(function(use)
   use "lambdalisue/guise.vim"
   use {
     "vim-skk/skkeleton",
-    event = { 'InsertEnter' },
+    -- event = { 'InsertEnter' },
     config = function()
       vim.cmd [[
         call skkeleton#config({ 'globalJisyo': '~/.skk/SKK-JISYO.L' })
+
+        imap <C-b> <Plug>(skkeleton-enable)
+        cmap <C-b> <Plug>(skkeleton-enable)
         " command! EnableSKK call skkeleton#enable()
       ]]
+    end,
+  }
+  use {
+    "delphinus/skkeleton_indicator.nvim",
+    config = function()
+      require 'skkeleton_indicator'.setup {}
     end,
   }
 
