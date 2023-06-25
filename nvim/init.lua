@@ -298,25 +298,24 @@ require('packer').startup(function(use)
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
   use "lambdalisue/guise.vim"
-  use {
-    "vim-skk/skkeleton",
-    -- event = { 'InsertEnter' },
-    config = function()
-      vim.cmd [[
-        call skkeleton#config({ 'globalJisyo': '~/.skk/SKK-JISYO.L' })
+  -- use {
+  --   "vim-skk/skkeleton",
+  --    event = { 'InsertEnter' },
+  --   config = function()
+  --     vim.cmd [[
+  --       "call skkeleton#config({ 'globalJisyo': '/Users/s11591/.skk/SKK-JISYO.L' })
 
-        imap <C-b> <Plug>(skkeleton-enable)
-        cmap <C-b> <Plug>(skkeleton-enable)
-        " command! EnableSKK call skkeleton#enable()
-      ]]
-    end,
-  }
-  use {
-    "delphinus/skkeleton_indicator.nvim",
-    config = function()
-      require 'skkeleton_indicator'.setup {}
-    end,
-  }
+  --       "imap <C-b> <Plug>(skkeleton-toggle)
+  --       "cmap <C-b> <Plug>(skkeleton-toggle)
+  --     ]]
+  --   end,
+  -- }
+  -- "use {
+  -- "  "delphinus/skkeleton_indicator.nvim",
+  -- "  config = function()
+  -- "    require 'skkeleton_indicator'.setup {}
+  -- "  end,
+  -- "}
 
   -- nvim-cmp
 
