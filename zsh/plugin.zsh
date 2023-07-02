@@ -53,7 +53,7 @@ ggl() {
 }
 
 gignore() {
-    curl -L -s https://www.gitignore.io/api/$@
+    curl -L -s "https://www.gitignore.io/api/$@"
 }
 
 ### Hooks
@@ -131,7 +131,7 @@ fkill() {
 
   if [ "x$pid" != "x" ]
   then
-    echo $pid | xargs kill -${1:-9}
+    echo "${pid}" | xargs kill "-${1:-9}"
   fi
 }
 
@@ -177,9 +177,9 @@ fshow_preview() {
 
 open_tracked_files() {
   projectRoot=$(git rev-parse --show-toplevel)
-  fname=$(git ls-files $projectRoot | fzf --preview "bat $projectRoot/{-1}")
+  fname=$(git ls-files "${projectRoot}" | fzf --preview "bat ${projectRoot}/{-1}")
   if [[ $fname != "" ]] then
-    vim "$projectRoot/$fname"
+    vim "${projectRoot}/${fname}"
   fi
 }
 zle -N open_tracked_files
@@ -187,9 +187,9 @@ bindkey '^f' open_tracked_files
 
 open_all_files() {
   projectRoot=$(git rev-parse --show-toplevel)
-  fname=$(find $projectRoot/* -type f -not -path ".git/*" | sed -e "s%$projectRoot/%%" | fzf --preview "bat $projectRoot/{-1}")
-  if [[ $fname != "" ]] then
-    vim "$projectRoot/$fname"
+  fname=$(find "${projectRoot}/*" -type f -not -path ".git/*" | sed -e "s%${projectRoot}/%%" | fzf --preview "bat ${projectRoot}/{-1}")
+  if [[ $fname != "" ]]; then
+    vim "${projectRoot}/${fname}"
   fi
 }
 zle -N open_all_files
@@ -197,15 +197,15 @@ bindkey '^a' open_all_files
 
 prs() {
   number=$(gh pr list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login' | fzf |grep -o -E "[1-9]+\d" | head -n1)
-  if [[ $number != "" ]] then
-    gh pr view -w -- $number
+  if [[ $number != "" ]]; then
+    gh pr view -w -- "${number}"
   fi
 }
 
 issues() {
   number=$(gh issue list --json number,title,author | jq -r '.[] | "#" + (.number|tostring) + "\t" + .title + " / @" + .author.login'| fzf |grep -o -E "[0-9]+" | head -n1)
-  if [[ $number != "" ]] then
-    gh issue view -w -- $number
+  if [[ $number != "" ]]; then
+    gh issue view -w -- "${number}"
   fi
 }
 
@@ -213,7 +213,7 @@ issues() {
 eval "$(rtx activate zsh)"
 
 ### custom configuration
-if [ -e $HOME/.config/zsh/custom.zsh ]; then
-  source $HOME/.config/zsh/custom.zsh
+if [ -e "$HOME/.config/zsh/custom.zsh" ]; then
+  source "$HOME/.config/zsh/custom.zsh"
 fi
 
