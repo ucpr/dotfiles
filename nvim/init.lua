@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 -- {{{ general options
 local options = {
   -- file encoding
