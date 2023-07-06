@@ -50,6 +50,7 @@ brew "ktr0731/evans/evans"
 brew "bazelisk"
 brew "awscli"
 brew "kustomize"
+brew "neofetch"
 
 cask "google-cloud-sdk"
 cask "1password"
