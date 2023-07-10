@@ -51,6 +51,7 @@ brew "bazelisk"
 brew "awscli"
 brew "kustomize"
 brew "neofetch"
+brew "tailscale"
 
 cask "google-cloud-sdk"
 cask "1password"
@@ -83,3 +84,4 @@ mas "LINE", id: 539883307
 # mas "Xcode", id: 497799835
 mas "meetingbar", id: 1532419400
 # mas "Kindle", id: 405399194
+mas "tailscale", id: 1475387142
