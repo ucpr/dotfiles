@@ -179,6 +179,7 @@ require('packer').startup(function(use)
           ]]
         end
       },
+      -- use { "hrsh7th/vim-vsnip-integ" }
     },
     config = function()
       vim.fn["ddc#custom#patch_global"]("ui", "pum")
@@ -221,8 +222,8 @@ require('packer').startup(function(use)
           snippetEngine = vim.fn['denops#callback#register'](function(body)
             return vim.fn['vsnip#anonymous'](body)
           end),
-          enableResolveItem = false,
-          enableAdditionalTextEdit = false,
+          enableResolveItem = true,
+          enableAdditionalTextEdit = true,
           confirmBehavior = "replace",
         },
       })
@@ -243,6 +244,13 @@ require('packer').startup(function(use)
       vim.g.signature_help_config = {
         contentsStyle = "full",
         viewStyle = "floating"
+      }
+
+      vim.g.popup_preview_config = {
+        border = false,
+        supportVsnip = true,
+        supportInfo = true,
+        delay = 60,
       }
 
       -- enable ddc
