@@ -179,49 +179,212 @@ require('packer').startup(function(use)
   -- ddc.vim
   use {
     "Shougo/ddc.vim",
-    -- event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
+    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
     requires = {
+      -- ui
+      "Shougo/ddc-ui-pum",
       use {
-        "Shougo/ddc-ui-native",
+        "Shougo/pum.vim",
+        config = function()
+          vim.fn["pum#set_option"]({
+            border = 'double',
+            item_orders = { "kind", "abbr", "menu" },
+          })
+        end,
       },
-      use {
-        "Shougo/ddc-source-around",
-      },
-      use {
-        "Shougo/ddc-matcher_head",
-      },
-      use {
-        "Shougo/ddc-sorter_rank",
-      },
+
+      -- sources
+      "Shougo/ddc-source-around",
+      "LumaKernel/ddc-file",
+      "uga-rosa/ddc-source-vsnip",
+      "Shougo/ddc-source-nvim-lsp",
+
+      -- filters
+      "tani/ddc-fuzzy",
     },
     config = function()
-      vim.fn["ddc#custom#patch_global"]("ui", "native")
-      vim.fn["ddc#custom#patch_global"]("sources", { "around" })
+      vim.fn["ddc#custom#patch_global"]("ui", "pum")
+      vim.fn["ddc#custom#patch_global"]("sources", {
+        "around",
+        "file",
+        "nvim-lsp",
+      })
       vim.fn["ddc#custom#patch_global"]('sourceOptions', {
         _ = {
-          matchers = { 'matcher_head' },
-          sorters = { 'sorter_rank' }
-        }
-      })
-      vim.fn["ddc#custom#patch_global"]('sourceOptions', {
-        around = { mark = 'A' }
+          matchers = { 'matcher_fuzzy' },
+          sorters = { 'sorter_fuzzy' },
+          converters = { "converter_fuzzy" },
+        },
+        file = {
+          mark = 'file',
+          isVolatile = true,
+          forceCompletionPattern = '\\S/\\S*'
+        },
+        vsnip = {
+          mark = 'snip',
+          minAutoCompleteLength = 1
+        },
+        around = { mark = 'A' },
+        ['nvim-lsp'] = {
+          mark = 'lsp',
+          forceCompletionPattern = '\\.\\w*|:\\w*|-\\>\\w*',
+          minAutoCompleteLength = 1,
+        },
       })
       vim.fn["ddc#custom#patch_global"]('sourceParams', {
-        around = { maxSize = 500 }
+        around = { maxSize = 500 },
+        ['nvim-lsp'] = {
+          --snippetEngine = vim.fn['denops#callback#register'](function(body)
+          --  return vim.fn['vsnip#anonymous'](body)
+          --end),
+          enableResolveItem = true,
+          enableAdditionalTextEdit = true
+        },
       })
-      vim.fn["ddc#custom#patch_filetype"]({ 'c', 'cpp' }, 'sources', { 'around', 'clangd' })
-      vim.fn["ddc#custom#patch_filetype"]({ 'c', 'cpp' }, 'sourceOptions', {
-        clangd = { mark = 'C' }
-      })
+
       vim.fn["ddc#custom#patch_filetype"]('markdown', 'sourceParams', {
         around = { maxSize = 100 }
       })
-      vim.api.nvim_set_keymap('i', '<Tab>',
-        'pumvisible() ? \'<C-n>\' : (col(\'.\') <= 1 || getline(\'.\')[col(\'.\') - 2] =~# \'\\s\') ? \'<Tab>\' : ddc#map#manual_complete()',
-        { silent = true, expr = true })
-      vim.api.nvim_set_keymap('i', '<S-Tab>', 'pumvisible() ? \'<C-p>\' : \'<C-h>\'', { expr = true })
+
+      -- vim.api.nvim_set_keymap('i', '<Tab>',
+      --   'pumvisible() ? \'<C-n>\' : (col(\'.\') <= 1 || getline(\'.\')[col(\'.\') - 2] =~# \'\\s\') ? \'<Tab>\' : ddc#map#manual_complete()',
+      --   { silent = true, expr = true })
+
+      -- vim.api.nvim_set_keymap('i', '<S-Tab>', 'pumvisible() ? \'<C-p>\' : \'<C-h>\'', { expr = true })
+
+      -- vim.keymap.set("i", "<C-n>", '<Cmd>call pum#map#insert_relative(+1)<CR>')
+      -- vim.keymap.set("i", "<C-p>", '<Cmd>call pum#map#insert_relative(-1)<CR>')
+      -- vim.keymap.set("i", "<C-y>", '<Cmd>call pum#map#confirm()<CR>')
+      -- vim.keymap.set("i", "<C-e>", '<Cmd>call pum#map#cancel()<CR>')
+      -- vim.keymap.set("i", "<PageDown>", '<Cmd>call pum#map#insert_relative_page(+1)<CR>')
+      -- vim.keymap.set("i", "<PageUp>", '<Cmd>call pum#map#insert_relative_page(-1)<CR>')
+
+      vim.cmd [[
+        imap <silent><expr> <TAB> pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' : vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<TAB>'
+        imap <silent><expr> <C-n> pum#visible() ? '<Cmd>call pum#map#select_relative(+1)<CR>' : '<Cmd>call ddc#map#manual_complete()<CR><Cmd>call pum#map#select_relative(+1)<CR>'
+        smap <silent><expr> <TAB> vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<TAB>'
+        imap <silent><expr> <S-TAB> pum#visible() ? '<Cmd>call pum#map#insert_relative(-1)<CR>' : vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-TAB>'
+        imap <silent><expr> <C-p> pum#visible() ? '<Cmd>call pum#map#select_relative(-1)<CR>' : '<Cmd>call ddc#map#manual_complete()<CR><Cmd>call pum#map#select_relative(-1)<CR>'
+        smap <silent><expr> <S-TAB> vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-TAB>'
+        imap <silent><expr> <CR>   pum#visible() ? '<Cmd>call pum#map#confirm()<CR>' : '<CR>'
+      ]]
+      -- enable ddc
       vim.fn["ddc#enable"]()
     end,
+  }
+
+  -- lsp
+  use {
+    "neovim/nvim-lspconfig",
+    requires = {
+      {
+        "williamboman/mason-lspconfig.nvim",
+      },
+      {
+        "williamboman/mason.nvim",
+        module = { "lspconfig" },
+      }
+    },
+    config = function()
+      local on_attach = function(_, bufnr)
+        local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+        -- local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+        local opts = { noremap = true, silent = true }
+        buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+        buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+        buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+        buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+        buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+        buf_set_keymap("n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
+        buf_set_keymap("n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
+        buf_set_keymap("n", "<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", opts)
+        buf_set_keymap("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+        buf_set_keymap("n", "<space>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+        buf_set_keymap("n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+        buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+        buf_set_keymap("n", "<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
+        buf_set_keymap("n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
+        buf_set_keymap("n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
+        buf_set_keymap("n", "<space>q", "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>", opts)
+        buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+      end
+
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local capabilities = require("ddc_nvim_lsp").make_client_capabilities()
+      -- capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+      local nvim_lsp = require("lspconfig")
+      require("mason").setup({
+        ui = {
+          icons = {
+            package_installed = "✓",
+            package_pending = "➜",
+            package_uninstalled = "✗"
+          }
+        }
+      })
+      require("mason-lspconfig").setup()
+      require("mason-lspconfig").setup_handlers {
+        function(server_name)
+          local opt = {
+            on_attach = on_attach,
+            capabilities = require("ddc_nvim_lsp").make_client_capabilities(),
+          }
+          if server_name == "gopls" then
+            opt.settings = {
+              gopls = {
+                env = { GOFLAGS = "-tags=integration,wireinject" },
+                gofumpt = true,
+              },
+            }
+            nvim_lsp[server_name].setup(opt)
+          else
+            nvim_lsp[server_name].setup(opt)
+          end
+        end
+      }
+      function OrgImports(wait_ms)
+        local params = vim.lsp.util.make_range_params()
+        params.context = { only = { "source.organizeImports" } }
+        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
+        for _, res in pairs(result or {}) do
+          for _, r in pairs(res.result or {}) do
+            if r.edit then
+              vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
+            else
+              vim.lsp.buf.execute_command(r.command)
+            end
+          end
+        end
+      end
+    end
+  }
+
+  -- snip
+  use {
+    "hrsh7th/vim-vsnip",
+    event = { "InsertEnter" },
+    config = function()
+      vim.cmd [[
+        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+        " autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+
+        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        let g:vsnip_filetypes = {}
+        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+        ]]
+    end
+  }
+  use {
+    "hrsh7th/vim-vsnip-integ",
+    event = { "InsertEnter" },
   }
 
   -- etc
@@ -379,7 +542,7 @@ require('packer').startup(function(use)
         highlight = {
           enable = true,
           -- disable = { "c", "rust" },
-          disable = function(lang, buf)
+          disable = function(_, buf)
             local max_filesize = 100 * 1024 -- 100 KB
             local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
             if ok and stats and stats.size > max_filesize then
@@ -454,7 +617,7 @@ require('packer').startup(function(use)
             disable_virtual_lines_ft = { 'yaml' },
             min_rows = 1,
             min_rows_ft = {},
-            custom_parser = function(node, ft, opts)
+            custom_parser = function(node, _, _)
               local utils = require('nvim_context_vt.utils')
 
               if node:type() == 'function' then
@@ -464,7 +627,7 @@ require('packer').startup(function(use)
               return '--> ' .. utils.get_node_text(node)[1]
             end,
 
-            custom_validator = function(node, ft, opts)
+            custom_validator = function(node, ft, _)
               local default_validator = require('nvim_context_vt.utils').default_validator
               if default_validator(node, ft) then
                 if node:type() == 'function' then
@@ -475,7 +638,7 @@ require('packer').startup(function(use)
               return true
             end,
 
-            custom_resolver = function(nodes, ft, opts)
+            custom_resolver = function(nodes, _, _)
               return nodes[#nodes]
             end,
           })
