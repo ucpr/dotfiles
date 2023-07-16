@@ -176,6 +176,54 @@ require('packer').startup(function(use)
     end
   }
 
+  -- ddc.vim
+  use {
+    "Shougo/ddc.vim",
+    -- event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
+    requires = {
+      use {
+        "Shougo/ddc-ui-native",
+      },
+      use {
+        "Shougo/ddc-source-around",
+      },
+      use {
+        "Shougo/ddc-matcher_head",
+      },
+      use {
+        "Shougo/ddc-sorter_rank",
+      },
+    },
+    config = function()
+      vim.fn["ddc#custom#patch_global"]("ui", "native")
+      vim.fn["ddc#custom#patch_global"]("sources", { "around" })
+      vim.fn["ddc#custom#patch_global"]('sourceOptions', {
+        _ = {
+          matchers = { 'matcher_head' },
+          sorters = { 'sorter_rank' }
+        }
+      })
+      vim.fn["ddc#custom#patch_global"]('sourceOptions', {
+        around = { mark = 'A' }
+      })
+      vim.fn["ddc#custom#patch_global"]('sourceParams', {
+        around = { maxSize = 500 }
+      })
+      vim.fn["ddc#custom#patch_filetype"]({ 'c', 'cpp' }, 'sources', { 'around', 'clangd' })
+      vim.fn["ddc#custom#patch_filetype"]({ 'c', 'cpp' }, 'sourceOptions', {
+        clangd = { mark = 'C' }
+      })
+      vim.fn["ddc#custom#patch_filetype"]('markdown', 'sourceParams', {
+        around = { maxSize = 100 }
+      })
+      vim.api.nvim_set_keymap('i', '<Tab>',
+        'pumvisible() ? \'<C-n>\' : (col(\'.\') <= 1 || getline(\'.\')[col(\'.\') - 2] =~# \'\\s\') ? \'<Tab>\' : ddc#map#manual_complete()',
+        { silent = true, expr = true })
+      vim.api.nvim_set_keymap('i', '<S-Tab>', 'pumvisible() ? \'<C-p>\' : \'<C-h>\'', { expr = true })
+      vim.fn["ddc#enable"]()
+    end,
+  }
+
   -- etc
   use {
     "navarasu/onedark.nvim",
@@ -434,139 +482,6 @@ require('packer').startup(function(use)
         end,
       },
     }
-  }
-
-  -- lsp
-  use {
-    "neovim/nvim-lspconfig",
-    requires = {
-      {
-        "williamboman/mason-lspconfig.nvim",
-      },
-      {
-        "williamboman/mason.nvim",
-        module = { "lspconfig" },
-      }
-    },
-    config = function()
-      local on_attach = function(client, bufnr)
-        local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-        local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-        local opts = { noremap = true, silent = true }
-        buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-        buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-        buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-        buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-        buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-        buf_set_keymap('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-        buf_set_keymap("n", "gn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-        buf_set_keymap("n", "gf", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", opts)
-        buf_set_keymap('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-        buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-        buf_set_keymap("n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
-        buf_set_keymap("n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
-        buf_set_keymap("n", "<space>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", opts)
-        buf_set_keymap("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-        buf_set_keymap("n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-        buf_set_keymap("n", "<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
-        buf_set_keymap("n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
-        buf_set_keymap("n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
-        buf_set_keymap("n", "<space>q", "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>", opts)
-      end
-
-      local capabilities = require('cmp_nvim_lsp').default_capabilities()
-      capabilities.textDocument.completion.completionItem.snippetSupport = true
-
-      vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-        vim.lsp.diagnostic.on_publish_diagnostics, {
-          underline = true,
-          virtual_text = true,
-          signs = true,
-          update_in_insert = false,
-        }
-      )
-      -- diagnostic sign setting
-      local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-      for type, icon in pairs(signs) do
-        local hl = "DiagnosticSign" .. type
-        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-      end
-
-      local nvim_lsp = require("lspconfig")
-      require("mason").setup({
-        ui = {
-          icons = {
-            package_installed = "✓",
-            package_pending = "➜",
-            package_uninstalled = "✗"
-          }
-        }
-      })
-      require("mason-lspconfig").setup()
-      require("mason-lspconfig").setup_handlers {
-        function(server_name)
-          if server_name == "gopls" then
-            nvim_lsp[server_name].setup {
-              on_attach = on_attach,
-              flags = {
-                debounce_text_changes = 150,
-              },
-              settings = {
-                gopls = {
-                  env = { GOFLAGS = "-tags=integration,wireinject" },
-                  gofumpt = true,
-                },
-              },
-            }
-            --           elseif server_name == "denols" then
-            --             nvim_lsp[server_name].setup({
-            --               root_dir = lspconfig.util.root_pattern("deno.json"),
-            --               init_options = {
-            --                 lint = true,
-            --                 unstable = true,
-            --                 suggest = {
-            --                   imports = {
-            --                     hosts = {
-            --                       ["https://deno.land"] = true,
-            --                       ["https://cdn.nest.land"] = true,
-            --                       ["https://crux.land"] = true,
-            --                     },
-            --                   },
-            --                 },
-            --               },
-            --             })
-            --           elseif server_name == "tsserver" then
-            --             nvim_lsp[server_name].setup({
-            --               root_dir = lspconfig.util.root_pattern("package.json"),
-            --               autostart = false,
-            --             })
-          else
-            nvim_lsp[server_name].setup {
-              on_attach = on_attach,
-            }
-          end
-        end
-      }
-      function OrgImports(wait_ms)
-        local params = vim.lsp.util.make_range_params()
-        params.context = { only = { "source.organizeImports" } }
-        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
-        for _, res in pairs(result or {}) do
-          for _, r in pairs(res.result or {}) do
-            if r.edit then
-              vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
-            else
-              vim.lsp.buf.execute_command(r.command)
-            end
-          end
-        end
-      end
-
-      vim.cmd [[
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-      ]]
-    end
   }
 
   -- nvim-dap
