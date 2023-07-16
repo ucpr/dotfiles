@@ -95,6 +95,11 @@ local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
+  -- denops
+  use "vim-denops/denops.vim"
+  use "yuki-yano/fuzzy-motion.vim"
+  use "lambdalisue/guise.vim"
+
   -- ddu.vim
   use {
     "Shougo/ddu.vim",
@@ -174,13 +179,6 @@ require('packer').startup(function(use)
           ]]
         end
       },
-      -- use {
-      --   "hrsh7th/vim-vsnip-integ",
-      --   config = function()
-      --     vim.cmd [[
-      --     ]]
-      --   end
-      -- },
     },
     config = function()
       vim.fn["ddc#custom#patch_global"]("ui", "pum")
@@ -212,7 +210,7 @@ require('packer').startup(function(use)
         ['nvim-lsp'] = {
           mark = '[lsp]',
           forceCompletionPattern = "\\.\\w*|::\\w*|->\\w*",
-          -- dup = "force",
+          dup = "force",
         },
       })
 
@@ -338,7 +336,6 @@ require('packer').startup(function(use)
         buf_set_keymap("n", "<space>q", "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>", opts)
         buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
       end
-
 
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()
       local capabilities = require("ddc_nvim_lsp").make_client_capabilities()
@@ -497,28 +494,6 @@ require('packer').startup(function(use)
     "tpope/vim-fugitive",
     event = "InsertEnter",
   }
-  -- denops
-  use "vim-denops/denops.vim"
-  use "yuki-yano/fuzzy-motion.vim"
-  use "lambdalisue/guise.vim"
-  -- use {
-  --   "vim-skk/skkeleton",
-  --    event = { 'InsertEnter' },
-  --   config = function()
-  --     vim.cmd [[
-  --       "call skkeleton#config({ 'globalJisyo': '/Users/s11591/.skk/SKK-JISYO.L' })
-
-  --       "imap <C-b> <Plug>(skkeleton-toggle)
-  --       "cmap <C-b> <Plug>(skkeleton-toggle)
-  --     ]]
-  --   end,
-  -- }
-  -- "use {
-  -- "  "delphinus/skkeleton_indicator.nvim",
-  -- "  config = function()
-  -- "    require 'skkeleton_indicator'.setup {}
-  -- "  end,
-  -- "}
 
   -- treesitter
   use {
