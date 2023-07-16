@@ -2,11 +2,6 @@
   <h1>dotfiles</h1>
 </div>
 
-## requirements
-
-- brew
-- deno
-
 ## setup
 
 ```
