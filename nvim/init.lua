@@ -183,15 +183,7 @@ require('packer').startup(function(use)
     requires = {
       -- ui
       "Shougo/ddc-ui-pum",
-      use {
-        "Shougo/pum.vim",
-        config = function()
-          vim.fn["pum#set_option"]({
-            border = 'double',
-            item_orders = { "kind", "abbr", "menu" },
-          })
-        end,
-      },
+      "Shougo/pum.vim",
 
       -- sources
       "Shougo/ddc-source-around",
@@ -208,6 +200,7 @@ require('packer').startup(function(use)
         "around",
         "file",
         "nvim-lsp",
+        "vsnip",
       })
       vim.fn["ddc#custom#patch_global"]('sourceOptions', {
         _ = {
@@ -222,7 +215,6 @@ require('packer').startup(function(use)
         },
         vsnip = {
           mark = 'snip',
-          minAutoCompleteLength = 1
         },
         around = { mark = 'A' },
         ['nvim-lsp'] = {
@@ -234,9 +226,9 @@ require('packer').startup(function(use)
       vim.fn["ddc#custom#patch_global"]('sourceParams', {
         around = { maxSize = 500 },
         ['nvim-lsp'] = {
-          --snippetEngine = vim.fn['denops#callback#register'](function(body)
-          --  return vim.fn['vsnip#anonymous'](body)
-          --end),
+          snippetEngine = vim.fn['denops#callback#register'](function(body)
+            return vim.fn['vsnip#anonymous'](body)
+          end),
           enableResolveItem = true,
           enableAdditionalTextEdit = true
         },
