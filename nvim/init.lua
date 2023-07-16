@@ -179,7 +179,7 @@ require('packer').startup(function(use)
   -- ddc.vim
   use {
     "Shougo/ddc.vim",
-    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
+    -- event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
     requires = {
       -- ui
       "Shougo/ddc-ui-pum",
@@ -233,23 +233,6 @@ require('packer').startup(function(use)
           enableAdditionalTextEdit = true
         },
       })
-
-      vim.fn["ddc#custom#patch_filetype"]('markdown', 'sourceParams', {
-        around = { maxSize = 100 }
-      })
-
-      -- vim.api.nvim_set_keymap('i', '<Tab>',
-      --   'pumvisible() ? \'<C-n>\' : (col(\'.\') <= 1 || getline(\'.\')[col(\'.\') - 2] =~# \'\\s\') ? \'<Tab>\' : ddc#map#manual_complete()',
-      --   { silent = true, expr = true })
-
-      -- vim.api.nvim_set_keymap('i', '<S-Tab>', 'pumvisible() ? \'<C-p>\' : \'<C-h>\'', { expr = true })
-
-      -- vim.keymap.set("i", "<C-n>", '<Cmd>call pum#map#insert_relative(+1)<CR>')
-      -- vim.keymap.set("i", "<C-p>", '<Cmd>call pum#map#insert_relative(-1)<CR>')
-      -- vim.keymap.set("i", "<C-y>", '<Cmd>call pum#map#confirm()<CR>')
-      -- vim.keymap.set("i", "<C-e>", '<Cmd>call pum#map#cancel()<CR>')
-      -- vim.keymap.set("i", "<PageDown>", '<Cmd>call pum#map#insert_relative_page(+1)<CR>')
-      -- vim.keymap.set("i", "<PageUp>", '<Cmd>call pum#map#insert_relative_page(-1)<CR>')
 
       vim.cmd [[
         imap <silent><expr> <TAB> pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' : vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<TAB>'
