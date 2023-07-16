@@ -38,6 +38,8 @@ local options = {
   laststatus = 2,
   showtabline = 2,
   statusline = '%f %y%m %r%h%w%=[%{&fileencoding!=""?&fileencoding:&encoding},%{&ff}] [Pos %02l,%02c] [%p%%/%L]',
+  pumblend = 10,
+  winblend = 10,
   -- syntax
   tabstop = 2,
   shiftwidth = 2,
@@ -93,158 +95,211 @@ local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
-  -- telescope
-  use "nvim-lua/plenary.nvim"
+  -- ddu.vim
   use {
-    "nvim-telescope/telescope.nvim",
-    module = { "telescope" },
+    "Shougo/ddu.vim",
     requires = {
-      {
-        "nvim-telescope/telescope-file-browser.nvim",
-        opt = true,
-      },
-      {
-        "nvim-telescope/telescope-live-grep-args.nvim",
-        opt = true,
-      },
-      {
-        "LinArcX/telescope-env.nvim",
-        opt = true,
-      },
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        run = "make",
-        opt = true,
-      },
+      use { "Shougo/ddu-ui-ff" },
+      use { "Shougo/ddu-kind-file" },
+      use { "Shougo/ddu-filter-matcher_substring" },
     },
-    wants = {
-      "telescope-fzf-native.nvim",
-      "telescope-file-browser.nvim",
-      "telescope-live-grep-args.nvim",
-      "telescope-fzf-native.nvim",
-      "telescope-env.nvim",
-    },
-    setup = function()
-      local function builtin(name)
-        return function(opt)
-          return function()
-            return require("telescope.builtin")[name](opt or {})
-          end
-        end
-      end
-
-      local function extensions(name, prop)
-        return function(opt)
-          return function()
-            local telescope = require "telescope"
-            telescope.load_extension(name)
-            return telescope.extensions[name][prop](opt or {})
-          end
-        end
-      end
-
-      vim.keymap.set("n", "<Space>b", builtin("buffers") {})
-      vim.keymap.set("n", "<Space>fb", extensions("file_browser", "file_browser") {})
-      vim.keymap.set("n", "<Space>ff", builtin("find_files") {})
-      vim.keymap.set("n", "<Space>lg", extensions("live_grep_args", "live_grep_args") {})
-    end,
     config = function()
-      local telescope = require "telescope"
-      telescope.setup {
-        defaults = {
-          file_ignore_patterns = {
-            "vendor", "vendor/*", "./vendor", "./vendor/*",
-            "node_modules",
+      vim.fn['ddu#custom#patch_global']({
+        ui = 'ff',
+        uiParams = {
+          ff = {
+            -- split = "floating",
+            startFilter = true,
           },
         },
-        extensions = {
-          fzf = {
-            fuzzy = true,
-            override_generic_sorter = true,
-            override_file_sorter = true,
-            case_mode = "smart_case",
-          },
-          file_browser = {
-            hijack_netrw = true,
-          },
-          live_grep_args = {
-            auto_quoting = true,
-          },
-        },
-      }
-      telescope.load_extension("fzf")
-    end
+      })
+
+      vim.fn['ddu#custom#patch_global']({
+        kindOptions = {
+          file = {
+            defaultAction = 'open'
+          }
+        }
+      })
+
+      vim.fn['ddu#custom#patch_global']({
+        sourceOptions = {
+          ['_'] = {
+            matchers = { 'matcher_substring' }
+          }
+        }
+      })
+    end,
   }
 
   -- ddc.vim
   use {
     "Shougo/ddc.vim",
-    -- event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
+    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
     requires = {
       -- ui
-      "Shougo/ddc-ui-pum",
-      "Shougo/pum.vim",
+      use { "Shougo/ddc-ui-pum" },
+      use {
+        "Shougo/pum.vim",
+        config = function()
+          vim.fn["pum#set_option"]({
+            border = 'double',
+            item_orders = { "abbr", "kind", "menu" },
+            padding = true,
+          })
+        end,
+      },
 
       -- sources
-      "Shougo/ddc-source-around",
-      "LumaKernel/ddc-file",
-      "uga-rosa/ddc-source-vsnip",
-      "Shougo/ddc-source-nvim-lsp",
+      use { "Shougo/ddc-source-around" },
+      use { "LumaKernel/ddc-file" },
+      use { "Shougo/ddc-source-nvim-lsp" },
+      use { "uga-rosa/ddc-source-vsnip" },
 
       -- filters
-      "tani/ddc-fuzzy",
+      use { "tani/ddc-fuzzy" },
+      use { "Shougo/ddc-filter-sorter_rank" },
+      use { "Shougo/ddc-converter_remove_overlap" },
+
+      -- etc
+      use { "matsui54/denops-popup-preview.vim" },
+      use { "matsui54/denops-signature_help" },
+      use {
+        'hrsh7th/vim-vsnip',
+        config = function()
+          vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+          vim.cmd [[
+            "autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+            autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+          ]]
+        end
+      },
+      -- use {
+      --   "hrsh7th/vim-vsnip-integ",
+      --   config = function()
+      --     vim.cmd [[
+      --     ]]
+      --   end
+      -- },
     },
     config = function()
       vim.fn["ddc#custom#patch_global"]("ui", "pum")
       vim.fn["ddc#custom#patch_global"]("sources", {
-        "around",
-        "file",
-        "nvim-lsp",
         "vsnip",
+        "nvim-lsp",
+        "file",
+        "around",
       })
       vim.fn["ddc#custom#patch_global"]('sourceOptions', {
         _ = {
           matchers = { 'matcher_fuzzy' },
-          sorters = { 'sorter_fuzzy' },
-          converters = { "converter_fuzzy" },
+          sorters = { 'sorter_rank' },
+          converters = { "converter_remove_overlap" },
+          minAutoCompleteLength = 1,
         },
         file = {
-          mark = 'file',
+          mark = '[file]',
           isVolatile = true,
           forceCompletionPattern = '\\S/\\S*'
         },
-        vsnip = {
-          mark = 'snip',
+        around = {
+          mark = '[around]',
         },
-        around = { mark = 'A' },
+        vsnip = {
+          mark = '[snip]',
+          keywordPattern = "\\S*",
+        },
         ['nvim-lsp'] = {
-          mark = 'lsp',
-          forceCompletionPattern = '\\.\\w*|:\\w*|-\\>\\w*',
-          minAutoCompleteLength = 1,
+          mark = '[lsp]',
+          forceCompletionPattern = "\\.\\w*|::\\w*|->\\w*",
+          -- dup = "force",
         },
       })
+
       vim.fn["ddc#custom#patch_global"]('sourceParams', {
-        around = { maxSize = 500 },
+        around = { maxSize = 100 },
+        vsnip = { menu = false },
         ['nvim-lsp'] = {
           snippetEngine = vim.fn['denops#callback#register'](function(body)
             return vim.fn['vsnip#anonymous'](body)
           end),
-          enableResolveItem = true,
-          enableAdditionalTextEdit = true
+          enableResolveItem = false,
+          enableAdditionalTextEdit = false,
+          confirmBehavior = "replace",
         },
       })
 
       vim.cmd [[
-        imap <silent><expr> <TAB> pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' : vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<TAB>'
-        imap <silent><expr> <C-n> pum#visible() ? '<Cmd>call pum#map#select_relative(+1)<CR>' : '<Cmd>call ddc#map#manual_complete()<CR><Cmd>call pum#map#select_relative(+1)<CR>'
-        smap <silent><expr> <TAB> vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<TAB>'
-        imap <silent><expr> <S-TAB> pum#visible() ? '<Cmd>call pum#map#insert_relative(-1)<CR>' : vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-TAB>'
-        imap <silent><expr> <C-p> pum#visible() ? '<Cmd>call pum#map#select_relative(-1)<CR>' : '<Cmd>call ddc#map#manual_complete()<CR><Cmd>call pum#map#select_relative(-1)<CR>'
-        smap <silent><expr> <S-TAB> vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-TAB>'
-        imap <silent><expr> <CR>   pum#visible() ? '<Cmd>call pum#map#confirm()<CR>' : '<CR>'
+        " autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        inoremap <silent><expr> <TAB>
+              \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
+              \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+              \ '<TAB>' : ddc#manual_complete()
+        inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
+        inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
+        inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
+        inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
+        inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
       ]]
+
+      vim.g.signature_help_config = {
+        contentsStyle = "full",
+        viewStyle = "floating"
+      }
+
       -- enable ddc
       vim.fn["ddc#enable"]()
+      vim.fn["popup_preview#enable"]()
+      vim.fn["signature_help#enable"]()
+    end,
+  }
+
+  use {
+    "github/copilot.vim",
+    event = { "InsertEnter" },
+    setup = function()
+      vim.g.copilot_filetypes = {
+        gitcommit = true,
+        markdown = true,
+        yaml = true,
+        text = true,
+      }
+      vim.g.copilot_no_tab_map = true
+    end,
+    config = function()
+      local keymap = vim.keymap
+      keymap.set(
+        "i",
+        "<C-c>",
+        'copilot#Accept()',
+        { silent = true, expr = true, script = true, replace_keycodes = false }
+      )
+      keymap.set(
+        "i",
+        "<C-x>",
+        '<Plug>(copilot-dismiss)'
+      )
+      -- keymap("i", "<C-j>", "<Plug>(copilot-next)")
+      -- keymap("i", "<C-k>", "<Plug>(copilot-previous)")
+      -- keymap("i", "<C-o>", "<Plug>(copilot-dismiss)")
+      -- keymap("i", "<C-s>", "<Plug>(copilot-suggest)")
+
+      local function append_diff()
+        -- Get the Git repository root directory
+        local git_dir = vim.fn.FugitiveGitDir()
+        local git_root = vim.fn.fnamemodify(git_dir, ':h')
+        -- Get the diff of the staged changes relative to the Git repository root
+        local diff = vim.fn.system('git -C ' .. git_root .. ' diff --cached')
+        -- Add a comment character to each line of the diff
+        local comment_diff = table.concat(vim.tbl_map(function(line)
+          return '# ' .. line
+        end, vim.split(diff, '\n')), "\n")
+        -- Append the diff to the commit message
+        vim.api.nvim_buf_set_lines(0, -1, -1, false, vim.split(comment_diff, '\n'))
+      end
+      vim.cmd [[
+          autocmd BufReadPost COMMIT_EDITMSG call lua append_diff()
+        ]]
     end,
   }
 
@@ -284,9 +339,10 @@ require('packer').startup(function(use)
         buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
       end
 
+
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()
       local capabilities = require("ddc_nvim_lsp").make_client_capabilities()
-      -- capabilities.textDocument.completion.completionItem.snippetSupport = true
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
 
       local nvim_lsp = require("lspconfig")
       require("mason").setup({
@@ -303,7 +359,7 @@ require('packer').startup(function(use)
         function(server_name)
           local opt = {
             on_attach = on_attach,
-            capabilities = require("ddc_nvim_lsp").make_client_capabilities(),
+            capabilities = capabilities,
           }
           if server_name == "gopls" then
             opt.settings = {
@@ -318,48 +374,7 @@ require('packer').startup(function(use)
           end
         end
       }
-      function OrgImports(wait_ms)
-        local params = vim.lsp.util.make_range_params()
-        params.context = { only = { "source.organizeImports" } }
-        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
-        for _, res in pairs(result or {}) do
-          for _, r in pairs(res.result or {}) do
-            if r.edit then
-              vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
-            else
-              vim.lsp.buf.execute_command(r.command)
-            end
-          end
-        end
-      end
     end
-  }
-
-  -- snip
-  use {
-    "hrsh7th/vim-vsnip",
-    event = { "InsertEnter" },
-    config = function()
-      vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        " autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-
-        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        let g:vsnip_filetypes = {}
-        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-        ]]
-    end
-  }
-  use {
-    "hrsh7th/vim-vsnip-integ",
-    event = { "InsertEnter" },
   }
 
   -- etc
@@ -556,7 +571,6 @@ require('packer').startup(function(use)
               },
               rust = {
                 'impl_item',
-
               },
               terraform = {
                 'block',
