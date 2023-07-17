@@ -106,6 +106,8 @@ require('packer').startup(function(use)
     requires = {
       use { "Shougo/ddu-ui-ff" },
       use { "Shougo/ddu-kind-file" },
+      use { "Shougo/ddu-source-file_rec" },
+      use { "shun/ddu-source-rg" },
       use { "Shougo/ddu-filter-matcher_substring" },
     },
     config = function()
@@ -113,26 +115,48 @@ require('packer').startup(function(use)
         ui = 'ff',
         uiParams = {
           ff = {
-            -- split = "floating",
+            split = "floating",
             startFilter = true,
+            prompt = "> ",
           },
         },
-      })
-
-      vim.fn['ddu#custom#patch_global']({
-        kindOptions = {
-          file = {
-            defaultAction = 'open'
+        sources = {
+          {
+            name = "file_rec",
+            params = {
+              ignoredDirectories = { ".git", "node_modules", "vendor" },
+            },
           }
-        }
-      })
-
-      vim.fn['ddu#custom#patch_global']({
+        },
         sourceOptions = {
           ['_'] = {
             matchers = { 'matcher_substring' }
           }
-        }
+        },
+        filterParams = {
+          matcher_substring = {
+            -- ignoreCase = true,
+            highlightMatched = "Title",
+          },
+        },
+        kindOptions = {
+          file = {
+            defaultAction = 'open'
+          }
+        },
+      })
+
+      vim.fn['ddu#custom#patch_local']("grep", {
+        sourceParams = {
+          rg = {
+            args = { "--column", "--no-heading", "--color", "never" },
+          },
+        },
+        uiParams = {
+          ff = {
+            startFilter = false,
+          },
+        },
       })
     end,
   }
