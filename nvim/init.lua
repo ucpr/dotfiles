@@ -100,65 +100,87 @@ require('packer').startup(function(use)
   use "yuki-yano/fuzzy-motion.vim"
   use "lambdalisue/guise.vim"
 
-  -- ddu.vim
+  -- telescope
+  use "nvim-lua/plenary.nvim"
   use {
-    "Shougo/ddu.vim",
+    "nvim-telescope/telescope.nvim",
+    module = { "telescope" },
     requires = {
-      use { "Shougo/ddu-ui-ff" },
-      use { "Shougo/ddu-kind-file" },
-      use { "Shougo/ddu-source-file_rec" },
-      use { "shun/ddu-source-rg" },
-      use { "Shougo/ddu-filter-matcher_substring" },
+      {
+        "nvim-telescope/telescope-file-browser.nvim",
+        opt = true,
+      },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        opt = true,
+      },
+      {
+        "LinArcX/telescope-env.nvim",
+        opt = true,
+      },
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        run = "make",
+        opt = true,
+      },
     },
-    config = function()
-      vim.fn['ddu#custom#patch_global']({
-        ui = 'ff',
-        uiParams = {
-          ff = {
-            split = "floating",
-            startFilter = true,
-            prompt = "> ",
-          },
-        },
-        sources = {
-          {
-            name = "file_rec",
-            params = {
-              ignoredDirectories = { ".git", "node_modules", "vendor" },
-            },
-          }
-        },
-        sourceOptions = {
-          ['_'] = {
-            matchers = { 'matcher_substring' }
-          }
-        },
-        filterParams = {
-          matcher_substring = {
-            -- ignoreCase = true,
-            highlightMatched = "Title",
-          },
-        },
-        kindOptions = {
-          file = {
-            defaultAction = 'open'
-          }
-        },
-      })
+    wants = {
+      "telescope-fzf-native.nvim",
+      "telescope-file-browser.nvim",
+      "telescope-live-grep-args.nvim",
+      "telescope-fzf-native.nvim",
+      "telescope-env.nvim",
+    },
+    setup = function()
+      local function builtin(name)
+        return function(opt)
+          return function()
+            return require("telescope.builtin")[name](opt or {})
+          end
+        end
+      end
 
-      vim.fn['ddu#custom#patch_local']("grep", {
-        sourceParams = {
-          rg = {
-            args = { "--column", "--no-heading", "--color", "never" },
-          },
-        },
-        uiParams = {
-          ff = {
-            startFilter = false,
-          },
-        },
-      })
+      local function extensions(name, prop)
+        return function(opt)
+          return function()
+            local telescope = require "telescope"
+            telescope.load_extension(name)
+            return telescope.extensions[name][prop](opt or {})
+          end
+        end
+      end
+
+      vim.keymap.set("n", "<Space>b", builtin("buffers") {})
+      vim.keymap.set("n", "<Space>fb", extensions("file_browser", "file_browser") {})
+      vim.keymap.set("n", "<Space>ff", builtin("find_files") {})
+      vim.keymap.set("n", "<Space>lg", extensions("live_grep_args", "live_grep_args") {})
     end,
+    config = function()
+      local telescope = require "telescope"
+      telescope.setup {
+        defaults = {
+          file_ignore_patterns = {
+            "vendor", "vendor/*", "./vendor", "./vendor/*",
+            "node_modules",
+          },
+        },
+        extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
+          },
+          file_browser = {
+            hijack_netrw = true,
+          },
+          live_grep_args = {
+            auto_quoting = true,
+          },
+        },
+      }
+      telescope.load_extension("fzf")
+    end
   }
 
   -- ddc.vim
