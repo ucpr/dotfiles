@@ -197,6 +197,14 @@ require('packer').startup(function(use)
         'hrsh7th/vim-vsnip',
         config = function()
           vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+
+          vim.keymap.set('i', '<Tab>', function()
+            return vim.fn['vsnip#jumpable'](1) ~= 0 and '<Plug>(vsnip-jump-next)' or '<Tab>'
+          end, { expr = true })
+          vim.keymap.set('i', '<S-Tab>', function()
+            return vim.fn['vsnip#jumpable'](-1) ~= 0 and '<Plug>(vsnip-jump-prev)' or '<S-Tab>'
+          end, { expr = true })
+
           vim.cmd [[
             "autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
             autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
@@ -252,18 +260,42 @@ require('packer').startup(function(use)
         },
       })
 
-      vim.cmd [[
-        " autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        inoremap <silent><expr> <TAB>
-              \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
-              \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
-              \ '<TAB>' : ddc#manual_complete()
-        inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
-        inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
-        inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
-        inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-        inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
-      ]]
+      --vim.cmd [[
+      --  " autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+      --  inoremap <silent><expr> <TAB>
+      --        \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
+      --        \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+      --        \ '<TAB>' : ddc#manual_complete()
+      --  inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
+      --  inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
+      --  inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
+      --  inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
+      --  inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
+      --]]
+
+      local feedkey = function(key, mode)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+      end
+      vim.keymap.set('i', '<Tab>', function()
+        if vim.fn["pum#visible"]() then
+          vim.fn["pum#map#select_relative"](1)
+        elseif vim.fn.col('.') <= 1 or string.match(vim.fn.getline('.'), '^%s*$') then
+          return '<Tab>'
+        elseif vim.fn["vsnip#available"](1) then
+          feedkey("<Plug>(vsnip-expand-or-jump)", "")
+        else
+          vim.fn['ddc#manual_complete']()
+        end
+      end, { silent = true, expr = true })
+      -- vim.keymap.set('i', "<CR>", function() vim.fn["pum#map#confirm"]() end)
+      -- vim.keymap.set({ "i", "c" }, "<CR>", function() vim.fn["pum#map#confirm"]() end)
+      vim.keymap.set({ "i", "c" }, "<C-y>", function() vim.fn["pum#map#confirm"]() end)
+      -- vim.keymap.set(
+      --   { "i", "c" },
+      --   "<C-p>",
+      --   function() return complete_or_select(-1) end,
+      --   { silent = true, expr = true, replace_keycodes = false }
+      -- )
 
       vim.g.signature_help_config = {
         contentsStyle = "full",
@@ -327,9 +359,13 @@ require('packer').startup(function(use)
         -- Append the diff to the commit message
         vim.api.nvim_buf_set_lines(0, -1, -1, false, vim.split(comment_diff, '\n'))
       end
-      vim.cmd [[
-          autocmd BufReadPost COMMIT_EDITMSG call lua append_diff()
-        ]]
+      --vim.cmd [[
+      --    autocmd BufReadPost COMMIT_EDITMSG call lua append_diff()
+      --  ]]
+      vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+        pattern = "COMMIT_EDITMSG",
+        callback = append_diff,
+      })
     end,
   }
 
@@ -670,6 +706,7 @@ end)
 local keymap = vim.keymap
 keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
 keymap.set("n", "<C-q>", ":<C-u>q!<CR>")
+keymap.set("n", "<C-s>", ":<C-u>w<CR>")
 
 -- buffer
 keymap.set("n", ",", ":<C-u>bprev<CR>")
