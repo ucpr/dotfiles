@@ -238,6 +238,7 @@ require('packer').startup(function(use)
         vsnip = {
           mark = '[snip]',
           keywordPattern = "\\S*",
+          minAutoCompleteLength = 1,
         },
         ['nvim-lsp'] = {
           mark = '[lsp]',
