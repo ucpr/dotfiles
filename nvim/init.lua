@@ -206,7 +206,6 @@ require('packer').startup(function(use)
           end, { expr = true })
 
           vim.cmd [[
-            "autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
             autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
           ]]
         end
@@ -260,48 +259,30 @@ require('packer').startup(function(use)
         },
       })
 
-      --vim.cmd [[
-      --  " autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-      --  inoremap <silent><expr> <TAB>
-      --        \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
-      --        \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
-      --        \ '<TAB>' : ddc#manual_complete()
-      --  inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
-      --  inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
-      --  inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
-      --  inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-      --  inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
-      --]]
-
-      local feedkey = function(key, mode)
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+      local has_words_before = function()
+        unpack = unpack or table.unpack
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
       end
-      vim.keymap.set('i', '<Tab>', function()
+      local complete_or_select = function(n)
         if vim.fn["pum#visible"]() then
-          vim.fn["pum#map#select_relative"](1)
+          vim.fn["pum#map#select_relative"](n)
+        elseif has_words_before() then
+          vim.fn['ddc#manual_complete']()
         elseif vim.fn.col('.') <= 1 or string.match(vim.fn.getline('.'), '^%s*$') then
           return '<Tab>'
-        elseif vim.fn["vsnip#available"](1) then
-          feedkey("<Plug>(vsnip-expand-or-jump)", "")
         else
           vim.fn['ddc#manual_complete']()
         end
-      end, { silent = true, expr = true })
-      -- vim.keymap.set('i', "<CR>", function() vim.fn["pum#map#confirm"]() end)
-      -- vim.keymap.set({ "i", "c" }, "<CR>", function() vim.fn["pum#map#confirm"]() end)
+      end
+      vim.keymap.set({ "i", "c" }, '<Tab>', function() complete_or_select(1) end, { silent = true, expr = true })
+      vim.keymap.set({ "i", "c" }, '<S-Tab>', function() complete_or_select(-1) end, { silent = true, expr = true })
       vim.keymap.set({ "i", "c" }, "<C-y>", function() vim.fn["pum#map#confirm"]() end)
-      -- vim.keymap.set(
-      --   { "i", "c" },
-      --   "<C-p>",
-      --   function() return complete_or_select(-1) end,
-      --   { silent = true, expr = true, replace_keycodes = false }
-      -- )
 
       vim.g.signature_help_config = {
         contentsStyle = "full",
         viewStyle = "floating"
       }
-
       vim.g.popup_preview_config = {
         border = false,
         supportVsnip = true,
@@ -359,9 +340,6 @@ require('packer').startup(function(use)
         -- Append the diff to the commit message
         vim.api.nvim_buf_set_lines(0, -1, -1, false, vim.split(comment_diff, '\n'))
       end
-      --vim.cmd [[
-      --    autocmd BufReadPost COMMIT_EDITMSG call lua append_diff()
-      --  ]]
       vim.api.nvim_create_autocmd({ "BufReadPost" }, {
         pattern = "COMMIT_EDITMSG",
         callback = append_diff,
