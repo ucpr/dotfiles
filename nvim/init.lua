@@ -202,13 +202,6 @@ require('packer').startup(function(use)
         config = function()
           vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
 
-          vim.keymap.set('i', '<Tab>', function()
-            return vim.fn['vsnip#jumpable'](1) ~= 0 and '<Plug>(vsnip-jump-next)' or '<Tab>'
-          end, { expr = true })
-          vim.keymap.set('i', '<S-Tab>', function()
-            return vim.fn['vsnip#jumpable'](-1) ~= 0 and '<Plug>(vsnip-jump-prev)' or '<S-Tab>'
-          end, { expr = true })
-
           vim.cmd [[
             autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
           ]]
@@ -281,14 +274,15 @@ require('packer').startup(function(use)
       local complete_or_select = function(n)
         if vim.fn["pum#visible"]() then
           vim.fn["pum#map#insert_relative"](n)
+          return ""
         elseif has_words_before() then
           vim.fn['ddc#manual_complete']()
-          --elseif vim.fn.col "." <= 1 or vim.fn.getline("."):sub(col - 1):match "%s" then
-          --  return "<Tab>"
-        elseif vim.fn.col('.') <= 1 or string.match(vim.fn.getline('.'), '^%s*$') then
+          return ""
+        elseif vim.fn.col "." <= 1 or vim.fn.getline("."):sub(col - 1):match "%s" then
           return "<Tab>"
         else
           vim.fn['ddc#manual_complete']()
+          return ""
         end
       end
       vim.keymap.set({ "i", "c" }, '<Tab>', function() complete_or_select(1) end, { silent = true, expr = true })
@@ -316,7 +310,6 @@ require('packer').startup(function(use)
         nnoremap :       <Cmd>call CommandlinePre()<CR>:
 
         function! CommandlinePre() abort
-          " Overwrite sources
           let s:prev_buffer_config = ddc#custom#get_buffer()
           call ddc#custom#patch_buffer('sources', ['cmdline', 'cmdline-history'])
           call ddc#custom#patch_buffer('autoCompleteEvents', ['CmdlineChanged'])
@@ -332,12 +325,9 @@ require('packer').startup(function(use)
             \ })
 
           autocmd CmdlineLeave ++once call CommandlinePost()
-
-          " Enable command line completion
           call ddc#enable_cmdline_completion()
         endfunction
         function! CommandlinePost() abort
-          " Restore sources
           call ddc#custom#set_buffer(s:prev_buffer_config)
         endfunction
       ]]
@@ -431,6 +421,7 @@ require('packer').startup(function(use)
   -- lsp
   use {
     "neovim/nvim-lspconfig",
+    event = { "VimEnter" },
     requires = {
       {
         "williamboman/mason-lspconfig.nvim",
