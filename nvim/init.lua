@@ -195,6 +195,7 @@ require('packer').startup(function(use)
       use { "matsui54/denops-signature_help" },
       use {
         'hrsh7th/vim-vsnip',
+        event = { "InsertEnter" },
         config = function()
           vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
 
