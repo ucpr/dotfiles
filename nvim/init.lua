@@ -164,7 +164,7 @@ require('packer').startup(function(use)
   -- ddc.vim
   use {
     "Shougo/ddc.vim",
-    event = { "InsertEnter", "CursorHold", "CmdlineEnter" },
+    event = { "InsertEnter", "CursorHold", "CmdlineEnter", "VimEnter" },
     requires = {
       -- ui
       use { "Shougo/ddc-ui-pum" },
@@ -181,9 +181,12 @@ require('packer').startup(function(use)
 
       -- sources
       use { "Shougo/ddc-source-around" },
+      use { "matsui54/ddc-buffer" },
       use { "LumaKernel/ddc-file" },
       use { "Shougo/ddc-source-nvim-lsp" },
       use { "uga-rosa/ddc-source-vsnip" },
+      use { "Shougo/ddc-source-cmdline" },
+      use { "Shougo/ddc-source-cmdline-history" },
 
       -- filters
       use { "tani/ddc-fuzzy" },
@@ -220,6 +223,7 @@ require('packer').startup(function(use)
         "nvim-lsp",
         "file",
         "around",
+        "buffer",
       })
       vim.fn["ddc#custom#patch_global"]('sourceOptions', {
         _ = {
@@ -236,13 +240,16 @@ require('packer').startup(function(use)
         around = {
           mark = '[around]',
         },
+        buffer = {
+          mark = "[buffer]",
+        },
         vsnip = {
           mark = '[snip]',
           keywordPattern = "\\S*",
         },
         ['nvim-lsp'] = {
           mark = '[lsp]',
-          forceCompletionPattern = "\\.\\w*|::\\w*|->\\w*",
+          forceCompletionPattern = [[\.\w*|:\w*|->\w*]],
           dup = "force",
         },
       })
@@ -250,6 +257,12 @@ require('packer').startup(function(use)
       vim.fn["ddc#custom#patch_global"]('sourceParams', {
         around = { maxSize = 100 },
         vsnip = { menu = false },
+        buffer = {
+          requireSameFiletype = false,
+          limitBytes = 500000,
+          fromAltBuf = true,
+          forceCollect = true,
+        },
         ['nvim-lsp'] = {
           snippetEngine = vim.fn['denops#callback#register'](function(body)
             return vim.fn['vsnip#anonymous'](body)
@@ -267,11 +280,13 @@ require('packer').startup(function(use)
       end
       local complete_or_select = function(n)
         if vim.fn["pum#visible"]() then
-          vim.fn["pum#map#select_relative"](n)
+          vim.fn["pum#map#insert_relative"](n)
         elseif has_words_before() then
           vim.fn['ddc#manual_complete']()
+          --elseif vim.fn.col "." <= 1 or vim.fn.getline("."):sub(col - 1):match "%s" then
+          --  return "<Tab>"
         elseif vim.fn.col('.') <= 1 or string.match(vim.fn.getline('.'), '^%s*$') then
-          return '<Tab>'
+          return "<Tab>"
         else
           vim.fn['ddc#manual_complete']()
         end
@@ -295,6 +310,71 @@ require('packer').startup(function(use)
       vim.fn["ddc#enable"]()
       vim.fn["popup_preview#enable"]()
       vim.fn["signature_help#enable"]()
+
+      -- setup cmdline
+      vim.cmd [[
+        nnoremap :       <Cmd>call CommandlinePre()<CR>:
+
+        function! CommandlinePre() abort
+          " Overwrite sources
+          let s:prev_buffer_config = ddc#custom#get_buffer()
+          call ddc#custom#patch_buffer('sources', ['cmdline', 'cmdline-history'])
+          call ddc#custom#patch_buffer('autoCompleteEvents', ['CmdlineChanged'])
+          call ddc#custom#patch_buffer('sourceOptions', #{
+            \   _:  #{
+            \    ignoreCase: v:true,
+            \    matchers:   ['matcher_fuzzy'],
+            \    sorters:    ['sorter_fuzzy'],
+            \    converters: ['converter_fuzzy']
+            \   },
+            \   cmdline: #{ mark: '[cmd]' },
+            \   cmdline-history: #{ mark: '[cmd-hist]' },
+            \ })
+
+          autocmd CmdlineLeave ++once call CommandlinePost()
+
+          " Enable command line completion
+          call ddc#enable_cmdline_completion()
+        endfunction
+        function! CommandlinePost() abort
+          " Restore sources
+          call ddc#custom#set_buffer(s:prev_buffer_config)
+        endfunction
+      ]]
+
+      -- なんか動かなくなるので後で直す
+      -- local command_line_post = function(prev_buffer_config)
+      --   vim.fn["ddc#custom#set_buffer"](prev_buffer_config)
+      -- end
+      -- local command_line_pre = function()
+      --   local prev_buffer_config = vim.fn["ddc#custom#get_buffer"]()
+      --   vim.fn["ddc#custom#patch_buffer"]("sources", { "cmdline", "cmdline-history" })
+      --   vim.fn["ddc#custom#patch_buffer"]("autoCompleteEvents", { "CmdlineChanged" })
+      --   vim.fn["ddc#custom#patch_buffer"]("sourceOptions", {
+      --     _ = {
+      --       ignoreCase = true,
+      --       matchers = { "matcher_fuzzy" },
+      --       sorters = { "sorter_fuzzy" },
+      --       converters = { "converter_fuzzy" },
+      --     },
+      --     cmdline = {
+      --       mark = '[cmd]',
+      --     },
+      --     ["cmdline-history"] = {
+      --       mark = '[history]',
+      --     },
+      --   })
+      --   vim.cmd [[ autocmd CmdlineLeave ++once lua command_line_post(prev_buffer_config) ]]
+
+      --   vim.api.nvim_create_autocmd("CmdlineLeave", {
+      --     pattern = '*',
+      --     -- once = true,
+      --     callback = function()
+      --       command_line_post(prev_buffer_config)
+      --     end,
+      --   })
+      -- end
+      -- vim.keymap.set("n", ":", function() command_line_pre() end)
     end,
   }
 
