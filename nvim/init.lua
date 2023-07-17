@@ -186,7 +186,6 @@ require('packer').startup(function(use)
       use { "Shougo/ddc-source-nvim-lsp" },
       use { "uga-rosa/ddc-source-vsnip" },
       use { "Shougo/ddc-source-cmdline" },
-      use { "Shougo/ddc-source-cmdline-history" },
 
       -- filters
       use { "tani/ddc-fuzzy" },
@@ -311,7 +310,7 @@ require('packer').startup(function(use)
 
         function! CommandlinePre() abort
           let s:prev_buffer_config = ddc#custom#get_buffer()
-          call ddc#custom#patch_buffer('sources', ['cmdline', 'cmdline-history'])
+          call ddc#custom#patch_buffer('sources', ['cmdline'])
           call ddc#custom#patch_buffer('autoCompleteEvents', ['CmdlineChanged'])
           call ddc#custom#patch_buffer('sourceOptions', #{
             \   _:  #{
@@ -321,7 +320,6 @@ require('packer').startup(function(use)
             \    converters: ['converter_fuzzy']
             \   },
             \   cmdline: #{ mark: '[cmd]' },
-            \   cmdline-history: #{ mark: '[cmd-hist]' },
             \ })
 
           autocmd CmdlineLeave ++once call CommandlinePost()
