@@ -508,7 +508,7 @@ require('packer').startup(function(use)
         'onsails/lspkind.nvim', event = { 'InsertEnter' }
       },
       {
-        'hrsh7th/cmp-vsnip',
+        'hrsh7th/cmp-vsnip', event = { 'InsertEnter' },
       },
       {
         "github/copilot.vim",
