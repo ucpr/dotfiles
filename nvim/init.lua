@@ -298,12 +298,12 @@ require('packer').startup(function(use)
           vim.fn["pum#map#insert_relative"](n)
           return ""
         elseif has_words_before() then
-          vim.fn['ddc#manual_complete']()
+          vim.fn['ddc#map#manual_complete']()
           return ""
         elseif vim.fn.col "." <= 1 or vim.fn.getline("."):sub(col - 1):match "%s" then
           return "<Tab>"
         else
-          vim.fn['ddc#manual_complete']()
+          vim.fn['ddc#map#manual_complete']()
           return ""
         end
       end
