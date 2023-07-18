@@ -504,10 +504,12 @@ require('packer').startup(function(use)
                 gofumpt = true,
               },
             }
-            nvim_lsp[server_name].setup(opt)
-          else
-            nvim_lsp[server_name].setup(opt)
+          elseif server_name == "denols" then
+            opt.root_dir = nvim_lsp.util.root_pattern("deno.json")
+          elseif server_name == "tsserver" then
+            opt.root_dir = nvim_lsp.util.root_pattern("package.json")
           end
+          nvim_lsp[server_name].setup(opt)
         end
       }
     end
