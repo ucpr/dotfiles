@@ -186,7 +186,7 @@ require('packer').startup(function(use)
   -- ddc.vim
   use {
     "Shougo/ddc.vim",
-    event = { "InsertEnter", "CursorHold", "CmdlineEnter", "VimEnter" },
+    -- event = { "InsertEnter", "CursorHold", "CmdlineEnter", "VimEnter" },
     requires = {
       -- ui
       use { "Shougo/ddc-ui-pum" },
@@ -228,7 +228,6 @@ require('packer').startup(function(use)
           ]]
         end
       },
-      -- use { "hrsh7th/vim-vsnip-integ" }
     },
     config = function()
       vim.fn["ddc#custom#patch_global"]("ui", "pum")
@@ -288,28 +287,75 @@ require('packer').startup(function(use)
         },
       })
 
-      local has_words_before = function()
-        unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-      end
-      local complete_or_select = function(n)
-        if vim.fn["pum#visible"]() then
-          vim.fn["pum#map#insert_relative"](n)
-          return ""
-        elseif has_words_before() then
-          vim.fn['ddc#map#manual_complete']()
-          return ""
-        elseif vim.fn.col "." <= 1 or vim.fn.getline("."):sub(col - 1):match "%s" then
-          return "<Tab>"
-        else
-          vim.fn['ddc#map#manual_complete']()
-          return ""
-        end
-      end
-      vim.keymap.set({ "i", "c" }, '<Tab>', function() complete_or_select(1) end, { silent = true, expr = true })
-      vim.keymap.set({ "i", "c" }, '<S-Tab>', function() complete_or_select(-1) end, { silent = true, expr = true })
-      vim.keymap.set({ "i", "c" }, "<C-y>", function() vim.fn["pum#map#confirm"]() end)
+      -- TODO: trans to lua code
+      vim.cmd [[
+        inoremap <silent><expr> <TAB>
+              \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
+              \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+              \ '<TAB>' : ddc#manual_complete()
+        inoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
+        inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
+
+        call ddc#custom#patch_global('autoCompleteEvents', [
+            \ 'InsertEnter', 'TextChangedI', 'TextChangedP',
+            \ 'CmdlineEnter', 'CmdlineChanged',
+            \ ])
+
+        nnoremap :  <Cmd>call CommandlinePre()<CR>:
+        nnoremap ;; <Cmd>call CommandlinePre()<CR>:
+
+        function! CommandlinePre() abort
+          cnoremap <Tab> <Cmd>call pum#map#insert_relative(+1)<CR>
+          cnoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
+          cnoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
+
+          if !exists('b:prev_buffer_config')
+            let b:prev_buffer_config = ddc#custom#get_buffer()
+          endif
+          call ddc#custom#patch_buffer('cmdlinesources',
+                  \ ['neovim', 'around'])
+
+          autocmd User DDCCmdlineLeave ++once call CommandlinePost()
+          autocmd InsertEnter <buffer> ++once call CommandlinePost()
+          call ddc#enable_cmdline_completion()
+        endfunction
+
+        function! CommandlinePost() abort
+          silent! cunmap <Tab>
+          silent! cunmap <S-Tab>
+          silent! cunmap <C-y>
+
+          if exists('b:prev_buffer_config')
+            call ddc#custom#set_buffer(b:prev_buffer_config)
+            unlet b:prev_buffer_config
+          else
+            call ddc#custom#set_buffer({})
+          endif
+        endfunction
+      ]]
+
+      -- local has_words_before = function()
+      --   unpack = unpack or table.unpack
+      --   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+      --   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      -- end
+      -- local complete_or_select = function(n)
+      --   if vim.fn["pum#visible"]() then
+      --     vim.fn["pum#map#insert_relative"](n)
+      --     return ""
+      --   elseif has_words_before() then
+      --     vim.fn['ddc#map#manual_complete']()
+      --     return ""
+      --   elseif vim.fn.col "." <= 1 or vim.fn.getline("."):sub(col - 1):match "%s" then
+      --     return "<Tab>"
+      --   else
+      --     vim.fn['ddc#map#manual_complete']()
+      --     return ""
+      --   end
+      -- end
+      -- vim.keymap.set({ "i", "c" }, '<Tab>', function() complete_or_select(1) end, { silent = true, expr = true })
+      -- vim.keymap.set({ "i", "c" }, '<S-Tab>', function() complete_or_select(-1) end, { silent = true, expr = true })
+      -- vim.keymap.set({ "i", "c" }, "<C-y>", function() vim.fn["pum#map#confirm"]() end)
 
       vim.g.signature_help_config = {
         contentsStyle = "full",
@@ -442,7 +488,7 @@ require('packer').startup(function(use)
   -- lsp
   use {
     "neovim/nvim-lspconfig",
-    event = { "VimEnter" },
+    -- event = { "VimEnter" },
     requires = {
       {
         "williamboman/mason-lspconfig.nvim",
