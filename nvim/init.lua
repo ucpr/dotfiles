@@ -287,6 +287,7 @@ require('packer').startup(function(use)
         },
       })
 
+      -- TODO: trans to lua code
       vim.cmd [[
         inoremap <silent><expr> <TAB>
               \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
@@ -309,7 +310,6 @@ require('packer').startup(function(use)
         nnoremap ;; <Cmd>call CommandlinePre()<CR>:
 
         function! CommandlinePre() abort
-          " Note: It disables default command line completion!
           cnoremap <Tab> <Cmd>call pum#map#insert_relative(+1)<CR>
           cnoremap <S-Tab> <Cmd>call pum#map#insert_relative(-1)<CR>
           cnoremap <C-n> <Cmd>call pum#map#insert_relative(+1)<CR>
@@ -317,7 +317,6 @@ require('packer').startup(function(use)
           cnoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
           cnoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
 
-          " Overwrite sources
           if !exists('b:prev_buffer_config')
             let b:prev_buffer_config = ddc#custom#get_buffer()
           endif
@@ -326,8 +325,6 @@ require('packer').startup(function(use)
 
           autocmd User DDCCmdlineLeave ++once call CommandlinePost()
           autocmd InsertEnter <buffer> ++once call CommandlinePost()
-
-          " Enable command line completion
           call ddc#enable_cmdline_completion()
         endfunction
 
@@ -339,7 +336,6 @@ require('packer').startup(function(use)
           silent! cunmap <C-y>
           silent! cunmap <C-e>
 
-          " Restore sources
           if exists('b:prev_buffer_config')
             call ddc#custom#set_buffer(b:prev_buffer_config)
             unlet b:prev_buffer_config
