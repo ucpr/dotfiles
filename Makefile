@@ -13,3 +13,7 @@ healthcheck:
 .PHONY: setup
 setup:
 	cd cli && deno run $(IMPORT_MAP) $(PERMISSIONS) main.ts setup
+
+.PHONY: update-brew
+update-brew:
+	cd brew && brew bundle
