@@ -212,7 +212,7 @@ require('packer').startup(function(use)
       require("onedark").load()
     end
   }
-  use { "ntpeters/vim-better-whitespace", opt = true }
+  use { "ntpeters/vim-better-whitespace", event = { "VimEnter" } }
   use {
     "kamykn/spelunker.vim",
     config = function()
@@ -220,7 +220,7 @@ require('packer').startup(function(use)
       vim.g.spelunker_check_type = 2
     end
   }
-  use { "simeji/winresizer" }
+  use { "simeji/winresizer", event = { "VimEnter" } }
   use { "markonm/traces.vim", opt = true }
   use {
     "cohama/lexima.vim",
@@ -238,6 +238,7 @@ require('packer').startup(function(use)
   }
   use {
     "numToStr/FTerm.nvim",
+    event = { "VimEnter" },
     module = { "FTerm" },
     setup = function()
       vim.keymap.set("n", "T", '<C-\\><C-n><CMD>lua require("FTerm").toggle()<CR>')
@@ -699,7 +700,6 @@ require('packer').startup(function(use)
     config = function()
       local on_attach = function(client, bufnr)
         local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-        local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
         local opts = { noremap = true, silent = true }
         buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
@@ -774,20 +774,6 @@ require('packer').startup(function(use)
           nvim_lsp[server_name].setup(opt)
         end
       }
-      function OrgImports(wait_ms)
-        local params = vim.lsp.util.make_range_params()
-        params.context = { only = { "source.organizeImports" } }
-        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
-        for _, res in pairs(result or {}) do
-          for _, r in pairs(res.result or {}) do
-            if r.edit then
-              vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
-            else
-              vim.lsp.buf.execute_command(r.command)
-            end
-          end
-        end
-      end
     end
   }
 
