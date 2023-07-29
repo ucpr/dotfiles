@@ -445,6 +445,7 @@ require('packer').startup(function(use)
           { name = "path",                    priority = 8 },
           { name = "buffer",                  priority = 7 },
           { name = "nvim_lsp_signature_help", priority = 6 },
+          { name = "emoji",                   priority = 1 },
         },
         mapping = cmp.mapping.preset.insert({
           ["<C-p>"] = cmp.mapping.select_prev_item(),
@@ -526,6 +527,9 @@ require('packer').startup(function(use)
       },
       {
         'hrsh7th/cmp-calc', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/cmp-emoji', event = { 'InsertEnter' },
       },
       {
         'onsails/lspkind.nvim', event = { 'InsertEnter' }
