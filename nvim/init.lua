@@ -751,7 +751,7 @@ require('packer').startup(function(use)
           }
         }
       })
-      require("mason-lspconfig").setup()
+      -- require("mason-lspconfig").setup()
       require("mason-lspconfig").setup_handlers {
         function(server_name)
           local opt = {
@@ -796,16 +796,6 @@ require('packer').startup(function(use)
               repl = "r",
               toggle = "t",
             },
-            -- Expand lines larger than the window
-            -- Requires >= 0.7
-            expand_lines = vim.fn.has("nvim-0.7") == 1,
-            -- Layouts define sections of the screen to place windows.
-            -- The position can be "left", "right", "top" or "bottom".
-            -- The size specifies the height/width depending on position. It can be an Int
-            -- or a Float. Integer specifies height/width directly (i.e. 20 lines/columns) while
-            -- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)
-            -- Elements are the elements shown in the layout (in order).
-            -- Layouts are opened in order so that earlier layouts take priority in window sizing.
             layouts = {
               {
                 elements = {
@@ -865,26 +855,16 @@ require('packer').startup(function(use)
           require("dap-go").setup {
             dap_configurations = {
               {
-                -- Must be "go" or it will be ignored by the plugin
                 type = "go",
                 name = "Attach remote",
                 mode = "remote",
                 request = "attach",
               },
             },
-            -- delve configurations
             delve = {
-              -- the path to the executable dlv which will be used for debugging.
-              -- by default, this is the "dlv" executable on your PATH.
               path = "dlv",
-              -- time to wait for delve to initialize the debug session.
-              -- default to 20 seconds
               initialize_timeout_sec = 20,
-              -- a string that defines the port to start delve debugger.
-              -- default to string "${port}" which instructs nvim-dap
-              -- to start the process in a random available port
               port = "${port}",
-              -- additional args to pass to dlv
               args = {}
             },
           }
