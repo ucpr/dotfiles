@@ -298,6 +298,13 @@ require('packer').startup(function(use)
     "tpope/vim-fugitive",
     event = "InsertEnter",
   }
+  use {
+    "lewis6991/gitsigns.nvim",
+    event = { "FocusLost", "CursorHold", "VimEnter" },
+    config = function()
+      require('gitsigns').setup {}
+    end
+  }
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
