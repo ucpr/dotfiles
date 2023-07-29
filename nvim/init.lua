@@ -538,7 +538,7 @@ require('packer').startup(function(use)
             -- event = { 'InsertEnter' },
             setup = function()
               vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-              vim.g.vsnip_filetypes = {}
+              -- vim.g.vsnip_filetypes = {}
             end,
             config = function()
               vim.cmd [[
@@ -763,7 +763,7 @@ require('packer').startup(function(use)
         }
       )
       -- diagnostic sign setting
-      local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+      local signs = { Error = "🙅", Warn = "⚠️", Hint = "💡", Info = "ℹ" }
       for type, icon in pairs(signs) do
         local hl = "DiagnosticSign" .. type
         vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
@@ -782,46 +782,24 @@ require('packer').startup(function(use)
       require("mason-lspconfig").setup()
       require("mason-lspconfig").setup_handlers {
         function(server_name)
+          local opt = {
+            on_attach = on_attach,
+            capabilities = capabilities,
+          }
           if server_name == "gopls" then
-            nvim_lsp[server_name].setup {
-              on_attach = on_attach,
-              flags = {
-                debounce_text_changes = 150,
-              },
-              settings = {
-                gopls = {
-                  env = { GOFLAGS = "-tags=integration,wireinject" },
-                  gofumpt = true,
-                },
+            opt.settings = {
+              gopls = {
+                env = { GOFLAGS = "-tags=integration,wireinject" },
+                gofumpt = true,
               },
             }
-            --           elseif server_name == "denols" then
-            --             nvim_lsp[server_name].setup({
-            --               root_dir = lspconfig.util.root_pattern("deno.json"),
-            --               init_options = {
-            --                 lint = true,
-            --                 unstable = true,
-            --                 suggest = {
-            --                   imports = {
-            --                     hosts = {
-            --                       ["https://deno.land"] = true,
-            --                       ["https://cdn.nest.land"] = true,
-            --                       ["https://crux.land"] = true,
-            --                     },
-            --                   },
-            --                 },
-            --               },
-            --             })
-            --           elseif server_name == "tsserver" then
-            --             nvim_lsp[server_name].setup({
-            --               root_dir = lspconfig.util.root_pattern("package.json"),
-            --               autostart = false,
-            --             })
-          else
-            nvim_lsp[server_name].setup {
-              on_attach = on_attach,
-            }
+          elseif server_name == "tsserver" then
+            -- package.json と deno.json があるディレクトリ場合は tsserver を使う
+            opt.root_dir = nvim_lsp.util.root_pattern("package.json")
+          elseif server_name == "denols" then
+            opt.root_dir = nvim_lsp.util.root_pattern("deno.json")
           end
+          nvim_lsp[server_name].setup(opt)
         end
       }
       function OrgImports(wait_ms)
