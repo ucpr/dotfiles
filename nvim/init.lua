@@ -825,6 +825,7 @@ require('packer').startup(function(use)
     requires = {
       {
         "rcarriga/nvim-dap-ui",
+        event = { 'VimEnter' },
         config = function()
           require("dapui").setup({
             icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
@@ -901,6 +902,7 @@ require('packer').startup(function(use)
       },
       {
         "leoluz/nvim-dap-go",
+        event = { 'VimEnter' },
         config = function()
           require("dap-go").setup {
             dap_configurations = {
