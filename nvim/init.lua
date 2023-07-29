@@ -535,7 +535,7 @@ require('packer').startup(function(use)
         requires = {
           {
             'hrsh7th/vim-vsnip',
-            -- event = { 'InsertEnter' },
+            event = { 'VimEnter' },
             setup = function()
               vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
               -- vim.g.vsnip_filetypes = {}
