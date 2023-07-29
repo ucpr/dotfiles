@@ -490,31 +490,34 @@ require('packer').startup(function(use)
         'onsails/lspkind.nvim', event = { 'InsertEnter' }
       },
       {
-        'hrsh7th/vim-vsnip',
-        -- event = { 'InsertEnter' },
-        setup = function()
-          vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        end,
-        config = function()
-          vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        'hrsh7th/cmp-vsnip',
+        event = { 'InsertEnter' },
+        requires = {
+          {
+            'hrsh7th/vim-vsnip',
+            -- event = { 'InsertEnter' },
+            setup = function()
+              vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+            end,
+            config = function()
+              vim.cmd [[
+                let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+                autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+                imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+                smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
 
-        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        let g:vsnip_filetypes = {}
-        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-        ]]
-        end
-      },
-      {
-        'hrsh7th/cmp-vsnip', event = { 'InsertEnter' },
+                imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+                smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+                imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+                smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+                imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+                smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+                let g:vsnip_filetypes = {}
+                autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+                ]]
+            end
+          },
+        },
       },
       {
         "github/copilot.vim",
@@ -653,17 +656,14 @@ require('packer').startup(function(use)
             disable_virtual_lines_ft = { 'yaml' },
             min_rows = 1,
             min_rows_ft = {},
-            custom_parser = function(node, ft, opts)
+            custom_parser = function(node, _, _)
               local utils = require('nvim_context_vt.utils')
-
               if node:type() == 'function' then
                 return nil
               end
-
               return '--> ' .. utils.get_node_text(node)[1]
             end,
-
-            custom_validator = function(node, ft, opts)
+            custom_validator = function(node, _, _)
               local default_validator = require('nvim_context_vt.utils').default_validator
               if default_validator(node, ft) then
                 if node:type() == 'function' then
@@ -673,8 +673,7 @@ require('packer').startup(function(use)
 
               return true
             end,
-
-            custom_resolver = function(nodes, ft, opts)
+            custom_resolver = function(nodes, _, _)
               return nodes[#nodes]
             end,
           })
