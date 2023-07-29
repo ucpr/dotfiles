@@ -322,29 +322,6 @@ require('packer').startup(function(use)
   -- "}
 
   -- nvim-cmp
-
-  use {
-    'hrsh7th/vim-vsnip',
-    -- event = { 'InsertEnter' },
-    config = function()
-      vim.cmd [[
-        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
-
-        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
-        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
-        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
-        let g:vsnip_filetypes = {}
-        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
-        ]]
-    end
-  }
-
   use {
     "hrsh7th/nvim-cmp",
     config = function()
@@ -420,7 +397,6 @@ require('packer').startup(function(use)
           { name = "path",                    priority = 8 },
           { name = "buffer",                  priority = 7 },
           { name = "nvim_lsp_signature_help", priority = 6 },
-          -- { name = 'copilot',                 priority = 5 },
         },
         mapping = cmp.mapping.preset.insert({
           ["<C-p>"] = cmp.mapping.select_prev_item(),
@@ -482,9 +458,6 @@ require('packer').startup(function(use)
       })
     end,
     requires = {
-      -- {
-      --  'hrsh7th/nvim-cmp', event = { 'InsertEnter', 'CmdlineEnter' }
-      -- },
       {
         'hrsh7th/cmp-nvim-lsp',
       },
@@ -508,6 +481,30 @@ require('packer').startup(function(use)
       },
       {
         'onsails/lspkind.nvim', event = { 'InsertEnter' }
+      },
+      {
+        'hrsh7th/vim-vsnip',
+        -- event = { 'InsertEnter' },
+        setup = function()
+          vim.g.vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+        end,
+        config = function()
+          vim.cmd [[
+        let g:vsnip_snippet_dir = "$HOME/.config/nvim/snippets"
+        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
+        imap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+        smap <expr> <S-Tab> vsnip#jumpable(-1)  ? "<Plug>(vsnip-jump-prev)"      : "<S-Tab>"
+
+        imap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        smap <expr> <C-j> vsnip#expandable() ? "<Plug>(vsnip-expand)" : "<C-j>"
+        imap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        smap <expr> <C-f> vsnip#jumpable(1)  ? "<Plug>(vsnip-jump-next)" : "<C-f>"
+        imap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        smap <expr> <C-b> vsnip#jumpable(-1) ? "<Plug>(vsnip-jump-prev)" : "<C-b>"
+        let g:vsnip_filetypes = {}
+        autocmd BufWritePre <buffer> lua vim.lsp.buf.format({}, 10000)
+        ]]
+        end
       },
       {
         'hrsh7th/cmp-vsnip', event = { 'InsertEnter' },
@@ -560,10 +557,6 @@ require('packer').startup(function(use)
           ]]
         end,
       },
-      -- {
-      --   "hrsh7th/cmp-copilot",
-      --   event = { "InsertEnter" },
-      -- },
     },
   }
   -- treesitter
@@ -578,7 +571,7 @@ require('packer').startup(function(use)
         highlight = {
           enable = true,
           -- disable = { "c", "rust" },
-          disable = function(lang, buf)
+          disable = function(_, buf)
             local max_filesize = 100 * 1024 -- 100 KB
             local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
             if ok and stats and stats.size > max_filesize then
@@ -809,10 +802,6 @@ require('packer').startup(function(use)
           end
         end
       end
-
-      vim.cmd [[
-        autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
-      ]]
     end
   }
 
