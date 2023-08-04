@@ -705,6 +705,8 @@ require('packer').startup(function(use)
         buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
         buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
         buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+        buf_set_keymap("n", "gvd", "<cmd>:vsp<CR><cmd>lua vim.lsp.buf.definition()<CR>", opts)
+        buf_set_keymap("n", "gsd", "<cmd>:sp<CR><cmd>lua vim.lsp.buf.definition()<CR>", opts)
         buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
         buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
         buf_set_keymap('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
@@ -761,7 +763,7 @@ require('packer').startup(function(use)
           if server_name == "gopls" then
             opt.settings = {
               gopls = {
-                env = { GOFLAGS = "-tags=integration,wireinject" },
+                env = { GOFLAGS = "-tags=integration,!integration,wireinject" },
                 gofumpt = true,
               },
             }
