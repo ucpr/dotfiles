@@ -1,4 +1,5 @@
 [tools]
 go = ['latest']
 nodejs = ['latest']
+rust = ['latest']
 terraform = ['latest']
