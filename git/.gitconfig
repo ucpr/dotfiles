@@ -29,7 +29,7 @@
   ck = checkout
   ss = status
   df = diff
-  c = commit
+  co = commit -s -a
   br = branch
   p = push
   ph = push origin head
