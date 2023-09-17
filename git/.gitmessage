@@ -1,8 +1,11 @@
 # --- Prefix ---
-# feat:
-# chore:
-# style:
-# mod:
-# fix:
+# build:
 # ci:
 # docs:
+# feat:
+# fix:
+# perf:
+# refactor:
+# revert:
+# style:
+# chore:
