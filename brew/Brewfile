@@ -76,6 +76,7 @@ cask "notion"
 cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
+cask "todoist"
 
 cask "font-hack-nerd-font"
 
