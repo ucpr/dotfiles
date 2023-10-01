@@ -52,6 +52,7 @@ brew "awscli"
 brew "kustomize"
 brew "neofetch"
 brew "tailscale"
+brew "cue"
 
 cask "google-cloud-sdk"
 cask "1password"
