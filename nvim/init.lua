@@ -347,6 +347,20 @@ require('packer').startup(function(use)
       }
     end
   }
+  use {
+    "jackMort/ChatGPT.nvim",
+    cmd = { "ChatGPT", "ChatGPTRun", "ChatGPTActAs", "ChatGPTEditWithInstructions" },
+    config = function()
+      require("chatgpt").setup({
+        api_key_cmd = "op read op://personal/OpenAI_API_Key/api_key --no-newline",
+      })
+    end,
+    requires = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim"
+    },
+  }
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
