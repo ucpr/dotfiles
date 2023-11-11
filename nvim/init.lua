@@ -361,6 +361,10 @@ require('packer').startup(function(use)
       "nvim-telescope/telescope.nvim"
     },
   }
+  use {
+    "tpope/vim-surround",
+    event = { "InsertEnter" },
+  }
   -- denops
   use "vim-denops/denops.vim"
   use "yuki-yano/fuzzy-motion.vim"
