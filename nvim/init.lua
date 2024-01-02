@@ -20,6 +20,7 @@ local options = {
   pastetoggle = "<F5>",
   helplang = "ja",
   -- theme
+  spell = false, -- spelunker.vim を使うためfalseにする
   title = false,
   number = true,
   cursorline = false,
@@ -213,13 +214,6 @@ require('packer').startup(function(use)
     end
   }
   use { "ntpeters/vim-better-whitespace", event = { "VimEnter" } }
-  use {
-    "kamykn/spelunker.vim",
-    config = function()
-      vim.g.enable_spelunker_vim = 1
-      vim.g.spelunker_check_type = 2
-    end
-  }
   use { "simeji/winresizer", event = { "VimEnter" } }
   use { "markonm/traces.vim", opt = true }
   use {
@@ -387,6 +381,19 @@ require('packer').startup(function(use)
   -- "    require 'skkeleton_indicator'.setup {}
   -- "  end,
   -- "}
+  use {
+    "kamykn/spelunker.vim",
+    -- event = { "VimEnter" },
+    config = function()
+      vim.cmd [[
+        highlight SpelunkerSpellBad cterm=underline ctermfg=247 gui=underline guifg=#9e9e9e
+        highlight SpelunkerComplexOrCompoundWord cterm=underline ctermfg=NONE gui=underline guifg=NONE
+      ]]
+
+      vim.g.enable_spelunker_vim = 1
+      vim.g.spelunker_check_type = 2
+    end
+  }
 
   -- nvim-cmp
   use {
