@@ -209,8 +209,8 @@ issues() {
   fi
 }
 
-### rtx
-eval "$(rtx activate zsh)"
+### mise
+eval "$(mise activate zsh)"
 
 ### custom configuration
 if [ -e "$HOME/.config/zsh/custom.zsh" ]; then

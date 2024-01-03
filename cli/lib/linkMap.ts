@@ -48,9 +48,9 @@ const linkMap: LinkMap = new Map([
     symlink: join(home, ".config", "zsh"),
     platform: "common",
   }],
-  ["rtx", {
-    target: join(dotfilesDir, "rtx"),
-    symlink: join(home, ".config", "rtx"),
+  ["mise", {
+    target: join(dotfilesDir, "mise"),
+    symlink: join(home, ".config", "mise"),
   }],
   ["k9s", {
     target: join(dotfilesDir, "k9s"),
