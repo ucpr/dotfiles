@@ -51,3 +51,5 @@
 [gpg "ssh"]
   program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
   allowedSignersFile = ~/.ssh/allowed_signers
+[branch]
+	sort = -authordate
