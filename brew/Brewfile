@@ -1,4 +1,4 @@
-tap 'homebrew/cask'
+# tap 'homebrew/cask'
 tap 'homebrew/core'
 tap "homebrew/cask-fonts"
 tap "ktr0731/evans"
@@ -74,6 +74,7 @@ cask "wireshark"
 cask "wezterm"
 cask "flutter"
 cask "notion"
+cask "notion-calendar"
 cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
@@ -84,6 +85,5 @@ cask "font-hack-nerd-font"
 mas "RunCat", id: 1429033973
 mas "LINE", id: 539883307
 # mas "Xcode", id: 497799835
-mas "meetingbar", id: 1532419400
 # mas "Kindle", id: 405399194
 mas "tailscale", id: 1475387142
