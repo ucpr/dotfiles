@@ -79,6 +79,7 @@ cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
 cask "todoist"
+cask "xbar"
 
 cask "font-hack-nerd-font"
 
