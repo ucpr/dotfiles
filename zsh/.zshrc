@@ -19,6 +19,7 @@ function ensure_zcompiled {
 ensure_zcompiled ~/.zshrc
 
 # common settings
+export PATH="/opt/homebrew/bin:$PATH"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 
