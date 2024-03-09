@@ -1,4 +1,5 @@
 brew/Brewfile.lock.json
 nvim/plugin/packer_compiled.lua
 zsh/.zcompdump
+zsh/plugins/*.zsh.zwc
 .luarc.json

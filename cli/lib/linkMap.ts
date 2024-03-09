@@ -51,6 +51,7 @@ const linkMap: LinkMap = new Map([
   ["mise", {
     target: join(dotfilesDir, "mise"),
     symlink: join(home, ".config", "mise"),
+    platform: "common",
   }],
   ["k9s", {
     target: join(dotfilesDir, "k9s"),
@@ -65,6 +66,11 @@ const linkMap: LinkMap = new Map([
   ["gitmessage", {
     target: join(dotfilesDir, "git/.gitmessage"),
     symlink: join(home, ".gitmessage"),
+    platform: "common",
+  }],
+  ["sheldon", {
+    target: join(dotfilesDir, "sheldon"),
+    symlink: join(home, ".config", "sheldon"),
     platform: "common",
   }],
 ]);

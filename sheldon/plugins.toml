@@ -1,0 +1,44 @@
+# `sheldon` configuration file
+# ----------------------------
+shell = "zsh"
+
+apply = ["defer"]
+
+[templates]
+defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+apply = ["source"]
+
+[plugins.compinit]
+inline = 'autoload -Uz compinit && zsh-defer compinit'
+
+[plugins.pure]
+github = "sindresorhus/pure"
+use = ["async.zsh", "pure.zsh"]
+apply = ["source"]
+
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+
+[plugins.autopair]
+github = "hlissner/zsh-autopair"
+
+[plugins.zsh-z]
+github = "agkozak/zsh-z"
+
+[plugins.dotfiles-defers]
+local = "~/.config/zsh/plugins"
+use = ["*_lazy.zsh"]
+
+#[plugins.dotfiles-sync]
+#local = "~/.config/zsh/plugins"
+#use = ["*_sync.zsh"]
+#apply = ["source"]

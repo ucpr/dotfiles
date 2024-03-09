@@ -1,46 +1,36 @@
-# use compiled zshrc
-if [ ~/.zshrc -nt ~/.zshrc.zwc ]; then
-   zcompile ~/.zshrc
-fi
-
+# history settings
 HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*:default' menu select=2
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*:default' menu select=2
-zstyle ':completion:*' ignore-parents parent pwd ..
-zstyle ':completion:*' use-cache true
-zstyle ':completion:*:default' menu select=2
+# use compiled zshrc
+ZSHRC_DIR=${${(%):-%N}:A:h}
+function source { # override source command
+  ensure_zcompiled $1
+  builtin source $1
+}
+function ensure_zcompiled {
+  local compiled="$1.zwc"
+  if [[ ! -r "$compiled" || "$1" -nt "$compiled" ]]; then
+    echo "\033[1;36mCompiling\033[m $1"
+    zcompile $1
+  fi
+}
+ensure_zcompiled ~/.zshrc
 
-autoload colors
-if [ -n "$LS_COLORS" ]; then
-  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-fi
+# common settings
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
 
-setopt hist_ignore_dups   # 直前と同じコマンドラインはヒストリに追加しない
-setopt hist_ignore_all_dups  # 重複したヒストリは追加しない
-setopt hist_ignore_space # スペースから始まるコマンド行はヒストリに残さない
-setopt magic_equal_subst
-setopt auto_list  # 補完候補が複数ある時に、一覧表示
-setopt ignore_eof # Ctrl+Dでzshを終了しない
+# sheldon settings
+eval "$(sheldon source)"
 
-bindkey "^[[3~" delete-char
-bindkey -v
-
-# zinit
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-source "${ZINIT_HOME}/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
-
-# set theme
-zinit ice pick"async.zsh" src"pure.zsh"
-zinit light sindresorhus/pure
-
-zinit wait lucid light-mode as'null' \
-  atinit'. "$HOME/.config/zsh/plugin.zsh"' \
-  for 'zdharma-continuum/null'
-### End of Zinit's installer chunk
+#cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
+#sheldon_cache="$cache_dir/sheldon.zsh"
+#sheldon_toml="$HOME/.config/sheldon/plugins.toml"
+#if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
+#  mkdir -p $cache_dir
+#  sheldon source > $sheldon_cache
+#fi
+#source "$sheldon_cache"
+#unset cache_dir sheldon_cache sheldon_toml
