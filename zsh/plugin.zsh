@@ -34,7 +34,10 @@ alias propen='gh pr view --web'
 alias prcreate='gh pr create -a @me -f -d && gh pr view --web'
 
 ### Export
-source "$HOME/.config/op/plugins.sh"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+
+source "$XDG_CONFIG_HOME/op/plugins.sh"
 export GOPATH=~/.go
 export PATH=~/.go/bin:$PATH
 

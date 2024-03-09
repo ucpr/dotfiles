@@ -17,7 +17,7 @@ local options = {
   backspace = "eol,indent,start",
   signcolumn = "yes",
   mouse = "a",
-  pastetoggle = "<F5>",
+  -- pastetoggle = "<F5>",
   helplang = "ja",
   -- theme
   spell = false, -- spelunker.vim を使うためfalseにする
