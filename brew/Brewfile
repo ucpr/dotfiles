@@ -53,6 +53,7 @@ brew "kustomize"
 brew "neofetch"
 brew "tailscale"
 brew "cue"
+brew "sheldon"
 
 cask "google-cloud-sdk"
 cask "1password"
@@ -78,8 +79,6 @@ cask "notion-calendar"
 cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
-cask "todoist"
-cask "xbar"
 
 cask "font-hack-nerd-font"
 
