@@ -21,22 +21,28 @@ apply = ["source"]
 
 [plugins.fast-syntax-highlighting]
 github = "zdharma-continuum/fast-syntax-highlighting"
+apply = ["source"]
 
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
+apply = ["source"]
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
+apply = ["source"]
 
 [plugins.autopair]
 github = "hlissner/zsh-autopair"
+apply = ["source"]
 
 [plugins.zsh-z]
 github = "agkozak/zsh-z"
+apply = ["source"]
 
 [plugins.dotfiles-defers]
 local = "~/.config/zsh/plugins"
 use = ["*_lazy.zsh"]
+apply = ["source"]
 
 #[plugins.dotfiles-sync]
 #local = "~/.config/zsh/plugins"
