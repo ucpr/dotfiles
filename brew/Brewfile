@@ -73,6 +73,7 @@ cask "notion-calendar"
 cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
+cask "vpn-by-google-one"
 
 cask "font-hack-nerd-font"
 
