@@ -7,3 +7,4 @@ go install github.com/110y/go-test-name@latest
 go install mvdan.cc/gofumpt@latest
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 go install github.com/go-delve/delve/cmd/dlv@latest
+go install github.com/goreleaser/goreleaser@latest
