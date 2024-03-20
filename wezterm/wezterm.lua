@@ -30,6 +30,6 @@ return {
     bottom = 0,
   },
   keys = keys,
-  window_background_opacity = 0.9,
+  window_background_opacity = 1,
   -- front_end = "WebGpu",
 }
