@@ -103,6 +103,7 @@ require('packer').startup(function(use)
       -- source
       "Shougo/ddu-source-file",
       "Shougo/ddu-source-file_rec",
+      "Shougo/ddu-source-action",
       "matsui54/ddu-source-file_external",
       "shun/ddu-source-rg",
       "4513ECHO/ddu-source-colorscheme",
@@ -142,6 +143,11 @@ require('packer').startup(function(use)
             ignoreCase = true,
           },
         },
+        kindOptions = {
+          action = {
+            defaultAction = "do",
+          },
+        },
       })
       vim.fn["ddu#custom#patch_local"]("file_recursive", {
         sources = {
@@ -164,12 +170,6 @@ require('packer').startup(function(use)
         },
       })
       vim.fn["ddu#custom#patch_local"]("grep", {
-        -- , params: #{ input: expand('<cword>') }}
-        sources = {
-          {
-            name = { "rg" },
-          },
-        },
         sourceParams = {
           rg = {
             args = { "--column", "--no-heading", "--color", "never" },
@@ -193,7 +193,10 @@ require('packer').startup(function(use)
          callback = function()
            local opts = { noremap = true, silent = true, buffer = true }
            vim.keymap.set({ "n" }, "q", [[<Cmd>call ddu#ui#do_action("quit")<CR>]], opts)
+           vim.keymap.set({ "n" }, "a", [[<Cmd>call ddu#ui#do_action("chooseAction")<CR>]], opts)
            vim.keymap.set({ "n" }, "<Cr>", [[<Cmd>call ddu#ui#do_action("itemAction")<CR>]], opts)
+           vim.keymap.set({ "n" }, "<C-v>", [[<Cmd>call ddu#ui#do_action("itemAction", {'params': {'command': 'vsplit'}})<CR>]], opts)
+           vim.keymap.set({ "n" }, "<C-x>", [[<Cmd>call ddu#ui#do_action("itemAction", {'params': {'command': 'split'}})<CR>]], opts)
            vim.keymap.set({ "n" }, "i", [[<Cmd>call ddu#ui#do_action("openFilterWindow")<CR>]], opts)
            vim.keymap.set({ "n" }, "P", [[<Cmd>call ddu#ui#do_action("togglePreview")<CR>]], opts)
          end,
@@ -219,7 +222,7 @@ require('packer').startup(function(use)
        })
 
       vim.keymap.set("n", "<Space>ff", "<Cmd>call ddu#start(#{name:'file_recursive'})<CR>")
-      vim.keymap.set("n", "<Space>g", "<Cmd>call ddu#start(#{name:'grep'})<CR>")
+      vim.keymap.set("n", "<Space>g", "<Cmd>call ddu#start(#{name:'grep', sources: [#{ name: 'rg', params: #{ input: expand('<cword>') } }]})<CR>")
     end,
   }
 
