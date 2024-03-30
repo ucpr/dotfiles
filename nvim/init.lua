@@ -39,8 +39,8 @@ local options = {
   laststatus = 2,
   showtabline = 2,
   statusline = '%f %y%m %r%h%w%=[%{&fileencoding!=""?&fileencoding:&encoding},%{&ff}] [Pos %02l,%02c] [%p%%/%L]',
-  -- pumblend = 1,
-  -- winblend = 10,
+  -- pumblend = 30,
+  winblend = 5,
   -- syntax
   tabstop = 2,
   shiftwidth = 2,
@@ -96,87 +96,134 @@ local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
-  -- telescope
-  use "nvim-lua/plenary.nvim"
   use {
-    "nvim-telescope/telescope.nvim",
-    module = { "telescope" },
+    "Shougo/ddu.vim",
+    -- event = { "VimEnter" },
     requires = {
-      {
-        "nvim-telescope/telescope-file-browser.nvim",
-        opt = true,
-      },
-      {
-        "nvim-telescope/telescope-live-grep-args.nvim",
-        opt = true,
-      },
-      {
-        "LinArcX/telescope-env.nvim",
-        opt = true,
-      },
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        run = "make",
-        opt = true,
-      },
+      -- source
+      "Shougo/ddu-source-file",
+      "Shougo/ddu-source-file_rec",
+      "Shougo/ddu-source-action",
+      "matsui54/ddu-source-file_external",
+      "shun/ddu-source-rg",
+      "4513ECHO/ddu-source-colorscheme",
+      -- kind
+      "Shougo/ddu-kind-file",
+      -- ui
+      "Shougo/ddu-ui-ff",
+      -- filter
+      "Shougo/ddu-filter-matcher_substring",
+      "uga-rosa/ddu-filter-converter_devicon",
+      "yuki-yano/ddu-filter-fzf",
+      -- etc
+      "Shougo/ddu-commands.vim",
     },
-    wants = {
-      "telescope-fzf-native.nvim",
-      "telescope-file-browser.nvim",
-      "telescope-live-grep-args.nvim",
-      "telescope-fzf-native.nvim",
-      "telescope-env.nvim",
-    },
-    setup = function()
-      local function builtin(name)
-        return function(opt)
-          return function()
-            return require("telescope.builtin")[name](opt or {})
-          end
-        end
-      end
-
-      local function extensions(name, prop)
-        return function(opt)
-          return function()
-            local telescope = require "telescope"
-            telescope.load_extension(name)
-            return telescope.extensions[name][prop](opt or {})
-          end
-        end
-      end
-
-      vim.keymap.set("n", "<Space>b", builtin("buffers") {})
-      vim.keymap.set("n", "<Space>fb", extensions("file_browser", "file_browser") {})
-      vim.keymap.set("n", "<Space>ff", builtin("find_files") {})
-      vim.keymap.set("n", "<Space>lg", extensions("live_grep_args", "live_grep_args") {})
-    end,
     config = function()
-      local telescope = require "telescope"
-      telescope.setup {
-        defaults = {
-          file_ignore_patterns = {
-            "vendor", "vendor/*", "./vendor", "./vendor/*",
-            "node_modules",
+      vim.fn["ddu#custom#patch_global"]({
+        ui = "ff",
+        uiParams = {
+          ff = {
+            filterFloatingPosition = "bottom",
+            filterSplitDirection = "floating",
+            floatingBorder = "rounded",
+            previewFloating = true,
+            previewFloatingBorder = "rounded",
+            previewFloatingTitle = "Preview",
+            previewSplit = "horizontal",
+            prompt = "> ",
+            split = "floating",
+            startFilter = true,
+          }
+        },
+        sourceOptions = {
+          _ = {
+            matchers = { "matcher_fzf" },
+            sorters = { "sorter_fzf" },
+            converters = { "converter_devicon" },
+            ignoreCase = true,
           },
         },
-        extensions = {
-          fzf = {
-            fuzzy = true,
-            override_generic_sorter = true,
-            override_file_sorter = true,
-            case_mode = "smart_case",
-          },
-          file_browser = {
-            hijack_netrw = true,
-          },
-          live_grep_args = {
-            auto_quoting = true,
+        kindOptions = {
+          action = {
+            defaultAction = "do",
           },
         },
-      }
-      telescope.load_extension("fzf")
-    end
+      })
+      vim.fn["ddu#custom#patch_local"]("file_recursive", {
+        sources = {
+          {
+            name = { "file_rec" },
+            options = {
+              converters = {
+                "converter_devicon",
+              },
+            },
+            params = {
+              ignoredDirectories = { "node_modules", ".git", ".vscode" },
+            },
+          },
+        },
+        kindOptions = {
+          file = {
+            defaultAction = "open",
+          },
+        },
+      })
+      vim.fn["ddu#custom#patch_local"]("grep", {
+        sourceParams = {
+          rg = {
+            args = { "--column", "--no-heading", "--color", "never" },
+          },
+        },
+        kindOptions = {
+          file = {
+            defaultAction = "open",
+          },
+        },
+        uiParams = {
+          ff = {
+            startFilter = false,
+            previewFloating = false,
+            previewSplit = "vertical",
+          },
+        },
+      })
+      vim.api.nvim_create_autocmd("FileType",{
+         pattern = "ddu-ff",
+         callback = function()
+           local opts = { noremap = true, silent = true, buffer = true }
+           vim.keymap.set({ "n" }, "q", [[<Cmd>call ddu#ui#do_action("quit")<CR>]], opts)
+           vim.keymap.set({ "n" }, "a", [[<Cmd>call ddu#ui#do_action("chooseAction")<CR>]], opts)
+           vim.keymap.set({ "n" }, "<Cr>", [[<Cmd>call ddu#ui#do_action("itemAction")<CR>]], opts)
+           vim.keymap.set({ "n" }, "<C-v>", [[<Cmd>call ddu#ui#do_action("itemAction", {'params': {'command': 'vsplit'}})<CR>]], opts)
+           vim.keymap.set({ "n" }, "<C-x>", [[<Cmd>call ddu#ui#do_action("itemAction", {'params': {'command': 'split'}})<CR>]], opts)
+           vim.keymap.set({ "n" }, "i", [[<Cmd>call ddu#ui#do_action("openFilterWindow")<CR>]], opts)
+           vim.keymap.set({ "n" }, "P", [[<Cmd>call ddu#ui#do_action("togglePreview")<CR>]], opts)
+         end,
+       })
+       vim.api.nvim_create_autocmd("FileType",{
+         pattern = "ddu-ff-filter",
+         callback = function()
+           local opts = { noremap = true, silent = true, buffer = true }
+           vim.keymap.set({ "n", "i" }, "<CR>", [[<Esc><Cmd>close<CR>]], opts)
+         end,
+       })
+       vim.fn["ddu#custom#patch_local"]("colorscheme", {
+         sources = {
+           {
+             name = { "colorscheme" },
+           },
+         },
+         kindOptions = {
+           colorscheme = {
+             defaultAction = "set",
+           }
+         }
+       })
+
+      vim.keymap.set("n", "<Space>ff", "<Cmd>call ddu#start(#{name:'file_recursive'})<CR>")
+      vim.keymap.set("n", "<Space>g", "<Cmd>call ddu#start(#{name:'grep', sources: [#{ name: 'rg', params: #{ input: expand('<cword>') } }]})<CR>")
+    end,
   }
 
   -- etc
