@@ -51,6 +51,7 @@ brew "tailscale"
 brew "cue"
 brew "sheldon"
 brew "hyperfine"
+brew "skaffold"
 
 cask "google-cloud-sdk"
 cask "1password"
