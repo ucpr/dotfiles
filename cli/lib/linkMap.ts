@@ -68,6 +68,13 @@ const linkMap: LinkMap = new Map([
     symlink: join(home, ".gitmessage"),
     platform: "common",
   }],
+  [
+    "gitignore", {
+      target: join(dotfilesDir, "git/ignore"),
+      symlink: join(home, ".config", "git", "ignore"),
+      platform: "common",
+    }
+  ],
   ["sheldon", {
     target: join(dotfilesDir, "sheldon"),
     symlink: join(home, ".config", "sheldon"),

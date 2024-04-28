@@ -11,6 +11,9 @@ async function initializeDirs() {
   if (!await exists(join(home, ".config"))) {
     await Deno.mkdir(join(home, ".config"));
   }
+  if (!await exists(join(home, ".config", "git"))) {
+    await Deno.mkdir(join(home, ".config", "git"));
+  }
   if (!await exists(join(home, ".skk"))) {
     await Deno.mkdir(join(home, ".skk"));
   }
