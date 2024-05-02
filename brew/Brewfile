@@ -52,6 +52,7 @@ brew "cue"
 brew "sheldon"
 brew "hyperfine"
 brew "skaffold"
+brew "oven-sh/bun/bun"
 
 cask "google-cloud-sdk"
 cask "1password"
@@ -74,7 +75,7 @@ cask "notion-calendar"
 cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
-cask "vpn-by-google-one"
+cask "arc"
 
 cask "font-hack-nerd-font"
 
