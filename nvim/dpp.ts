@@ -115,6 +115,22 @@ export class Config extends BaseConfig {
       ) as Toml,
     );
 
+    tomls.push(
+      await args.dpp.extAction(
+        args.denops,
+        context,
+        options,
+        "toml",
+        "load",
+        {
+          path: await fn.expand(args.denops, dotfilesDir + "tomls/theme.toml"),
+          options: {
+            lazy: true,
+          },
+        },
+      ) as Toml,
+    );
+
     const recordPlugins: Record<string, Plugin> = {};
     const ftplugins: Record<string, string> = {};
     const hooksFiles: string[] = [];
