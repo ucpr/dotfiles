@@ -134,3 +134,10 @@ lua_post_source = '''
     },
   })
 '''
+
+[[plugins]]
+repo = 'kamykn/spelunker.vim'
+lua_add = '''
+  vim.g.enable_spelunker_vim = 1
+  vim.g.spelunker_check_type = 2
+'''
