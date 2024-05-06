@@ -1,0 +1,144 @@
+[[plugins]]
+repo = 'cohama/lexima.vim'
+on_event = 'InsertEnter'
+
+[[plugins]]
+repo = 'ntpeters/vim-better-whitespace'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'simeji/winresizer'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'markonm/traces.vim'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'mattn/vim-sonictemplate'
+on_cmd = 'Template'
+lua_post_source = '''
+  vim.g.sonictemplate_vim_template_dir = { "$HOME/.vim/template" }
+'''
+
+[[plugins]]
+repo = 'almo7aya/openingh.nvim'
+on_cmd = ['OpenInGHFile', 'OpenInGHRepo']
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+on_event = 'InsertEnter'
+
+[[plugins]]
+repo = 'yuki-yano/fuzzy-motion.vim'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'lambdalisue/guise.vim'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'unblevable/quick-scope'
+on_event = 'BufEnter'
+hook_add = '''
+  augroup qs_colors
+    autocmd!
+    autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+    autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
+  augroup END
+'''
+lua_post_source = '''
+  vim.g.qs_hi_priority = 2
+  vim.g.qs_max_chars = 80
+  vim.g.qs_lazy_highlight = 0
+  vim.g.qs_buftype_blacklist = { "terminal", "nofile" }
+'''
+
+[[plugins]]
+repo = 'nvim-tree/nvim-tree.lua'
+on_cmd = ["NvimTreeToggle"]
+lua_post_source = '''
+  vim.g.loaded_netrw = 1
+  vim.g.loaded_netrwPlugin = 1
+
+  require("nvim-tree").setup({
+    sort_by = "case_sensitive",
+    renderer = {
+      group_empty = true,
+    },
+    filters = {
+      dotfiles = true,
+    },
+  })
+'''
+
+[[plugins]]
+repo = 'lewis6991/gitsigns.nvim'
+on_event = ["FocusLost", "CursorHold", "VimEnter"]
+lua_post_source = '''
+  require('gitsigns').setup {
+    signs                        = {
+      add          = { text = '│' },
+      change       = { text = '│' },
+      delete       = { text = '_' },
+      topdelete    = { text = '‾' },
+      changedelete = { text = '~' },
+      untracked    = { text = '┆' },
+    },
+    signcolumn                   = true,  -- Toggle with `:Gitsigns toggle_signs`
+    numhl                        = false, -- Toggle with `:Gitsigns toggle_numhl`
+    linehl                       = false, -- Toggle with `:Gitsigns toggle_linehl`
+    word_diff                    = false, -- Toggle with `:Gitsigns toggle_word_diff`
+    watch_gitdir                 = {
+      follow_files = true
+    },
+    attach_to_untracked          = true,
+    current_line_blame           = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+    current_line_blame_opts      = {
+      virt_text = true,
+      virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+      delay = 1000,
+      ignore_whitespace = false,
+    },
+    current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
+    sign_priority                = 6,
+    update_debounce              = 100,
+    status_formatter             = nil,   -- Use default
+    max_file_length              = 40000, -- Disable if file is longer than this (in lines)
+    preview_config               = {
+      -- Options passed to nvim_open_win
+      border = 'double',
+      style = 'minimal',
+      relative = 'cursor',
+      row = 0,
+      col = 1
+    },
+    yadm                         = {
+      enable = false
+    },
+  }
+'''
+
+[[plugins]]
+repo = 'numToStr/FTerm.nvim'
+on_event = 'BufEnter'
+lua_add = '''
+  vim.keymap.set("n", "T", '<C-\\><C-n><CMD>lua require("FTerm").toggle()<CR>')
+'''
+lua_post_source = '''
+  require 'FTerm'.setup({
+    border     = 'double',
+    dimensions = {
+      height = 0.9,
+      width = 0.9,
+    },
+  })
+'''
+
+[[plugins]]
+repo = 'kamykn/spelunker.vim'
+on_event = 'BufEnter'
+lua_add = '''
+  vim.g.enable_spelunker_vim = 1
+  vim.g.spelunker_check_type = 2
+'''
