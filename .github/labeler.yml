@@ -1,6 +1,9 @@
 dotfiles-cli:
-  - "cli/**/*"
+- changed-files:
+  - any-glob-to-any-file: "cli/**/*"
 neovim:
-  - "nvim/**/*"
+- changed-files:
+  - any-glob-to-any-file: "nvim/**/*"
 zsh:
-  - "zsh/**/*"
+- changed-files:
+  - any-glob-to-any-file: "zsh/**/*"
