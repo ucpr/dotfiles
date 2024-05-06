@@ -123,7 +123,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/theme.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "tomls/style.toml"),
           options: {
             lazy: true,
           },

@@ -30,3 +30,20 @@ lua_source = '''
  }
  require("onedark").load()
 '''
+
+[[plugins]]
+repo = 'shellRaining/hlchunk.nvim'
+on_event = 'VimEnter'
+lua_post_source = '''
+  require("hlchunk").setup({
+    indent = {
+      enable = false,
+    },
+    line_num = {
+      enable = false,
+    },
+    blank = {
+      enable = false,
+    },
+  })
+'''

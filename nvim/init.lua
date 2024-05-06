@@ -112,7 +112,7 @@ for _, ext in ipairs(dpp_exts) do
   vim.opt.runtimepath:append(dpp_repo .. ext)
 end
 
-vim.g["denops#debug"] = 1  -- note: cmdheight=0 のときはEnterで進めないといけない
+vim.g["denops#debug"] = 1 -- note: cmdheight=0 のときはEnterで進めないといけない
 
 if dpp.load_state(dpp_base) then
   local denops_src = dpp_repo .. "github.com/vim-denops/denops.vim"
@@ -121,7 +121,7 @@ if dpp.load_state(dpp_base) then
   local dpp_config = "$XDG_CONFIG_HOME/nvim/dpp.ts"
   vim.api.nvim_create_autocmd("User", {
     pattern = "DenopsReady",
-    callback = function ()
+    callback = function()
       vim.notify("failed to load_state")
       dpp.make_state(dpp_base, dpp_config)
     end
@@ -138,3 +138,7 @@ end
 
 vim.api.nvim_create_user_command('DppInstall', install, {})
 vim.api.nvim_create_user_command('DppUpdate', update, {})
+
+vim.cmd [[
+  autocmd FileType go setl ts=4 sw=4 noet
+]]
