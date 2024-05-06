@@ -141,23 +141,7 @@ export class Config extends BaseConfig {
         {
           path: await fn.expand(args.denops, dotfilesDir + "tomls/cmp.toml"),
           options: {
-            lazy: false,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/lsp.toml"),
-          options: {
-            lazy: false,
+            lazy: true,
           },
         },
       ) as Toml,
