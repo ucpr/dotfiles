@@ -127,3 +127,14 @@ if dpp.load_state(dpp_base) then
     end
   })
 end
+
+local function install()
+  vim.fn["dpp#async_ext_action"]('installer', 'install')
+end
+
+local function update()
+  vim.fn["dpp#async_ext_action"]('installer', 'update')
+end
+
+vim.api.nvim_create_user_command('DppInstall', install, {})
+vim.api.nvim_create_user_command('DppUpdate', update, {})
