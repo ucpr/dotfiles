@@ -181,3 +181,10 @@ lua_post_source = '''
 [[plugins]]
 repo = 'linrongbin16/gitlinker.nvim'
 on_cmd = 'GitLink'
+
+[[plugins]]
+repo = 'delphinus/auto-cursorline.nvim'
+on_event = 'VimEnter'
+lua_post_source = '''
+  require("auto-cursorline").setup {}
+'''
