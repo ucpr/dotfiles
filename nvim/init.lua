@@ -1,4 +1,4 @@
--- vim.loader.enable()
+vim.loader.enable()
 
 require("settings/opts")
 require("settings/disable")
