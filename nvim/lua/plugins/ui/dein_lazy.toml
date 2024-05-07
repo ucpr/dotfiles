@@ -2,3 +2,19 @@
 repo = 'shellRaining/hlchunk.nvim'
 on_event = 'VimEnter'
 hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/ui/hlchunk.lua'
+
+[[plugins]]
+repo = 'ntpeters/vim-better-whitespace'
+on_event = 'VimEnter'
+
+[[plugins]]
+repo = 'kevinhwang91/nvim-hlslens'
+on_event = 'VimEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/ui/nvim-hlslens.lua'
+
+[[plugins]]
+repo = 'delphinus/auto-cursorline.nvim'
+on_event = 'VimEnter'
+lua_post_source = '''
+  require("auto-cursorline").setup {}
+'''
