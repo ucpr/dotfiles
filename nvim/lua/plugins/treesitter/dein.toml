@@ -1,0 +1,16 @@
+[[plugins]]
+repo = 'nvim-treesitter/nvim-treesitter'
+hook_post_update = 'TSUpdate'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/treesitter/nvim-treesitter.lua'
+
+[[plugins]]
+repo = 'm-demare/hlargs.nvim'
+depends = ['nvim-treesitter']
+lua_post_source = '''
+  require('hlargs').setup()
+'''
+
+[[plugins]]
+repo = 'nvim-treesitter/nvim-treesitter-context'
+depends = ['nvim-treesitter']
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/treesitter/nvim-treesitter-context.lua'

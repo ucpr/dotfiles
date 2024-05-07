@@ -1,0 +1,4 @@
+[[plugins]]
+repo = 'shellRaining/hlchunk.nvim'
+on_event = 'VimEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/ui/hlchunk.lua'

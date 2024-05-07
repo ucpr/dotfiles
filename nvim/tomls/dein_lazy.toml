@@ -145,7 +145,7 @@ lua_add = '''
 
 [[plugins]]
 repo = 'kevinhwang91/nvim-hlslens'
-on_event = 'BufEnter'
+on_event = 'VimEnter'
 lua_post_source = '''
   require('hlslens').setup({
     override_lens = function(render, posList, nearest, idx, relIdx)

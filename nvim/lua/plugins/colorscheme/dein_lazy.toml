@@ -1,0 +1,4 @@
+[[plugins]]
+repo = 'navarasu/onedark.nvim'
+on_event = 'VimEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/colorscheme/onedark.lua'
