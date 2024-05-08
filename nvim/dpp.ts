@@ -43,7 +43,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/dein.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/core/dein.toml"),
           options: {
             lazy: false,
           },
@@ -59,7 +59,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/dein_lazy.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/core/dein_lazy.toml"),
           options: {
             lazy: true,
           },
@@ -75,7 +75,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/ddu.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/ddu/dein_lazy.toml"),
           options: {
             lazy: true,
           },
@@ -91,7 +91,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/treesitter.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/treesitter/dein.toml"),
           options: {
             lazy: false,
           },
@@ -107,7 +107,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/go.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/languages/dein_lazy.toml"),
           options: {
             lazy: true,
           },
@@ -123,7 +123,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/style.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/colorscheme/dein_lazy.toml"),
           options: {
             lazy: true,
           },
@@ -139,7 +139,55 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/cmp.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/ui/dein_lazy.toml"),
+          options: {
+            lazy: true,
+          },
+        },
+      ) as Toml,
+    );
+
+    tomls.push(
+      await args.dpp.extAction(
+        args.denops,
+        context,
+        options,
+        "toml",
+        "load",
+        {
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/completion/dein_lazy.toml"),
+          options: {
+            lazy: true,
+          },
+        },
+      ) as Toml,
+    );
+
+    tomls.push(
+      await args.dpp.extAction(
+        args.denops,
+        context,
+        options,
+        "toml",
+        "load",
+        {
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/lsp/dein_lazy.toml"),
+          options: {
+            lazy: true,
+          },
+        },
+      ) as Toml,
+    );
+
+    tomls.push(
+      await args.dpp.extAction(
+        args.denops,
+        context,
+        options,
+        "toml",
+        "load",
+        {
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/git/dein_lazy.toml"),
           options: {
             lazy: true,
           },
@@ -152,7 +200,6 @@ export class Config extends BaseConfig {
     const hooksFiles: string[] = [];
 
     tomls.forEach((toml) => {
-
       for (const plugin of toml.plugins) {
         recordPlugins[plugin.name] = plugin;
       }
@@ -183,9 +230,8 @@ export class Config extends BaseConfig {
       },
     ) as LazyMakeStateResult;
 
-    console.log(lazyResult);
-
     return {
+      hooksFiles,
       plugins: lazyResult.plugins,
       stateLines: lazyResult.stateLines,
     };

@@ -17,6 +17,6 @@ on_ft = ['go']
 [[plugins]]
 repo = 'mattn/vim-goimports'
 on_ft = ['go']
-#lua_add = '''
-#  vim.g.goimports = 1
-#'''
+lua_source = '''
+  vim.g.goimports = 1
+'''
