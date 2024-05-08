@@ -1,0 +1,3 @@
+[[plugins]]
+repo = 'cohama/lexima.vim'
+on_event = 'InsertEnter'

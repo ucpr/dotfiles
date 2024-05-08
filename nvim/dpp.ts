@@ -163,6 +163,38 @@ export class Config extends BaseConfig {
       ) as Toml,
     );
 
+    tomls.push(
+      await args.dpp.extAction(
+        args.denops,
+        context,
+        options,
+        "toml",
+        "load",
+        {
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/completion/dein_lazy.toml"),
+          options: {
+            lazy: true,
+          },
+        },
+      ) as Toml,
+    );
+
+    tomls.push(
+      await args.dpp.extAction(
+        args.denops,
+        context,
+        options,
+        "toml",
+        "load",
+        {
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/git/dein_lazy.toml"),
+          options: {
+            lazy: true,
+          },
+        },
+      ) as Toml,
+    );
+
     const recordPlugins: Record<string, Plugin> = {};
     const ftplugins: Record<string, string> = {};
     const hooksFiles: string[] = [];

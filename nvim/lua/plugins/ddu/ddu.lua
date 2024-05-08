@@ -1,4 +1,4 @@
---- lua_post_source {{{
+--- lua_add {{{
 vim.fn["ddu#custom#patch_global"]({
   ui = "ff",
   uiParams = {
