@@ -1,0 +1,19 @@
+[[plugins]]
+repo = 'williamboman/mason-lspconfig.nvim'
+on_event = 'VimEnter'
+
+[[plugins]]
+repo = 'williamboman/mason.nvim'
+on_event = 'VimEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/lsp/mason.lua'
+
+[[plugins]]
+repo = 'neovim/nvim-lspconfig'
+on_event = 'VimEnter'
+depends = ['mason-lspconfig.nvim', 'cmp-nvim-lsp']
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/lsp/nvim-lspconfig.lua'
+
+[[plugins]]
+repo = 'stevearc/aerial.nvim'
+on_event = 'VimEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/lsp/aerial.lua'

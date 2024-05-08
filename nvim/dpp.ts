@@ -155,7 +155,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/cmp.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/completion/dein_lazy.toml"),
           options: {
             lazy: true,
           },
@@ -171,7 +171,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/completion/dein_lazy.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/lsp/dein_lazy.toml"),
           options: {
             lazy: true,
           },
