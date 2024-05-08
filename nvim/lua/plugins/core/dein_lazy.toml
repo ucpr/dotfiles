@@ -9,6 +9,9 @@ on_event = 'BufEnter'
 [[plugins]]
 repo = 'yuki-yano/fuzzy-motion.vim'
 on_event = 'BufEnter'
+lua_source = '''
+  vim.keymap.set("n", "s", ":<C-u>FuzzyMotion<CR>")
+'''
 
 [[plugins]]
 repo = 'lambdalisue/guise.vim'
