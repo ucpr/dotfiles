@@ -1,5 +1,5 @@
 --- lua_source {{{
-local pasers_path = vim.fn.expand("$HOME/.cache/nvim/treesitter/parsers")
+local pasers_path = vim.fn.expand("$XDG_CACHE_HOME/nvim/treesitter/parsers")
 vim.opt.runtimepath:append(pasers_path)
 
 require 'nvim-treesitter.configs'.setup {
