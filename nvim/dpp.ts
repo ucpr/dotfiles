@@ -43,7 +43,7 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "tomls/dein.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/core/dein.toml"),
           options: {
             lazy: false,
           },
