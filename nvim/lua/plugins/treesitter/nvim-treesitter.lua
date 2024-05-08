@@ -1,6 +1,10 @@
 --- lua_source {{{
+local pasers_path = vim.fn.expand("$HOME/.cache/nvim/treesitter/parsers")
+vim.opt.runtimepath:append(pasers_path)
+
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "toml", "json", "vim", "hcl", "rust" },
+  parser_install_dir = pasers_path,
+  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "json", "vim", "hcl", "rust", "toml" },
   sync_install = false,
   auto_install = true,
   highlight = {

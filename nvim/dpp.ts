@@ -91,9 +91,9 @@ export class Config extends BaseConfig {
         "toml",
         "load",
         {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/treesitter/dein.toml"),
+          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/treesitter/dein_lazy.toml"),
           options: {
-            lazy: false,
+            lazy: true,
           },
         },
       ) as Toml,

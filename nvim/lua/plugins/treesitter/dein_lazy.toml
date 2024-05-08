@@ -1,6 +1,7 @@
 [[plugins]]
 repo = 'nvim-treesitter/nvim-treesitter'
-hook_post_update = 'TSUpdate'
+on_event = 'BufEnter'
+# hook_post_update = 'TSUpdate'
 hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/treesitter/nvim-treesitter.lua'
 
 [[plugins]]

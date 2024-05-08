@@ -1,6 +1,6 @@
--- lua_post_source {{{
+-- lua_source {{{
 require("onedark").setup {
-  style = "warmer",
+  style = "darker",
   transparent = true,           -- Show/hide background
   term_colors = true,           -- Change terminal color as per the selected theme style
   ending_tildes = false,        -- Show the end-of-buffer tildes. By default they are hidden
@@ -11,7 +11,7 @@ require("onedark").setup {
     keywords = 'none',
     functions = 'none',
     strings = 'none',
-    variables = 'none'
+    variables = 'bold'
   },
 
   -- Custom Highlights --
@@ -25,5 +25,8 @@ require("onedark").setup {
     background = true, -- use background color for virtual text
   },
 }
+--- }}}
+
+-- lua_post_source {{{
 require("onedark").load()
 --- }}}
