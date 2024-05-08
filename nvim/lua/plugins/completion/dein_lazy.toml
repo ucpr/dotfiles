@@ -48,3 +48,10 @@ on_event = 'VimEnter'
 repo = 'github/copilot.vim'
 on_event = 'VimEnter'
 hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/completion/copilot.lua'
+
+[[plugins]]
+repo = 'mattn/vim-sonictemplate'
+on_cmd = 'Template'
+lua_post_source = '''
+  vim.g.sonictemplate_vim_template_dir = { "$HOME/.vim/template" }
+'''

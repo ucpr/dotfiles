@@ -1,0 +1,33 @@
+[[plugins]]
+repo = 'simeji/winresizer'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'markonm/traces.vim'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'yuki-yano/fuzzy-motion.vim'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'lambdalisue/guise.vim'
+on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'unblevable/quick-scope'
+on_event = 'BufEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/core/quick-scope.lua'
+
+[[plugins]]
+repo = 'numToStr/FTerm.nvim'
+on_event = 'BufEnter'
+hooks_file = '$XDG_CONFIG_HOME/nvim/lua/plugins/core/fterm.lua'
+
+[[plugins]]
+repo = 'kamykn/spelunker.vim'
+on_event = 'BufEnter'
+lua_add = '''
+  vim.g.enable_spelunker_vim = 1
+  vim.g.spelunker_check_type = 2
+'''
