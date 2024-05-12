@@ -4,7 +4,7 @@ vim.opt.runtimepath:append(pasers_path)
 
 require 'nvim-treesitter.configs'.setup {
   parser_install_dir = pasers_path,
-  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "json", "vim", "hcl", "rust", "toml" },
+  ensure_installed = { "lua", "go", "python", "bash", "typescript", "yaml", "json", "vim", "hcl", "rust", "toml", "proto" },
   sync_install = false,
   auto_install = true,
   highlight = {
