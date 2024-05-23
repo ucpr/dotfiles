@@ -1,6 +1,5 @@
 [[plugins]]
 repo = 'kyoh86/vim-go-coverage'
-on_ft = ['go']
 
 [[plugins]]
 repo = 'mattn/vim-goaddtags'

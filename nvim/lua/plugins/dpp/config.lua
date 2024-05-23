@@ -16,7 +16,7 @@ for _, ext in ipairs(dpp_exts) do
   vim.opt.runtimepath:append(dpp_repo .. ext)
 end
 
-vim.g["denops#debug"] = 1 -- note: cmdheight=0 のときはEnterで進めないといけない
+-- vim.g["denops#debug"] = 1 -- note: cmdheight=0 のときはEnterで進めないといけない
 
 if dpp.load_state(dpp_base) then
   local denops_src = dpp_repo .. "github.com/vim-denops/denops.vim"
