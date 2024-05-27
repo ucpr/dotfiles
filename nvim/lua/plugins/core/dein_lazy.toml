@@ -3,6 +3,10 @@ repo = 'simeji/winresizer'
 on_event = 'BufEnter'
 
 [[plugins]]
+repo = 'kana/vim-smartword'
+on_event = 'BufEnter'
+
+[[plugins]]
 repo = 'markonm/traces.vim'
 on_event = 'BufEnter'
 

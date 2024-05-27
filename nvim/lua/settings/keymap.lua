@@ -23,3 +23,6 @@ vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
 -- custom script
 vim.keymap.set("n", "got", ":<C-u>lua go_test()<CR>")
+
+-- vim-smartword
+vim.keymap.set("n", "w", "<Plug>(smartword-w)")
