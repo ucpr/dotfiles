@@ -33,167 +33,56 @@ export class Config extends BaseConfig {
 
     const [context, options] = await args.contextBuilder.get(args.denops);
     const dotfilesDir = "~/.config/nvim/";
+    const lazyTomlPaths: string[] = [
+      "lua/plugins/core/dein_lazy.toml",
+      "lua/plugins/ddu/dein_lazy.toml",
+      "lua/plugins/treesitter/dein_lazy.toml",
+      "lua/plugins/languages/dein_lazy.toml",
+      "lua/plugins/colorscheme/dein_lazy.toml",
+      "lua/plugins/ui/dein_lazy.toml",
+      "lua/plugins/completion/dein_lazy.toml",
+      "lua/plugins/lsp/dein_lazy.toml",
+      "lua/plugins/git/dein_lazy.toml"
+    ];
+    const tomlPaths: string[] = [
+      "lua/plugins/core/dein.toml",
+    ]
 
     const tomls: Toml[] = [];
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/core/dein.toml"),
-          options: {
-            lazy: false,
+    for (const tomlPath of tomlPaths) {
+      tomls.push(
+        await args.dpp.extAction(
+          args.denops,
+          context,
+          options,
+          "toml",
+          "load",
+          {
+            path: await fn.expand(args.denops, dotfilesDir + tomlPath),
+            options: {
+              lazy: false,
+            },
           },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/core/dein_lazy.toml"),
-          options: {
-            lazy: true,
+        ) as Toml,
+      );
+    }
+    for (const tomlPath of lazyTomlPaths) {
+      tomls.push(
+        await args.dpp.extAction(
+          args.denops,
+          context,
+          options,
+          "toml",
+          "load",
+          {
+            path: await fn.expand(args.denops, dotfilesDir + tomlPath),
+            options: {
+              lazy: true,
+            },
           },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/ddu/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/treesitter/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/languages/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/colorscheme/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/ui/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/completion/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/lsp/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
-
-    tomls.push(
-      await args.dpp.extAction(
-        args.denops,
-        context,
-        options,
-        "toml",
-        "load",
-        {
-          path: await fn.expand(args.denops, dotfilesDir + "lua/plugins/git/dein_lazy.toml"),
-          options: {
-            lazy: true,
-          },
-        },
-      ) as Toml,
-    );
+        ) as Toml,
+      );
+    }
 
     const recordPlugins: Record<string, Plugin> = {};
     const ftplugins: Record<string, string> = {};
