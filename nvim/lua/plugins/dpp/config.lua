@@ -40,5 +40,10 @@ local function update()
   vim.fn["dpp#async_ext_action"]('installer', 'update')
 end
 
+vim.cmd [[
+autocmd BufWritePost *.lua,*.vim,*.toml,*.ts,vimrc,.vimrc
+            \ call dpp#check_files()
+]]
+
 vim.api.nvim_create_user_command('DppInstall', install, {})
 vim.api.nvim_create_user_command('DppUpdate', update, {})
