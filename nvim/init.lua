@@ -9,3 +9,7 @@ require("plugins/dpp/config")
 
 require("scripts/go_test")
 require("scripts/list_loaded_plugins")
+
+vim.cmd [[
+  filetype plugin on
+]]
