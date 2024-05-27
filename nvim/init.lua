@@ -8,3 +8,4 @@ require("settings/keymap")
 require("plugins/dpp/config")
 
 require("scripts/go_test")
+require("scripts/list_loaded_plugins")
