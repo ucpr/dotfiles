@@ -56,3 +56,9 @@ vim.opt.clipboard:append({ "unnamedplus" })
 for k, v in pairs(options) do
   vim.opt[k] = v
 end
+
+-- cmdline.vim でこれを入れていないと statusline の下のコマンドでも cursor が動き回る
+vim.cmd [[
+  set guicursor=n-v-c-sm:block-Cursor
+  set guicursor+=i:ver25-CursorInsert
+]]

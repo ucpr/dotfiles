@@ -26,6 +26,10 @@ repo = 'shun/ddu-source-rg'
 on_source = 'ddu.vim'
 
 [[plugins]]
+repo = 'shun/ddu-source-buffer'
+on_source = 'ddu.vim'
+
+[[plugins]]
 repo = '4513ECHO/ddu-source-colorscheme'
 on_source = 'ddu.vim'
 
@@ -47,10 +51,9 @@ on_source = 'ddu.vim'
 repo = 'Shougo/ddu-filter-matcher_substring'
 on_source = 'ddu.vim'
 
-# TODO:
-#[[plugins]]
-#repo = 'uga-rosa/ddu-filter-converter_devicon'
-#on_source = 'ddu.vim'
+[[plugins]]
+repo = 'uga-rosa/ddu-filter-converter_devicon'
+on_source = 'ddu.vim'
 
 [[plugins]]
 repo = 'yuki-yano/ddu-filter-fzf'
@@ -61,3 +64,8 @@ on_source = 'ddu.vim'
 [[plugins]]
 repo = 'Shougo/ddu-commands.vim'
 on_source = 'ddu.vim'
+
+[[plugins]]
+repo = 'Shougo/cmdline.vim'
+on_source = 'ddu.vim'
+hooks_file = "$XDG_CONFIG_HOME/nvim/lua/plugins/ddu/cmdline.lua"

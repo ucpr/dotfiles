@@ -1,18 +1,31 @@
 --- lua_add {{{
+local winCol = vim.api.nvim_win_get_width(0)
+local winRow = vim.api.nvim_win_get_height(0)
+local winWidth = math.floor(winCol * 0.95)
+local winHeight = math.floor(winRow * 0.8)
+
 vim.fn["ddu#custom#patch_global"]({
   ui = "ff",
   uiParams = {
     ff = {
-      filterFloatingPosition = "bottom",
-      filterSplitDirection = "floating",
-      floatingBorder = "rounded",
+      autoAction = { name = "preview" },
+      startAutoAction = true,
+
       previewFloating = true,
       previewFloatingBorder = "rounded",
       previewFloatingTitle = "Preview",
-      previewSplit = "horizontal",
+      previewSplit = "vertical",
+      previewWidth = math.floor(winWidth / 2),
+      previewHeight = math.floor(winHeight / 1.5),
+
       prompt = "> ",
       split = "floating",
-      startFilter = true,
+      floatingBorder = "rounded",
+      floatingTitle = "Data",
+      winWidth = math.floor(winWidth / 2),
+      winHeight = math.floor(winHeight / 1.5),
+      winRow = 3,
+      winCol = 5,
     }
   },
   sourceOptions = {
@@ -39,7 +52,7 @@ vim.fn["ddu#custom#patch_local"]("file_recursive", {
         },
       },
       params = {
-        ignoredDirectories = { "node_modules", ".git", ".vscode" },
+        ignoredDirectories = { "node_modules", ".git", ".vscode", "dist", "build" },
       },
     },
   },
@@ -49,7 +62,26 @@ vim.fn["ddu#custom#patch_local"]("file_recursive", {
     },
   },
 })
+vim.fn["ddu#custom#patch_local"]("buffer", {
+  sources = {
+    {
+      name = { "buffer" },
+      options = {
+      },
+    },
+  },
+  kindOptions = {
+    buffer = {
+      defaultAction = "open",
+    },
+  },
+})
 vim.fn["ddu#custom#patch_local"]("grep", {
+  sources = {
+    {
+      name = { "rg" },
+    },
+  },
   sourceParams = {
     rg = {
       args = { "--column", "--no-heading", "--color", "never" },
@@ -58,13 +90,6 @@ vim.fn["ddu#custom#patch_local"]("grep", {
   kindOptions = {
     file = {
       defaultAction = "open",
-    },
-  },
-  uiParams = {
-    ff = {
-      startFilter = false,
-      previewFloating = false,
-      previewSplit = "vertical",
     },
   },
 })
@@ -104,6 +129,12 @@ vim.fn["ddu#custom#patch_local"]("colorscheme", {
 })
 
 vim.keymap.set("n", "<Space>ff", "<Cmd>call ddu#start(#{name:'file_recursive'})<CR>")
+vim.keymap.set("n", "<Space>b", "<Cmd>call ddu#start(#{name:'buffer'})<CR>")
+vim.keymap.set("n", "<Space>gg", "<Cmd>call ddu#start(#{name:'grep'})<CR>")
 vim.keymap.set("n", "<Space>g",
-  "<Cmd>call ddu#start(#{name:'grep', sources: [#{ name: 'rg', params: #{ input: expand('<cword>') } }]})<CR>")
+  "<Cmd>call ddu#start(#{name:'grep', sources: [#{ name: 'grep', params: #{ input: expand('<cword>') } }]})<CR>")
+
+vim.cmd [[
+autocmd User Ddu:ui:ff:openFilterWindow call cmdline#enable()
+]]
 --- }}}
