@@ -22,5 +22,11 @@
     "body": [
       "${VIM:strftime('%Y-%m-%d')}"
     ]
+  },
+  "pwd": {
+    "prefix": "pwd",
+    "body": [
+      "${VIM:expand('%:p:h')}"
+    ]
   }
 }
