@@ -38,6 +38,7 @@
   plr = !"git pull --rebase origin $(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')"
   graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
   ucat = !"git ls-files --others --exclude-standard | xargs bat"
+  fixup = commit --amend -C HEAD
 [fetch]
   prune = true
 [pull]
