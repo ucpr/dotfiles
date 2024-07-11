@@ -1,6 +1,3 @@
-# tap 'homebrew/cask'
-# tap 'homebrew/core'
-tap "homebrew/cask-fonts"
 tap "ktr0731/evans"
 cask_args appdir: "/Applications"
 
