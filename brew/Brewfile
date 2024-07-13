@@ -72,7 +72,6 @@ cask "notion-calendar"
 cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
-cask "arc"
 cask "postman"
 
 cask "font-hack-nerd-font"
