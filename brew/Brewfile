@@ -73,6 +73,7 @@ cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
 cask "postman"
+cask "obsidian"
 
 cask "font-hack-nerd-font"
 
