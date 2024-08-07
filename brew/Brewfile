@@ -50,6 +50,9 @@ brew "sheldon"
 brew "hyperfine"
 brew "skaffold"
 brew "oven-sh/bun/bun"
+brew "bazelisk"
+brew "helm"
+brew "opa"
 
 cask "google-cloud-sdk"
 cask "1password"
@@ -74,6 +77,7 @@ cask "google-drive"
 cask "postman"
 cask "obsidian"
 cask "alfred"
+cask "bitwarden"
 
 cask "font-hack-nerd-font"
 

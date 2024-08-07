@@ -17,3 +17,7 @@ setup:
 .PHONY: update-brew
 update-brew:
 	cd brew && brew bundle
+
+.PHONY: brew-cleanup
+brew-cleanup:
+	cd brew && brew bundle cleanup --force
