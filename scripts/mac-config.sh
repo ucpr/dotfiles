@@ -64,3 +64,5 @@ defaults write com.apple.screencapture include-date -int 0
 defaults write com.apple.dock mru-spaces -boolean false
 # ライブ変換無効化
 defaults write com.apple.inputmethod.Kotoeri JIMPrefLiveConversionKey -boolean false
+# 
+defaults write -g NSWindowShouldDragOnGesture -bool true
