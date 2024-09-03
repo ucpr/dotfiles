@@ -9,4 +9,5 @@ vim.api.nvim_create_autocmd("FileType", {
 
 vim.cmd [[
   au BufRead,BufNewFile *.tf set filetype=hcl
+  autocmd BufNewFile,BufRead *.mdx set filetype=mdx
 ]]

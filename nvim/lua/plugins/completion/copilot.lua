@@ -2,11 +2,11 @@
 vim.g.copilot_filetypes = {
   gitcommit = true,
   markdown = true,
+  mdx = true,
   yaml = true,
   text = true,
 }
 vim.g.copilot_no_tab_map = true
-
 vim.keymap.set(
   "i",
   "<C-c>",
