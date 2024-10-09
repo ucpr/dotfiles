@@ -77,6 +77,7 @@ cask "postman"
 cask "obsidian"
 cask "alfred"
 cask "bitwarden"
+cask "readdle-spark"
 
 cask "font-hack-nerd-font"
 
