@@ -35,5 +35,9 @@ return {
     config = function()
       require('gitlinker').setup()
     end,
-  }
+  },
+  {
+    'jghauser/mkdir.nvim',
+    event = 'VimEnter',
+  },
 }
