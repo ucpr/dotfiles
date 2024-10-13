@@ -1,7 +1,8 @@
 return {
   'stevearc/oil.nvim',
   event = 'VimEnter',
-  setup = function()
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  config = function()
     require("oil").setup({
       -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
       -- Set to false if you still want to use netrw.
@@ -10,9 +11,9 @@ return {
       -- See :help oil-columns
       columns = {
         "icon",
-        -- "permissions",
-        -- "size",
-        -- "mtime",
+        "permissions",
+        "size",
+        "mtime",
       },
       -- Buffer-local options to use for oil buffers
       buf_options = {
@@ -179,7 +180,7 @@ return {
         border = "rounded",
       },
     })
- 
+
     vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
   end
 }
