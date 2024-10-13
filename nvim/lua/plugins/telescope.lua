@@ -9,6 +9,7 @@ return {
   },
   config = function()
     require("telescope").setup({
+      file_ignore_patterns = { "node_modules/", ".git", ".cache", ".venv", ".vscode", ".idea", ".DS_Store", "vendor/" },
       extensions = {
         fzf = {
           fuzzy = true,                   -- false will only do exact matching

@@ -1,9 +1,9 @@
 return {
   "hrsh7th/nvim-cmp",
-  event = "InsertEnter",
+  event = "VimEnter",
   dependencies = {
     "hrsh7th/cmp-buffer", -- source for text in buffer
-    "hrsh7th/cmp-path", -- source for file system paths
+    "hrsh7th/cmp-path",   -- source for file system paths
     "hrsh7th/cmp-nvim-lsp-document-symbol",
     "hrsh7th/cmp-nvim-lsp-signature-help",
     {
@@ -18,6 +18,7 @@ return {
     },
     "hrsh7th/cmp-vsnip",
     "onsails/lspkind.nvim", -- vs-code like pictogram
+    "hrsh7th/cmp-cmdline",
   },
   config = function()
     local cmp = require("cmp")
@@ -35,6 +36,16 @@ return {
 
 
     cmp.setup({
+      window = {
+        completion = cmp.config.window.bordered({
+          border = 'double',
+          winhighlight = "Normal:CmpNormal",
+        }),
+        documentation = cmp.config.window.bordered({
+          border = 'double',
+          winhighlight = "Normal:CmpDocNormal",
+        }),
+      },
       snippet = {
         expand = function(args)
           vim.fn["vsnip#anonymous"](args.body)
@@ -77,6 +88,27 @@ return {
         { name = "buffer" },
         { name = "path" },
       }),
+    })
+    -- `/` cmdline setup.
+    cmp.setup.cmdline('/', {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = {
+        { name = 'buffer' }
+      }
+    })
+    -- `:` cmdline setup.
+    cmp.setup.cmdline(':', {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = cmp.config.sources({
+        { name = 'path' }
+      }, {
+        {
+          name = 'cmdline',
+          option = {
+            ignore_cmds = { 'Man', '!' }
+          }
+        }
+      })
     })
 
     vim.cmd([[

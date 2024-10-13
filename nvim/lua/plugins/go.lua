@@ -1,23 +1,23 @@
 return {
   {
     'kyoh86/vim-go-coverage',
-    ft = {'go'},
+    ft = { 'go' },
   },
   {
     'mattn/vim-goaddtags',
-    ft = {'go'},
+    ft = { 'go' },
   },
   {
     'mattn/vim-goimpl',
-    ft = {'go'},
+    ft = { 'go' },
   },
   {
     'mattn/vim-gomod',
-    ft = {'go'},
+    ft = { 'go', 'gomod', 'gosum', 'gowork' },
   },
   {
     'mattn/vim-goimports',
-    ft = {'go'},
+    ft = { 'go' },
     config = function()
       vim.g.goimports = 1
     end,
