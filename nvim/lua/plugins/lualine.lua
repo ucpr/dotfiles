@@ -46,35 +46,35 @@ return {
           inactive = { c = { fg = colors.fg, bg = colors.bg } },
         },
       },
-      tabline = {
-        lualine_a = {
-          {
-            'buffers',
-            buffers_color = {
-              active = { fg = colors.blue, bg = colors.bg },
-              inactive = { fg = colors.fg, bg = colors.bg },
-            },
-            symbols = { modified = '_󰷥', alternate_file = ' ', directory = ' ' },
-          },
-        },
-        lualine_b = {},
-        lualine_c = {},
-        lualine_x = {
-          'filetype',
-        },
-        lualine_y = {
-          -- 'branch'
-        },
-        lualine_z = {
-          {
-            'tabs',
-            tabs_color = {
-              active = { fg = colors.blue, bg = colors.bg },
-              inactive = { fg = colors.fg, bg = colors.bg },
-            }
-          },
-        },
-      },
+      -- tabline = {
+      --   lualine_a = {
+      --     {
+      --       'buffers',
+      --       buffers_color = {
+      --         active = { fg = colors.blue, bg = colors.bg },
+      --         inactive = { fg = colors.fg, bg = colors.bg },
+      --       },
+      --       symbols = { modified = '_󰷥', alternate_file = ' ', directory = ' ' },
+      --     },
+      --   },
+      --   lualine_b = {},
+      --   lualine_c = {},
+      --   lualine_x = {
+      --     'filetype',
+      --   },
+      --   lualine_y = {
+      --     -- 'branch'
+      --   },
+      --   lualine_z = {
+      --     {
+      --       'tabs',
+      --       tabs_color = {
+      --         active = { fg = colors.blue, bg = colors.bg },
+      --         inactive = { fg = colors.fg, bg = colors.bg },
+      --       }
+      --     },
+      --   },
+      -- },
 
       sections = {
         -- these are to remove the defaults
