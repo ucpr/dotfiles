@@ -15,7 +15,7 @@ return {
 
       -- All the patterns used to detect root dir, when **"pattern"** is in
       -- detection_methods
-      patterns = { "go.mod", "init.lua", "Makefile", ".git", "Makefile", "package.json" },
+      patterns = { "go.mod", "init.lua", "Makefile", ".git", "Makefile", "package.json", "base" },
 
       -- Table of lsp clients to ignore by name
       -- eg: { "efm", ... }
