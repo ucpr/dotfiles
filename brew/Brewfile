@@ -74,10 +74,10 @@ cask "spectacle"
 cask "karabiner-elements"
 cask "google-drive"
 cask "postman"
-cask "obsidian"
 cask "alfred"
 cask "bitwarden"
 cask "readdle-spark"
+cask "chatgpt"
 
 cask "font-hack-nerd-font"
 
