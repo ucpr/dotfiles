@@ -78,6 +78,7 @@ cask "alfred"
 cask "bitwarden"
 cask "readdle-spark"
 cask "chatgpt"
+cask "vlc"
 
 cask "font-hack-nerd-font"
 
