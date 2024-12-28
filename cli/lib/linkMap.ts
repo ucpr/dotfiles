@@ -55,7 +55,7 @@ const linkMap: LinkMap = new Map([
   }],
   ["k9s", {
     target: join(dotfilesDir, "k9s"),
-    symlink: join(home, ".k9s"),
+    symlink: join(home, ".config", "k9s"),
     platform: "common",
   }],
   ["gitconfig", {
