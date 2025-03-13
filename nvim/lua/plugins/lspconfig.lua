@@ -71,7 +71,9 @@ return {
           opts = {
             settings = {
               gopls = {
-                env = { GOFLAGS = "-tags=integration,!integration,wireinject" },
+                env = {
+                  GOFLAGS = "-tags=integration,wireinject",
+                },
                 gofumpt = true,
                 analyses = {
                   unusedparams = true,
