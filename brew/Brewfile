@@ -80,6 +80,7 @@ cask "readdle-spark"
 cask "chatgpt"
 cask "vlc"
 cask "craft"
+cask "claude"
 
 cask "font-hack-nerd-font"
 
