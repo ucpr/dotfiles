@@ -18,7 +18,7 @@ jobs:
      - name: Checkout repo
        uses: actions/checkout@v4.2.2
      - name: Setup Deno
-       uses: denoland/setup-deno@v2.0.2
+       uses: denoland/setup-deno@v2.0.3
        with:
          deno-version: ${{ matrix.version }}
      - name: Run setup
