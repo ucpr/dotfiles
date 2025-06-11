@@ -4,3 +4,6 @@ nodejs = ['latest']
 rust = ['latest']
 terraform = ['latest']
 neovim = ['v0.10.2']
+
+[settings]
+idiomatic_version_file_enable_tools = ["node"]
