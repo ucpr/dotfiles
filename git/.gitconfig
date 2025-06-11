@@ -39,6 +39,7 @@
   graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short  --decorate --graph --branches --tags --remotes
   ucat = !"git ls-files --others --exclude-standard | xargs bat"
   fixup = commit --amend -C HEAD
+  work = "!zsh -i -c git-worktree-switcher"
 [fetch]
   prune = true
 [pull]
