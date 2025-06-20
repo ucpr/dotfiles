@@ -86,7 +86,7 @@ return {
           settings = {
             gopls = {
               env = {
-                GOFLAGS = "-tags=integration,wireinject",
+                GOFLAGS = "-tags=integration,wireinject,!integration",
               },
               gofumpt = true,
               analyses = {

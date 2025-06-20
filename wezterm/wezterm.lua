@@ -47,6 +47,24 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
+-- Claude Code のタスクが完了したら OS 通知を飛ばす
+wezterm.on('bell', function(window, pane)
+  local function get_tab_id(window, pane)
+    local mux_window = window:mux_window()
+    for i, tab_info in ipairs(mux_window:tabs_with_info()) do
+      for _, p in ipairs(tab_info.tab:panes()) do
+        if p:pane_id() == pane:pane_id() then
+          return i
+        end
+      end
+    end
+  end
+  local tab_title = pane:get_title() or "Unknown Tab"
+
+  local tab_id = get_tab_id(window, pane)
+  window:toast_notification('Claude Code', 'Task completed (tab=' .. tab_title .. ', tab_id=' .. tab_id .. ')', nil, 4000)
+end)
+
 return {
   color_scheme = 'One Dark (Gogh)',
   use_ime = true,
@@ -57,10 +75,10 @@ return {
   -- show_new_tab_button_in_tab_bar = false,
   -- show_close_tab_button_in_tabs = false,
   colors = {
-   tab_bar = {
-     inactive_tab_edge = "none",
-   },
- },
+    tab_bar = {
+      inactive_tab_edge = "none",
+    },
+  },
   window_padding = {
     left = 0,
     right = 0,
