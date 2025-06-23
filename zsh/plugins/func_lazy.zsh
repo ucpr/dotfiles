@@ -39,3 +39,59 @@ git-worktree-switcher() {
         fi
     fi
 }
+
+osascript-system-notify() {
+    local title="${1:-Notification}"
+    local message="${2:-Message}"
+    local subtitle="${3:-}"
+    local sound="${4:-}"
+    
+    # Check if terminal-notifier is available
+    if command -v terminal-notifier &> /dev/null; then
+        # Use terminal-notifier for better notification features
+        local cmd="terminal-notifier -title \"$title\" -message \"$message\""
+        
+        if [[ -n "$subtitle" ]]; then
+            cmd="$cmd -subtitle \"$subtitle\""
+        fi
+        
+        if [[ -n "$sound" ]]; then
+            cmd="$cmd -sound \"$sound\""
+        fi
+        
+        # Add action to open WezTerm when clicked
+        cmd="$cmd -activate \"com.github.wez.wezterm\""
+        
+        eval "$cmd"
+    else
+        # Fallback to AppleScript
+        # Escape special characters for AppleScript
+        escape_applescript() {
+            local str="$1"
+            # Escape backslashes first, then double quotes
+            str="${str//\\/\\\\}"
+            str="${str//\"/\\\"}"
+            echo "$str"
+        }
+        
+        title=$(escape_applescript "$title")
+        message=$(escape_applescript "$message")
+        
+        local script="display notification \"$message\" with title \"$title\""
+        
+        if [[ -n "$subtitle" ]]; then
+            subtitle=$(escape_applescript "$subtitle")
+            script="$script subtitle \"$subtitle\""
+        fi
+        
+        if [[ -n "$sound" ]]; then
+            # Sound names should be validated against a whitelist
+            # Common system sounds: Basso, Blow, Bottle, Frog, Funk, Glass, Hero, Morse, Ping, Pop, Purr, Sosumi, Submarine, Tink
+            sound=$(escape_applescript "$sound")
+            script="$script sound name \"$sound\""
+        fi
+        
+        # Use printf to safely pass the script to osascript
+        printf '%s' "$script" | osascript
+    fi
+}
