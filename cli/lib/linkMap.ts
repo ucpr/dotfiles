@@ -86,6 +86,11 @@ const linkMap: LinkMap = new Map([
     symlink: join(home, ".config", "karabiner"),
     platform: "darwin",
   }],
+  ["claude", {
+    target: join(dotfilesDir, "claude"),
+    symlink: join(home, ".config", "claude"),
+    platform: "common",
+  }],
 ]);
 
 export { dotfilesDir, home, linkMap };
