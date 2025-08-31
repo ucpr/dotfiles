@@ -1,6 +1,6 @@
 return {
   'Wansmer/treesj',
-  keys = { '<space>m', '<space>j', '<space>s' },
+  keys = { '<space>m' },
   -- cmd = { 'TSJToggle', 'TSJSplit', 'TSJJoin' },
   config = function()
     require('treesj').setup({
