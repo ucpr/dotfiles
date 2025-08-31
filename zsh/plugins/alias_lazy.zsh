@@ -19,3 +19,5 @@ alias python='python3'
 
 alias propen='gh pr view --web'
 alias prcreate='gh pr create -a @me -f -d && gh pr view --web'
+
+alias devclaude="devcontainer up --workspace-folder . --config ~/.config/devcontainer/claude/devcontainer.json && devcontainer exec --workspace-folder . --config ~/.config/devcontainer/claude/devcontainer.json claude"
