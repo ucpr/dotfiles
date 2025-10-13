@@ -64,3 +64,6 @@ end
 --   set guicursor=n-v-c-sm:block-Cursor
 --   set guicursor+=i:ver25-CursorInsert
 -- ]]
+
+
+vim.env.XDG_STATE_HOME = '/tmp'

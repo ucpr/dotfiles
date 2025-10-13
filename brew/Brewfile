@@ -81,6 +81,7 @@ cask "chatgpt"
 cask "vlc"
 cask "craft"
 cask "claude"
+cask "monitorcontrol"
 
 cask "font-hack-nerd-font"
 
