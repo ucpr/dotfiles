@@ -68,9 +68,7 @@ end)
 return {
   color_scheme = 'One Dark (Gogh)',
   use_ime = true,
-  -- font = wezterm.font "Hack Nerd Font",
-  font = wezterm.font "Monaspace Radon",
-  -- font = wezterm.font "Monaspace Neon",
+  font = wezterm.font "JetBrains Mono",
   font_size = 15.0,
   window_decorations = "RESIZE",
   hide_tab_bar_if_only_one_tab = true,

@@ -1,4 +1,9 @@
-{pkgs, ...}: {
+{ pkgs, user, ... }: {
+  users.users.${user} = {
+    name = user;
+    home = "/Users/${user}";
+  };
+
   nix = {
     optimise.automatic = true;
     settings = {
@@ -7,10 +12,9 @@
     };
   };
 
-
   system = {
     stateVersion = 6;
-    primaryUser = "ucpr";
+    primaryUser = user;
 
     defaults = {
       NSGlobalDomain = {
@@ -88,26 +92,33 @@
       autoUpdate = true;
       cleanup = "uninstall";
     };
+    brews = [
+      "tree-sitter-cli"
+      "mise"
+      "sheldon"
+    ];
     casks = [
       "1password"
       "1password-cli"
+      "codex"
       "google-chrome"
       "google-japanese-ime"
-      "google-cloud-sdk"
       "google-drive"
+      "gcloud-cli"
       "discord"
       "slack"
-      "docker"
+      "docker-desktop"
       "visual-studio-code"
       "spotify"
       "zoom"
-      "wireshark"
+      "wireshark-app"
       "wezterm"
       "notion"
       "notion-calendar"
       "rectangle"
       "karabiner-elements"
       "alfred"
+      "font-jetbrains-mono"
     ];
   };
 }

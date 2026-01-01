@@ -3,24 +3,41 @@ HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
 
-# use compiled zshrc
-ZSHRC_DIR=${${(%):-%N}:A:h}
-function source { # override source command
-  ensure_zcompiled $1
-  builtin source $1
+# cache directory for zwc files
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+ZSH_ZWC_CACHE_DIR="$XDG_CACHE_HOME/zsh/zwc"
+mkdir -p "$ZSH_ZWC_CACHE_DIR"
+
+function _zwc_cache_path() {
+  local src="$1"
+  local key="${src:A}"
+  key="${key//\//-}"
+  key="${key//[^A-Za-z0-9._-]/_}"
+  echo "$ZSH_ZWC_CACHE_DIR/${key}.zwc"
 }
+
 function ensure_zcompiled {
-  local compiled="$1.zwc"
-  if [[ ! -r "$compiled" || "$1" -nt "$compiled" ]]; then
-    echo "\033[1;36mCompiling\033[m $1"
-    zcompile $1
+  local src="$1"
+  local zwc="$(_zwc_cache_path "$src")"
+
+  if [[ ! -r "$zwc" || "$src" -nt "$zwc" ]]; then
+    echo "\033[1;36mCompiling\033[m $src"
+    # output file is the first arg (no -o)
+    zcompile "$zwc" "$src"
   fi
 }
+
+# override source command (compile to cache, then source normally)
+function source {
+  ensure_zcompiled "$1"
+  builtin source "$1"
+}
+
+# pre-compile zshrc itself
 ensure_zcompiled ~/.zshrc
 
 # common settings
 export PATH="/opt/homebrew/bin:$PATH"
-export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 
 # sheldon settings
