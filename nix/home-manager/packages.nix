@@ -8,5 +8,6 @@
     fzf
     neovim
     tree
+    delta
   ];
 }
