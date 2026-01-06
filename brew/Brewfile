@@ -53,6 +53,7 @@ brew "oven-sh/bun/bun"
 brew "bazelisk"
 brew "helm"
 brew "opa"
+brew "k1LoW/tap/git-wt"
 
 cask "google-cloud-sdk"
 cask "1password"
