@@ -14,6 +14,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias date='gdate'
+alias gw='git_wt_fzf'
 
 alias python='python3'
 

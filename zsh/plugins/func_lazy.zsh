@@ -6,38 +6,34 @@ gignore() {
     curl -L -s "https://www.gitignore.io/api/$@"
 }
 
-git-worktree-switcher() {
-    if ! git rev-parse --git-dir > /dev/null 2>&1; then
-        echo "Not in a git repository"
-        return 1
-    fi
+git_wt_fzf() {
+  local line target key
 
-    local worktrees=$(git worktree list | awk '{print $1}')
-    local selected=$(echo "$worktrees" | fzf --prompt="Select worktree (ESC to create new): " --header="Git Worktrees" --preview="git -C {} log --oneline -n 10" --preview-window=right:50%)
+  line="$(git wt | tail -n +2 | fzf --ansi \
+    --prompt='git wt> ' \
+    --header=$'ENTER: switch/create   CTRL-D: delete(safe)   CTRL-X: delete(force)   CTRL-N: new\nESC: cancel' \
+    --expect=enter,ctrl-d,ctrl-x,ctrl-n
+  )" || return
 
-    if [[ -n "$selected" ]]; then
-        cd "$selected"
-    else
-        echo -n "Enter branch name for new worktree: "
-        read branch_name
-        if [[ -z "$branch_name" ]]; then
-            echo "Branch name cannot be empty"
-            return 1
-        fi
+  key="$(printf '%s\n' "$line" | head -n1)"
+  target="$(printf '%s\n' "$line" | tail -n1 | awk '{print $(NF-1)}')"
 
-        echo -n "Enter path for new worktree (default: ../$branch_name): "
-        read worktree_path
-        if [[ -z "$worktree_path" ]]; then
-            worktree_path="../$branch_name"
-        fi
-
-        if git worktree add "$worktree_path" -b "$branch_name"; then
-            cd "$worktree_path"
-        else
-            echo "Failed to create worktree"
-            return 1
-        fi
-    fi
+  case "$key" in
+    ctrl-n)
+      printf "new branch/worktree name: "
+      read -r target
+      [ -n "$target" ] && git wt "$target"
+      ;;
+    ctrl-d)
+      [ -n "$target" ] && git wt -d "$target"
+      ;;
+    ctrl-x)
+      [ -n "$target" ] && git wt -D "$target"
+      ;;
+    enter|"")
+      [ -n "$target" ] && git wt "$target"
+      ;;
+  esac
 }
 
 osascript-system-notify() {
