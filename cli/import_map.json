@@ -1,9 +1,0 @@
-{
-  "imports": {
-    "std/": "https://deno.land/std@0.177.1/",
-    "compress": "https://deno.land/x/compress@v0.4.4/mod.ts",
-    "cliffy/command": "https://deno.land/x/cliffy@v0.25.7/command/mod.ts",
-    "cliffy/table": "https://deno.land/x/cliffy@v0.25.7/table/mod.ts",
-    "lib/": "./lib/"
-  }
-}
