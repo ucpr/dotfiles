@@ -11,5 +11,6 @@
     delta
     ghq
     deno
+    wget
   ];
 }
