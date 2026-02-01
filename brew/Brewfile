@@ -83,6 +83,7 @@ cask "craft"
 cask "claude"
 cask "monitorcontrol"
 cask "nani"
+cask "homerow"
 
 cask "font-hack-nerd-font"
 
