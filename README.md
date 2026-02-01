@@ -9,3 +9,9 @@ $ git clone https://github.com/ucpr/dotfiles
 $ cd ~/dotfiles
 $ make setup
 ```
+
+## Nix
+
+```bash
+sudo HOME=$HOME NIX_USER=username nix run nix-darwin -- switch --flake .#mac --impure
+```

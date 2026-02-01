@@ -5,11 +5,7 @@
   };
 
   nix = {
-    optimise.automatic = true;
-    settings = {
-      experimental-features = "nix-command flakes";
-      max-jobs = 8;
-    };
+    enable = false;  # Determinate Nix を使用するため無効化
   };
 
   system = {
