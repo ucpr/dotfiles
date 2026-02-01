@@ -1,27 +1,19 @@
 return {
   "mason-org/mason.nvim",
-  version = "v1.32.0",
   dependencies = {
-    {
-      "williamboman/mason-lspconfig.nvim",
-      version = "v1.32.0",
-    },
-    {
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
-      commit = "4aa03a08c3705e622f2e7886783fd450f7749cdd",
-    },
+    "mason-org/mason-lspconfig.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
   },
   config = function()
     require("mason").setup()
 
+    -- mason-lspconfig v2.0.0+ ではMasonでインストールしたサーバーが自動有効化される
     require("mason-lspconfig").setup({
-      automatic_installation = true,
       ensure_installed = {
         "cssls",
         "eslint",
         "html",
         "jsonls",
-        -- "tsserver",
         "pyright",
         "tailwindcss",
       },
@@ -43,7 +35,7 @@ return {
         'shellcheck',
       },
       integrations = {
-        ['mason-lspconfig'] = true,
+        ['mason-lspconfig'] = false,
         ['mason-null-ls'] = false,
         ['mason-nvim-dap'] = false,
       },
