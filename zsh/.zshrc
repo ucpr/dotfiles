@@ -4,25 +4,19 @@ HISTSIZE=1000000
 SAVEHIST=1000000
 
 # cache directory for zwc files
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-ZSH_ZWC_CACHE_DIR="$XDG_CACHE_HOME/zsh/zwc"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+ZSH_ZWC_CACHE_DIR="$XDG_CONFIG_HOME/.cache/zsh/zwc"
 mkdir -p "$ZSH_ZWC_CACHE_DIR"
 
-function _zwc_cache_path() {
+function ensure_zcompiled {
   local src="$1"
   local key="${src:A}"
   key="${key//\//-}"
   key="${key//[^A-Za-z0-9._-]/_}"
-  echo "$ZSH_ZWC_CACHE_DIR/${key}.zwc"
-}
-
-function ensure_zcompiled {
-  local src="$1"
-  local zwc="$(_zwc_cache_path "$src")"
+  local zwc="$ZSH_ZWC_CACHE_DIR/${key}.zwc"
 
   if [[ ! -r "$zwc" || "$src" -nt "$zwc" ]]; then
     echo "\033[1;36mCompiling\033[m $src"
-    # output file is the first arg (no -o)
     zcompile "$zwc" "$src"
   fi
 }
@@ -38,7 +32,6 @@ ensure_zcompiled ~/.zshrc
 
 # common settings
 export PATH="/opt/homebrew/bin:$PATH"
-export XDG_CONFIG_HOME="$HOME/.config"
 
 # sheldon settings
 # eval "$(sheldon source)"
