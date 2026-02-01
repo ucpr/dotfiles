@@ -21,6 +21,7 @@
       user =
         let u = builtins.getEnv "NIX_USER";
         in if u != "" then u else "ucpr";
+      pkgs = nixpkgs.legacyPackages.${system};
     in
     {
       darwinConfigurations = {
@@ -32,6 +33,16 @@
             ./nix/nix-darwin/default.nix
             home-manager.darwinModules.home-manager
             ./nix/home-manager/default.nix
+          ];
+        };
+      };
+
+      homeConfigurations = {
+        mac = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = { inherit inputs user system; };
+          modules = [
+            ./nix/home-manager/home.nix
           ];
         };
       };

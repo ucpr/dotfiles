@@ -9,5 +9,6 @@
     neovim
     tree
     delta
+    ghq
   ];
 }
