@@ -10,5 +10,6 @@
     tree
     delta
     ghq
+    deno
   ];
 }
