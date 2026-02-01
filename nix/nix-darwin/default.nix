@@ -96,7 +96,6 @@
     casks = [
       "1password"
       "1password-cli"
-      "codex"
       "google-chrome"
       "google-japanese-ime"
       "google-drive"
@@ -114,6 +113,12 @@
       "rectangle"
       "karabiner-elements"
       "alfred"
+      "bitwarden"
+      "craft"
+      "claude"
+      "nani"
+      "homerow"
+      "chatgpt"
       "font-jetbrains-mono"
     ];
   };
