@@ -12,5 +12,6 @@
     ghq
     deno
     wget
+    bun
   ];
 }

@@ -6,7 +6,5 @@ terraform = ['latest']
 neovim = "v0.11.4"
 node = "latest"
 
-"npm:@anthropic-ai/claude-code" = "latest"
-
 [settings]
 idiomatic_version_file_enable_tools = ["node"]

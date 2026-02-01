@@ -10,3 +10,4 @@ export VISUAL=nvim
 export EDITOR=nvim
 
 export CLAUDE_CONFIG_DIR="${HOME}/.config/claude/"
+export PATH="$HOME/.local/bin:$PATH"
