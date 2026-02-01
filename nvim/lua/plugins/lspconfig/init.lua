@@ -9,9 +9,11 @@ end
 
 return {
   "neovim/nvim-lspconfig",
-  event = { "BufReadPre", "BufNewFile" },
+  lazy = false, -- LSPは遅延読み込みしない
   dependencies = {
     "hrsh7th/cmp-nvim-lsp",
+    "mason-org/mason.nvim",
+    "mason-org/mason-lspconfig.nvim",
     {
       "folke/lazydev.nvim",
       ft = "lua",
@@ -33,13 +35,17 @@ return {
       vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
     end
 
+    local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
     -- 全サーバー共通設定
     vim.lsp.config("*", {
-      capabilities = require("cmp_nvim_lsp").default_capabilities(),
+      capabilities = capabilities,
     })
 
-    -- 個別サーバー設定
-    vim.lsp.config("gopls", load_lsp_config("gopls"))
+    -- 個別サーバー設定（gopls）
+    local gopls_config = load_lsp_config("gopls")
+    gopls_config.capabilities = capabilities
+    vim.lsp.config("gopls", gopls_config)
 
     -- LspAttach でキーマップを設定
     vim.api.nvim_create_autocmd("LspAttach", {
