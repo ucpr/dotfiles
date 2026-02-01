@@ -32,4 +32,6 @@ require("lazy").setup({
 	-- install = { colorscheme = { "habamax" } },
 	-- automatically check for plugin updates
   checker = { enabled = true, notify = false },
+  -- Use writable path for lockfile (Nix store is read-only)
+  lockfile = vim.fn.stdpath("data") .. "/lazy-lock.json",
 })
