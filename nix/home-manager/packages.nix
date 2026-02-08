@@ -13,5 +13,9 @@
     deno
     wget
     bun
+    kubectx
+    k9s
+    kustomize
+    fastfetch
   ];
 }

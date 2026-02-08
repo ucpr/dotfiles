@@ -92,6 +92,8 @@
       "tree-sitter-cli"
       "mise"
       "sheldon"
+      "git-lfs"
+      "bazelisk"
     ];
     casks = [
       "1password"
@@ -120,6 +122,7 @@
       "homerow"
       "chatgpt"
       "font-jetbrains-mono"
+      "codex-app"
     ];
   };
 }
