@@ -1,4 +1,4 @@
-FROM denoland/deno:2.7.3
+FROM denoland/deno:2.7.4
 
 WORKDIR config
 
