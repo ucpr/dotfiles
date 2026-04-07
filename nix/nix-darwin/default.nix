@@ -94,6 +94,7 @@
       "sheldon"
       "git-lfs"
       "bazelisk"
+      # "codex"
     ];
     casks = [
       "1password"
@@ -122,7 +123,7 @@
       "homerow"
       "chatgpt"
       "font-jetbrains-mono"
-      "codex-app"
+      # "codex-app"
     ];
   };
 }
