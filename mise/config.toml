@@ -3,7 +3,7 @@ go = ['latest']
 nodejs = ['latest']
 rust = ['latest']
 terraform = ['latest']
-neovim = "v0.11.4"
+neovim = "v0.12.1"
 node = "latest"
 
 [settings]
