@@ -20,11 +20,16 @@
         AppleShowScrollBars = "WhenScrolling";
         AppleEnableMouseSwipeNavigateWithScrolls = true;
         AppleEnableSwipeNavigateWithScrolls = true;
+        NSAutomaticWindowAnimationsEnabled = false;
+        NSWindowResizeTime = 0.001;
         NSDocumentSaveNewDocumentsToCloud = false;
         NSStatusItemSpacing = 2;
         NSTableViewDefaultSizeMode = 1;
         "com.apple.sound.beep.volume" = 0.001;
         "com.apple.trackpad.scaling" = 3.0;
+      };
+      universalaccess = {
+        reduceMotion = true;
       };
       ".GlobalPreferences" = {
         "com.apple.mouse.scaling" = 1.0;
@@ -66,6 +71,7 @@
         autohide = true;
         autohide-delay = 1.0;
         autohide-time-modifier = 1.0;
+        expose-animation-duration = 0.0;
         show-recents = false;
         orientation = "bottom";
         tilesize = 32;
@@ -88,12 +94,17 @@
       autoUpdate = true;
       cleanup = "uninstall";
     };
+    taps = [
+      "nikitabobko/tap"
+      "FelixKratz/formulae"
+    ];
     brews = [
       "tree-sitter-cli"
       "mise"
       "sheldon"
       "git-lfs"
       "bazelisk"
+      "borders"
       # "codex"
     ];
     casks = [
@@ -123,6 +134,8 @@
       "homerow"
       "chatgpt"
       "font-jetbrains-mono"
+      "nikitabobko/tap/aerospace"
+      "alt-tab"
       # "codex-app"
     ];
   };
