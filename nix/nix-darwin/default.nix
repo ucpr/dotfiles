@@ -28,9 +28,9 @@
         "com.apple.sound.beep.volume" = 0.001;
         "com.apple.trackpad.scaling" = 3.0;
       };
-      universalaccess = {
-        reduceMotion = true;
-      };
+#      universalaccess = {
+#        reduceMotion = true;
+#      };
       ".GlobalPreferences" = {
         "com.apple.mouse.scaling" = 1.0;
       };
