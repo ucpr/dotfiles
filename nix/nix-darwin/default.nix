@@ -136,7 +136,7 @@
       "font-jetbrains-mono"
       "nikitabobko/tap/aerospace"
       "alt-tab"
-      # "codex-app"
+      "codex-app"
     ];
   };
 }
