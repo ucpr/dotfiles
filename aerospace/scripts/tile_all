@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+ws="$(aerospace list-workspaces --focused)"
+[ -z "$ws" ] && exit 0
+
+aerospace list-windows --workspace "$ws" \
+| awk -F' *\| *' '{print $1}' \
+| xargs -n1 aerospace layout tiling --window-id
