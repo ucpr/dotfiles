@@ -22,6 +22,10 @@
   xdg.configFile."mise".source = ../../mise;
   # ~/.config/karabiner
   xdg.configFile."karabiner".source = ../../karabiner;
+  # ~/.config/aerospace
+  xdg.configFile."aerospace".source = ../../aerospace;
+  # ~/.config/borders
+  xdg.configFile."borders".source = ../../borders;
   # ~/.config/claude
   # xdg.configFile."claude".source = ../../claude;
 }
