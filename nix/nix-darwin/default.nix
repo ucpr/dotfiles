@@ -105,6 +105,7 @@
       "git-lfs"
       "bazelisk"
       "borders"
+      "k1LoW/tap/mo"
       # "codex"
     ];
     casks = [
