@@ -5,6 +5,7 @@ rust = ['latest']
 terraform = ['latest']
 neovim = "v0.12.1"
 node = "latest"
+zig = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]

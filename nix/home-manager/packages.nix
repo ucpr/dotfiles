@@ -17,5 +17,7 @@
     k9s
     kustomize
     fastfetch
+    awscli
+    tailscale
   ];
 }
