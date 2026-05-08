@@ -19,5 +19,6 @@
     fastfetch
     awscli
     tailscale
+    ast-grep
   ];
 }
