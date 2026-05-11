@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -n "${CI:-}" ]; then
+  exit 0
+fi
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "pre-commit: docker not found, skipping secretlint" >&2
+  exit 0
+fi
+
+files=()
+while IFS= read -r -d '' f; do
+  files+=("$f")
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+if [ ${#files[@]} -eq 0 ]; then
+  exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+docker run \
+  -v "${repo_root}:${repo_root}" \
+  -w "${repo_root}" \
+  --rm -i \
+  secretlint/secretlint:v5.1.1 \
+  secretlint "${files[@]}"
+
+docker run \
+  -v "${repo_root}:/path" \
+  --rm \
+  zricethezav/gitleaks:latest \
+  protect --staged --source=/path --redact --verbose
