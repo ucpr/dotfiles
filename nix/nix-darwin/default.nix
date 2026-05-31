@@ -8,6 +8,8 @@
     enable = false;  # Determinate Nix を使用するため無効化
   };
 
+  services.tailscale.enable = true;
+
   system = {
     stateVersion = 6;
     primaryUser = user;
