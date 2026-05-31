@@ -138,6 +138,7 @@
       "nikitabobko/tap/aerospace"
       "alt-tab"
       "codex-app"
+      "codex"
       "openvpn-connect"
       "flutter"
     ];
