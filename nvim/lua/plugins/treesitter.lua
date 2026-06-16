@@ -60,6 +60,9 @@ return {
 
         vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
         require('treesitter-context').setup {
+          on_attach = function(bufnr)
+            return vim.bo[bufnr].filetype ~= "markdown"
+          end,
           patterns = {
             default = {
               'class',
