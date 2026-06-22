@@ -44,5 +44,52 @@ return {
       --    enable = false,
       --},
     })
+
+    local function complete_git_refs(arg_lead)
+      local refs = vim.fn.systemlist({
+        "git",
+        "for-each-ref",
+        "--format=%(refname:short)",
+        "refs/heads",
+        "refs/remotes",
+      })
+      if vim.v.shell_error ~= 0 then
+        return {}
+      end
+
+      return vim.tbl_filter(function(ref)
+        return vim.startswith(ref, arg_lead)
+      end, refs)
+    end
+
+    vim.api.nvim_create_user_command("GitCompareBase", function(args)
+      local base = args.args ~= "" and args.args or "origin/main"
+      gitsigns.change_base(base, true)
+      vim.notify("Gitsigns base: " .. base)
+    end, {
+      nargs = "?",
+      complete = complete_git_refs,
+      desc = "Show gitsigns against a base revision",
+    })
+
+    vim.api.nvim_create_user_command("GitCompareMain", function()
+      gitsigns.change_base("origin/main", true)
+      vim.notify("Gitsigns base: origin/main")
+    end, {
+      desc = "Show gitsigns against origin/main",
+    })
+
+    vim.api.nvim_create_user_command("GitCompareReset", function()
+      gitsigns.reset_base(true)
+      vim.notify("Gitsigns base reset")
+    end, {
+      desc = "Reset gitsigns base",
+    })
+
+    vim.api.nvim_create_user_command("GitPreviewHunkInline", function()
+      gitsigns.preview_hunk_inline()
+    end, {
+      desc = "Preview current gitsigns hunk inline",
+    })
   end,
 }
