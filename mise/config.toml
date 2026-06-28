@@ -6,6 +6,7 @@ terraform = ['latest']
 neovim = "v0.12.1"
 node = "latest"
 zig = "latest"
+python = "3.12"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
