@@ -1,6 +1,7 @@
 return {
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPre", "BufNewFile" },
+    branch = "main",
+    lazy = false,
     build = ":TSUpdate",
     dependencies = {
         "windwp/nvim-ts-autotag",
@@ -8,54 +9,74 @@ return {
         "nvim-treesitter/nvim-treesitter-context",
     },
     opts = {
-      highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-      },
-      indent = { enable = true },
-      autotag = {
-          enable = true,
-      },
-      ensure_installed = {
-          "json",
-          "javascript",
-          "typescript",
-          "tsx",
-          "yaml",
-          "html",
-          "css",
-          "markdown",
-          "markdown_inline",
-          "bash",
-          "lua",
-          "vim",
-          "dockerfile",
-          "gitignore",
-          "c",
-          "rust",
-          "go",
-      },
-      incremental_selection = {
-          enable = true,
-          keymaps = {
-              init_selection = "<C-space>",
-              node_incremental = "<C-space>",
-              scope_incremental = false,
-              node_decremental = "<bs>",
-          },
-      },
-      rainbow = {
-          enable = true,
-          disable = { "html" },
-          extended_mode = false,
-          max_file_lines = nil,
-      },
-      context_commentstring = {
-          enable = true,
-          enable_autocmd = false,
-      },
+        install_dir = vim.fn.stdpath("data") .. "/site",
+        parsers = {
+            "bash",
+            "css",
+            "dockerfile",
+            "gitignore",
+            "go",
+            "html",
+            "javascript",
+            "json",
+            "rust",
+            "tsx",
+            "typescript",
+            "yaml",
+        },
+        highlight_filetypes = {
+            "bash",
+            "c",
+            "css",
+            "dockerfile",
+            "gitignore",
+            "go",
+            "html",
+            "javascript",
+            "javascriptreact",
+            "json",
+            "lua",
+            "rust",
+            "sh",
+            "tsx",
+            "typescript",
+            "typescriptreact",
+            "vim",
+            "yaml",
+        },
     },
-    config = function()
+    config = function(_, opts)
+        local ok, treesitter = pcall(require, "nvim-treesitter")
+        if ok and treesitter.setup then
+            treesitter.setup {
+                install_dir = opts.install_dir,
+            }
+            vim.api.nvim_create_user_command("TSInstallConfigured", function()
+                treesitter.install(opts.parsers)
+            end, {})
+
+            local group = vim.api.nvim_create_augroup("UserTreesitterStart", { clear = true })
+            vim.api.nvim_create_autocmd("FileType", {
+                group = group,
+                pattern = opts.highlight_filetypes,
+                callback = function(ev)
+                    pcall(vim.treesitter.start, ev.buf)
+                    vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end,
+            })
+        else
+            require("nvim-treesitter.configs").setup {
+                ensure_installed = opts.parsers,
+                highlight = {
+                    enable = true,
+                    disable = { "markdown" },
+                    additional_vim_regex_highlighting = false,
+                },
+                indent = { enable = true },
+            }
+        end
+
+        require("nvim-ts-autotag").setup()
         require('hlargs').setup()
 
         vim.cmd("hi TreesitterContextBottom gui=underline guisp=Grey")
