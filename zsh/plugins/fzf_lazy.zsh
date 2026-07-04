@@ -34,6 +34,88 @@ ghq-fzf() {
 zle -N ghq-fzf
 bindkey '^p' ghq-fzf
 
+wezterm-workspace-fzf() {
+  local result action workspace answer current_pane
+  local -a pane_ids
+
+  if ! command -v wezterm >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+    zle -R -c
+    return 1
+  fi
+
+  result=$(
+    wezterm cli list --format json |
+      jq -r '
+        sort_by(.workspace)
+        | group_by(.workspace)[]
+        | .[0].workspace + "\t" + (length | tostring) + " panes\t" + ((map(select(.is_active == true))[0].title // .[0].title // ""))
+      ' |
+      fzf --no-multi \
+        --delimiter=$'\t' \
+        --prompt="WezTerm Workspace > " \
+        --header=$'ENTER: switch   CTRL-N: create from query   CTRL-D: delete selected\nESC: cancel' \
+        --bind 'enter:become(printf "%s\t%s\n" switch {1})' \
+        --bind 'ctrl-n:become(printf "%s\t%s\n" create {q})' \
+        --bind 'ctrl-d:become(printf "%s\t%s\n" delete {1})'
+  ) || {
+    zle -R -c
+    return 0
+  }
+
+  action="${result%%$'\t'*}"
+  workspace="${result#*$'\t'}"
+
+  case "$action" in
+    create)
+      workspace=$(printf '%s' "$workspace" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      if [[ -n "$workspace" ]]; then
+        wezterm-switch-workspace "$workspace"
+      fi
+      ;;
+    switch)
+      if [[ -n "$workspace" ]]; then
+        wezterm-switch-workspace "$workspace"
+      fi
+      ;;
+    delete)
+      if [[ -n "$workspace" ]]; then
+        print -n -- "Delete WezTerm workspace '$workspace' by closing all panes? [y/N] "
+        read -q answer
+        print
+        if [[ "$answer" == [yY] ]]; then
+          current_pane="${WEZTERM_PANE:-}"
+          pane_ids=("${(@f)$(
+            wezterm cli list --format json |
+              jq -r --arg workspace "$workspace" --arg current_pane "$current_pane" '
+                map(select(.workspace == $workspace))
+                | sort_by(if (.pane_id | tostring) == $current_pane then 1 else 0 end)
+                | .[].pane_id
+              '
+          )}")
+          for pane_id in "${pane_ids[@]}"; do
+            wezterm cli kill-pane --pane-id "$pane_id"
+          done
+        fi
+      fi
+      ;;
+  esac
+
+  zle -R -c
+}
+zle -N wezterm-workspace-fzf
+bindkey '^S' wezterm-workspace-fzf
+bindkey -M viins '^S' wezterm-workspace-fzf
+bindkey -M vicmd '^S' wezterm-workspace-fzf
+
+wezterm-switch-workspace() {
+  local workspace="$1"
+  local payload encoded
+
+  payload="${workspace}"$'\t'"${PWD}"$'\t'"$$-${RANDOM}"
+  encoded=$(printf '%s' "$payload" | base64 | tr -d '\n')
+  printf '\033]1337;SetUserVar=switch_workspace=%s\007' "$encoded"
+}
+
 # 現在のブランチで変更されたファイル（コミット済み含む）を選択
 uncommited-staged-files() {
   # local f=$(git diff --name-only --diff-filter=d | awk '{print}' | fzf --preview 'f(){ sh -c "head -n 100 $1"}; f {}' | xargs echo)

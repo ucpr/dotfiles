@@ -59,6 +59,35 @@ wezterm.on("update-right-status", function(window, _)
 	}))
 end)
 
+wezterm.on("user-var-changed", function(window, pane, name, value)
+	if name ~= "switch_workspace" then
+		return
+	end
+
+	local workspace, cwd = value:match("^([^\t]+)\t([^\t]*)")
+	if not workspace then
+		workspace = value
+		cwd = ""
+	end
+	if not workspace or workspace == "" then
+		return
+	end
+
+	if pcall(wezterm.mux.set_active_workspace, workspace) then
+		return
+	end
+
+	window:perform_action(
+		wezterm.action.SwitchToWorkspace({
+			name = workspace,
+			spawn = {
+				cwd = cwd ~= "" and cwd or nil,
+			},
+		}),
+		pane
+	)
+end)
+
 -- Claude Code のタスクが完了したら OS 通知を飛ばす
 wezterm.on("bell", function(window, pane)
 	local function get_tab_id(_, _)

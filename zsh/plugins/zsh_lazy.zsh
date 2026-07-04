@@ -27,6 +27,7 @@ zshaddhistory() {
 }
 
 # Bindings
+stty -ixon 2>/dev/null
 bindkey "^[[3~" delete-char
 bindkey -v
 
