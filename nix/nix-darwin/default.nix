@@ -126,7 +126,7 @@
       "spotify"
       "zoom"
       "wireshark-app"
-      "wezterm"
+      "wezterm@nightly"
       "notion"
       "notion-calendar"
       "rectangle"
