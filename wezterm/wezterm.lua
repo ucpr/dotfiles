@@ -120,8 +120,6 @@ return {
 	hide_tab_bar_if_only_one_tab = false,
 	show_new_tab_button_in_tab_bar = false,
 	show_close_tab_button_in_tabs = false,
-	inactive_tab_edge = "none",
-	active_title_bar = "none",
 	window_frame = {
 		inactive_titlebar_bg = "none",
 		active_titlebar_bg = "none",
