@@ -106,10 +106,12 @@
       "sheldon"
       "git-lfs"
       "bazelisk"
-      "borders"
       "k1LoW/tap/mo"
       # "codex"
     ];
+    extraConfig = ''
+      brew "FelixKratz/formulae/borders", trusted: true
+    '';
     casks = [
       "1password"
       "1password-cli"
