@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # ratchet:actions/checkout@v7.0.0
       - name: setup get-diff-action
-        uses: technote-space/get-diff-action@v6.1.2
+        uses: technote-space/get-diff-action@f27caffdd0fb9b13f4fc191c016bb4e0632844af # ratchet:technote-space/get-diff-action@v6.1.2
       - name: Run secretlint command on docker
-        uses: addnab/docker-run-action@v3
+        uses: addnab/docker-run-action@4f65fabd2431ebc8d299f8e5a018d79a769ae185 # ratchet:addnab/docker-run-action@v3
         with:
           image: secretlint/secretlint:v5.1.1
           options: >
