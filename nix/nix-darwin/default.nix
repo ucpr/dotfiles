@@ -108,7 +108,7 @@
       "bazelisk"
       "herdr"
       "k1LoW/tap/mo"
-      # "codex"
+      "container"
     ];
     extraConfig = ''
       brew "FelixKratz/formulae/borders", trusted: true
@@ -146,6 +146,7 @@
       "codex"
       "openvpn-connect"
       "flutter"
+      "claude-code"
     ];
   };
 }
