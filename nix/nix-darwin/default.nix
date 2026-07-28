@@ -106,6 +106,7 @@
       "sheldon"
       "git-lfs"
       "bazelisk"
+      "herdr"
       "k1LoW/tap/mo"
       # "codex"
     ];

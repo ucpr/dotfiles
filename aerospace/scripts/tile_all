@@ -4,5 +4,12 @@ ws="$(aerospace list-workspaces --focused)"
 [ -z "$ws" ] && exit 0
 
 aerospace list-windows --workspace "$ws" \
-| awk -F' *\| *' '{print $1}' \
-| xargs -n1 aerospace layout tiling --window-id
+  --format '%{window-id}' \
+| while IFS= read -r window_id; do
+  [ -z "$window_id" ] && continue
+  aerospace layout --window-id "$window_id" tiling
+  aerospace layout --window-id "$window_id" tiles
+done
+
+aerospace flatten-workspace-tree
+aerospace balance-sizes

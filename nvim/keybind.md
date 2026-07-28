@@ -5,16 +5,18 @@
 
 ## <leader> (Space) Keybindings
 
-### AI/Claude Code (`<leader>a`)
-- `<leader>a` - AI/Claude Code prefix
+### AI/Sidekick (`<leader>a`)
+- `<leader>a` - AI/Sidekick prefix
+- `<leader>aa` - Toggle Sidekick CLI
 - `<leader>ac` - Toggle Claude
 - `<leader>af` - Focus Claude
 - `<leader>ar` - Resume Claude
+- `<leader>ad` - Close Sidekick CLI
 - `<leader>aC` - Continue Claude
-- `<leader>ab` - Add current buffer
-- `<leader>as` - Send to Claude (visual mode) / Add file (in file tree)
-- `<leader>aa` - Accept diff
-- `<leader>ad` - Deny diff
+- `<leader>ab` - Send current file to Claude
+- `<leader>as` - Send selection to Claude (visual mode)
+- `<leader>ap` - Select Sidekick prompt
+- `<C-.>` - Focus Sidekick CLI
 
 ### Code Actions (`<space>ca`)
 - `<space>ca` - Code actions (normal and visual mode)
@@ -102,10 +104,6 @@
 ### Treesitter
 - `<C-space>` - Init/increment selection
 - `<bs>` - Decrement selection
-
-### Copilot
-- `<C-c>` - Accept Copilot suggestion (insert mode)
-- `<C-x>` - Dismiss Copilot suggestion (insert mode)
 
 ### Custom Scripts
 - `got` - Run Go test

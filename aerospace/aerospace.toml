@@ -91,6 +91,7 @@ outer.right =      10
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
 alt-slash = 'layout tiles horizontal vertical'
 alt-comma = 'layout accordion horizontal vertical'
+alt-t = 'exec-and-forget /Users/s11591/.config/aerospace/scripts/tile_all'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 alt-h = 'focus left'
