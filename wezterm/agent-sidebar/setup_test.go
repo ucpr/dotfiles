@@ -151,6 +151,30 @@ func TestEnsureHooksPreservesExistingContent(t *testing.T) {
 	}
 }
 
+func TestClaudeSettingsPathHonorsConfigDirEnvVar(t *testing.T) {
+	t.Setenv("CLAUDE_CONFIG_DIR", "")
+	if got, want := claudeSettingsPath("/home/u"), filepath.Join("/home/u", ".claude", "settings.json"); got != want {
+		t.Errorf("with no CLAUDE_CONFIG_DIR: got %q, want %q", got, want)
+	}
+
+	t.Setenv("CLAUDE_CONFIG_DIR", "/custom/claude-dir")
+	if got, want := claudeSettingsPath("/home/u"), filepath.Join("/custom/claude-dir", "settings.json"); got != want {
+		t.Errorf("with CLAUDE_CONFIG_DIR set: got %q, want %q", got, want)
+	}
+}
+
+func TestCodexHooksPathHonorsCodexHomeEnvVar(t *testing.T) {
+	t.Setenv("CODEX_HOME", "")
+	if got, want := codexHooksPath("/home/u"), filepath.Join("/home/u", ".codex", "hooks.json"); got != want {
+		t.Errorf("with no CODEX_HOME: got %q, want %q", got, want)
+	}
+
+	t.Setenv("CODEX_HOME", "/custom/codex-dir")
+	if got, want := codexHooksPath("/home/u"), filepath.Join("/custom/codex-dir", "hooks.json"); got != want {
+		t.Errorf("with CODEX_HOME set: got %q, want %q", got, want)
+	}
+}
+
 func TestHookCommandIncludesStatusAndAgentName(t *testing.T) {
 	got := hookCommand("blocked", "Codex")
 	if got == "" {

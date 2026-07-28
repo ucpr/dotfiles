@@ -34,6 +34,25 @@ func hookCommand(status, agentName string) string {
 	return fmt.Sprintf("%s %s %q", hookScriptPath, status, agentName)
 }
 
+// claudeSettingsPath honors $CLAUDE_CONFIG_DIR, which relocates Claude
+// Code's whole config directory (so settings.json moves with it), instead
+// of assuming the ~/.claude default.
+func claudeSettingsPath(home string) string {
+	if dir := os.Getenv("CLAUDE_CONFIG_DIR"); dir != "" {
+		return filepath.Join(dir, "settings.json")
+	}
+	return filepath.Join(home, ".claude", "settings.json")
+}
+
+// codexHooksPath honors $CODEX_HOME the same way claudeSettingsPath honors
+// $CLAUDE_CONFIG_DIR.
+func codexHooksPath(home string) string {
+	if dir := os.Getenv("CODEX_HOME"); dir != "" {
+		return filepath.Join(dir, "hooks.json")
+	}
+	return filepath.Join(home, ".codex", "hooks.json")
+}
+
 func runSetup() {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -41,13 +60,16 @@ func runSetup() {
 		os.Exit(1)
 	}
 
+	claudePath := claudeSettingsPath(home)
+	codexPath := codexHooksPath(home)
+
 	targets := []struct {
 		path      string
 		agentName string
 		label     string
 	}{
-		{filepath.Join(home, ".claude", "settings.json"), "Claude Code", "Claude Code (~/.claude/settings.json)"},
-		{filepath.Join(home, ".codex", "hooks.json"), "Codex", "Codex (~/.codex/hooks.json)"},
+		{claudePath, "Claude Code", fmt.Sprintf("Claude Code (%s)", claudePath)},
+		{codexPath, "Codex", fmt.Sprintf("Codex (%s)", codexPath)},
 	}
 
 	failed := false
