@@ -218,6 +218,11 @@ func announceSelf() {
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "setup" {
+		runSetup()
+		return
+	}
+
 	announceSelf()
 	// Without the alt screen, bubbletea uses inline rendering, which tracks
 	// the previous frame's line count to move the cursor back up before
