@@ -1,11 +1,12 @@
-// Command agent-sidebar renders a live, vertical list of every WezTerm
-// workspace/tab and its rolled-up agent_status (working/blocked/done/idle).
+// Command agent-sidebar renders a live, vertical list of every pane running
+// an agent (Claude Code, Codex, ...) and its status (working/blocked/done/
+// idle). Plain shells with no agent are not shown.
 //
 // It has no access to WezTerm's Lua user_vars (wezterm cli list does not
 // expose them), so it just polls the snapshot file that wezterm.lua writes
 // via write_agent_status_snapshot():
 //
-//	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\ttitle per line)
+//	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\tagent_name\ttitle per line)
 package main
 
 import (
@@ -17,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -24,27 +26,30 @@ import (
 type entry struct {
 	workspace string
 	status    string
+	agentName string
 	title     string
 }
 
 type tickMsg time.Time
 
 var (
-	titleStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("15")).Padding(0, 1)
-	wsStyle    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("214"))
-	dimStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	titleStyle     = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("15")).Padding(0, 1)
+	wsStyle        = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("214"))
+	dimStyle       = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	agentNameStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("111"))
 
-	statusColor = map[string]string{
-		"blocked": "203",
-		"working": "220",
-		"done":    "78",
-		"idle":    "240",
-	}
+	// Plain, universally-rendered emoji rather than dingbats/symbols, since
+	// emoji already carry their own color and don't need an ANSI style.
 	statusIcon = map[string]string{
-		"blocked": "⛔",
-		"working": "⚙",
-		"done":    "✔",
-		"idle":    "·",
+		"blocked": "🔴",
+		"done":    "✅",
+		"idle":    "⚪",
+	}
+
+	// A rotating clock face, the classic simple emoji spinner.
+	clockSpinner = spinner.Spinner{
+		Frames: []string{"🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"},
+		FPS:    time.Second / 4,
 	}
 )
 
@@ -69,11 +74,11 @@ func loadEntries() []entry {
 		if line == "" {
 			continue
 		}
-		parts := strings.SplitN(line, "\t", 3)
-		if len(parts) < 3 || parts[0] == "" {
+		parts := strings.SplitN(line, "\t", 4)
+		if len(parts) < 4 || parts[0] == "" {
 			continue
 		}
-		entries = append(entries, entry{workspace: parts[0], status: parts[1], title: parts[2]})
+		entries = append(entries, entry{workspace: parts[0], status: parts[1], agentName: parts[2], title: parts[3]})
 	}
 	return entries
 }
@@ -82,10 +87,13 @@ type model struct {
 	entries []entry
 	width   int
 	height  int
+	spinner spinner.Model
 }
 
 func initialModel() model {
-	return model{entries: loadEntries()}
+	s := spinner.New()
+	s.Spinner = clockSpinner
+	return model{entries: loadEntries(), spinner: s}
 }
 
 func tickCmd() tea.Cmd {
@@ -95,7 +103,7 @@ func tickCmd() tea.Cmd {
 }
 
 func (m model) Init() tea.Cmd {
-	return tickCmd()
+	return tea.Batch(tickCmd(), m.spinner.Tick)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -112,20 +120,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		m.entries = loadEntries()
 		return m, tickCmd()
+	default:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	}
 	return m, nil
 }
 
-func renderIcon(status string) string {
+// renderIcon returns the leading icon for a row. "working" uses the live
+// spinner instead of a static glyph. Entries with no agent_status are never
+// sent by wezterm.lua in the first place (see write_agent_status_snapshot),
+// so every status here is one of the known ones.
+func (m model) renderIcon(status string) string {
+	if status == "working" {
+		return m.spinner.View() + " "
+	}
 	icon, ok := statusIcon[status]
 	if !ok {
 		return "  "
 	}
-	color, ok := statusColor[status]
-	if !ok {
-		color = "255"
-	}
-	return lipgloss.NewStyle().Foreground(lipgloss.Color(color)).Render(icon) + " "
+	return icon + " "
 }
 
 func truncate(s string, max int) string {
@@ -167,17 +182,25 @@ func (m model) View() string {
 	}
 	sort.Strings(workspaces)
 
-	maxTitle := width - 4
-	if maxTitle < 4 {
-		maxTitle = 4
-	}
-
 	for _, ws := range workspaces {
 		b.WriteString(wsStyle.Render(ws))
 		b.WriteString("\n")
 		for _, e := range byWorkspace[ws] {
+			prefix := ""
+			if e.agentName != "" {
+				prefix = e.agentName + " · "
+			}
+			maxTitle := width - 4 - len([]rune(prefix))
+			if maxTitle < 4 {
+				maxTitle = 4
+			}
+
 			b.WriteString(" ")
-			b.WriteString(renderIcon(e.status))
+			b.WriteString(m.renderIcon(e.status))
+			if prefix != "" {
+				b.WriteString(agentNameStyle.Render(e.agentName))
+				b.WriteString(dimStyle.Render(" · "))
+			}
 			b.WriteString(truncate(e.title, maxTitle))
 			b.WriteString("\n")
 		}

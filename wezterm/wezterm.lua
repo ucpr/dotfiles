@@ -135,10 +135,13 @@ local function write_agent_status_snapshot()
 					for _, t in ipairs(w:tabs()) do
 						for _, p in ipairs(t:panes()) do
 							local uv = p:get_user_vars()
-							if not uv.agent_sidebar then
-								local status = uv.agent_status or ""
+							-- Only panes that have an actual agent_status (i.e. an agent
+							-- hook has fired there at some point) are included, so the
+							-- sidebar doesn't list every plain shell pane.
+							if not uv.agent_sidebar and uv.agent_status then
+								local agent_name = uv.agent_name or ""
 								local title = p:get_title() or ""
-								table.insert(lines, ws .. "\t" .. status .. "\t" .. title)
+								table.insert(lines, ws .. "\t" .. uv.agent_status .. "\t" .. agent_name .. "\t" .. title)
 							end
 						end
 					end
