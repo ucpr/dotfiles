@@ -13,6 +13,7 @@ import (
 )
 
 const hookScriptPath = "$HOME/.ghq/github.com/ucpr/dotfiles/wezterm/scripts/agent-status.sh"
+const fileChangeScriptPath = "$HOME/.ghq/github.com/ucpr/dotfiles/wezterm/scripts/agent-filechange.sh"
 
 type hookSpec struct {
 	event  string
@@ -32,6 +33,13 @@ var hookSpecs = []hookSpec{
 
 func hookCommand(status, agentName string) string {
 	return fmt.Sprintf("%s %s %q", hookScriptPath, status, agentName)
+}
+
+// fileChangeCommand builds the PostToolUse hook command that reports
+// per-edit line diffs to agent-filechange.sh, which the status hooks above
+// have no channel for (they only ever report a status word).
+func fileChangeCommand(agentName string) string {
+	return fmt.Sprintf("%s %q", fileChangeScriptPath, agentName)
 }
 
 // claudeSettingsPath honors $CLAUDE_CONFIG_DIR, which relocates Claude
@@ -120,22 +128,15 @@ func ensureHooks(path, agentName string) (changed bool, err error) {
 	}
 
 	for _, spec := range hookSpecs {
-		cmd := hookCommand(spec.status, agentName)
-		eventGroups, _ := hooks[spec.event].([]interface{})
-
-		if hookCommandPresent(eventGroups, cmd) {
-			continue
+		if mergeHookCommand(hooks, spec.event, hookCommand(spec.status, agentName)) {
+			changed = true
 		}
+	}
+	// The file-change stream rides on the same PostToolUse event as the
+	// "working" status hook above but is a separate command, since it reports
+	// a per-edit diff rather than a status word.
+	if mergeHookCommand(hooks, "PostToolUse", fileChangeCommand(agentName)) {
 		changed = true
-		eventGroups = append(eventGroups, map[string]interface{}{
-			"hooks": []interface{}{
-				map[string]interface{}{
-					"type":    "command",
-					"command": cmd,
-				},
-			},
-		})
-		hooks[spec.event] = eventGroups
 	}
 
 	if !changed {
@@ -152,6 +153,26 @@ func ensureHooks(path, agentName string) (changed bool, err error) {
 	}
 	out = append(out, '\n')
 	return true, os.WriteFile(path, out, 0o644)
+}
+
+// mergeHookCommand appends cmd to hooks[event] as a new hook group, unless
+// it's already present, so callers can merge multiple independent commands
+// into the same event without duplicating any of them across reruns.
+func mergeHookCommand(hooks map[string]interface{}, event, cmd string) bool {
+	eventGroups, _ := hooks[event].([]interface{})
+	if hookCommandPresent(eventGroups, cmd) {
+		return false
+	}
+	eventGroups = append(eventGroups, map[string]interface{}{
+		"hooks": []interface{}{
+			map[string]interface{}{
+				"type":    "command",
+				"command": cmd,
+			},
+		},
+	})
+	hooks[event] = eventGroups
+	return true
 }
 
 // hookCommandPresent reports whether cmd already appears anywhere in an

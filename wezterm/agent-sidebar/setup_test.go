@@ -70,6 +70,12 @@ func TestEnsureHooksCreatesFileFromScratch(t *testing.T) {
 			t.Errorf("event %s: command %q appears %d times, want 1", spec.event, want, got)
 		}
 	}
+
+	groups := eventGroups(t, hooks, "PostToolUse")
+	want := fileChangeCommand("Claude Code")
+	if got := countCommand(groups, want); got != 1 {
+		t.Errorf("PostToolUse: file-change command %q appears %d times, want 1", want, got)
+	}
 }
 
 func TestEnsureHooksIsIdempotent(t *testing.T) {
@@ -93,6 +99,12 @@ func TestEnsureHooksIsIdempotent(t *testing.T) {
 		if got := countCommand(groups, want); got != 1 {
 			t.Errorf("event %s: command %q appears %d times after re-running setup, want 1 (no duplicates)", spec.event, want, got)
 		}
+	}
+
+	groups := eventGroups(t, hooks, "PostToolUse")
+	want := fileChangeCommand("Claude Code")
+	if got := countCommand(groups, want); got != 1 {
+		t.Errorf("PostToolUse: file-change command %q appears %d times after re-running setup, want 1 (no duplicates)", want, got)
 	}
 }
 
@@ -182,5 +194,15 @@ func TestHookCommandIncludesStatusAndAgentName(t *testing.T) {
 	}
 	if !strings.Contains(got, "blocked") || !strings.Contains(got, "Codex") || !strings.Contains(got, hookScriptPath) {
 		t.Errorf("hookCommand(%q, %q) = %q, missing expected parts", "blocked", "Codex", got)
+	}
+}
+
+func TestFileChangeCommandIncludesAgentName(t *testing.T) {
+	got := fileChangeCommand("Codex")
+	if got == "" {
+		t.Fatal("fileChangeCommand returned empty string")
+	}
+	if !strings.Contains(got, "Codex") || !strings.Contains(got, fileChangeScriptPath) {
+		t.Errorf("fileChangeCommand(%q) = %q, missing expected parts", "Codex", got)
 	}
 }
