@@ -6,3 +6,4 @@ zsh/plugins/*.zsh.zwc
 .luarc.json
 .DS_Store
 *.swp
+wezterm/agent-sidebar/agent-sidebar
