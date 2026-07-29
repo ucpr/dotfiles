@@ -85,7 +85,7 @@ local function write_agent_status_snapshot()
 		for _, ws in ipairs(wezterm.mux.get_workspace_names()) do
 			for _, w in ipairs(wezterm.mux.all_windows()) do
 				if w:get_workspace() == ws then
-					for _, t in ipairs(w:tabs()) do
+					for tab_number, t in ipairs(w:tabs()) do
 						for _, p in ipairs(t:panes()) do
 							local uv = p:get_user_vars()
 							-- Only panes that have an actual agent_status (i.e. an agent
@@ -96,7 +96,17 @@ local function write_agent_status_snapshot()
 								local title = p:get_title() or ""
 								table.insert(
 									lines,
-									ws .. "\t" .. uv.agent_status .. "\t" .. agent_name .. "\t" .. title .. "\t" .. p:pane_id()
+									ws
+										.. "\t"
+										.. uv.agent_status
+										.. "\t"
+										.. agent_name
+										.. "\t"
+										.. tab_number
+										.. "\t"
+										.. title
+										.. "\t"
+										.. p:pane_id()
 								)
 							end
 						end

@@ -6,7 +6,7 @@
 // expose them), so it just polls the snapshot file that wezterm.lua writes
 // via write_agent_status_snapshot():
 //
-//	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\tagent_name\ttitle\tpane_id per line)
+//	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\tagent_name\ttab_number\ttitle\tpane_id per line)
 package main
 
 import (
@@ -29,6 +29,7 @@ type entry struct {
 	workspace string
 	status    string
 	agentName string
+	tabNumber string
 	title     string
 	paneID    string
 }
@@ -87,20 +88,20 @@ func loadEntries() []entry {
 		if line == "" {
 			continue
 		}
-		parts := strings.SplitN(line, "\t", 4)
-		if len(parts) < 4 || parts[0] == "" {
+		parts := strings.SplitN(line, "\t", 5)
+		if len(parts) < 5 || parts[0] == "" {
 			continue
 		}
 		// pane_id is split off the end (rather than via one big SplitN) so a
 		// title that happens to contain a literal tab still parses correctly;
 		// pane_id itself is always a plain number with no tab in it.
-		titleAndPaneID := parts[3]
+		titleAndPaneID := parts[4]
 		idx := strings.LastIndex(titleAndPaneID, "\t")
 		if idx < 0 {
 			continue
 		}
 		title, paneID := titleAndPaneID[:idx], titleAndPaneID[idx+1:]
-		entries = append(entries, entry{workspace: parts[0], status: parts[1], agentName: parts[2], title: title, paneID: paneID})
+		entries = append(entries, entry{workspace: parts[0], status: parts[1], agentName: parts[2], tabNumber: parts[3], title: title, paneID: paneID})
 	}
 	return entries
 }
@@ -308,7 +309,7 @@ func (m model) agentUnits(width int) []agentUnit {
 		for _, e := range byWorkspace[ws] {
 			units = append(units, agentUnit{
 				lines: []string{
-					" " + m.renderIcon(e.status) + agentNameStyle.Render(e.agentName),
+					" " + m.renderIcon(e.status) + agentNameStyle.Render(e.agentName) + " " + dimStyle.Render("(tab:"+e.tabNumber+")"),
 					"   " + truncate(e.title, maxTitle),
 				},
 				paneID: e.paneID,
