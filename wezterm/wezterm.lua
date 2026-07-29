@@ -98,20 +98,45 @@ local function has_live_agent_process(p)
 	return lower:find("claude", 1, true) ~= nil or lower:find("codex", 1, true) ~= nil
 end
 
+-- A single missed check doesn't necessarily mean the agent exited - some
+-- tool invocations (an interactive ssh/pty-allocating command, or the brief
+-- fork/exec window right as the CLI starts up) can transiently change what
+-- looks like the foreground process. Removing an entry only for it to
+-- reappear a tick later churns the AGENTS list's row layout, which is what
+-- was causing sidebar ghosting and mouse clicks landing on the wrong pane.
+-- Requiring a few consecutive misses before actually dropping a pane keeps
+-- the "disappear when the agent exits" behavior while making that churn
+-- rare instead of routine.
+local AGENT_MISSING_GRACE_TICKS = 3
+local agent_missing_ticks = {}
+
+local function pane_agent_is_live(p)
+	local pane_id = p:pane_id()
+	if has_live_agent_process(p) then
+		agent_missing_ticks[pane_id] = nil
+		return true
+	end
+	local misses = (agent_missing_ticks[pane_id] or 0) + 1
+	agent_missing_ticks[pane_id] = misses
+	return misses <= AGENT_MISSING_GRACE_TICKS
+end
+
 local function write_agent_status_snapshot()
 	local ok, err = pcall(function()
 		local lines = {}
+		local seen_pane_ids = {}
 		for _, ws in ipairs(wezterm.mux.get_workspace_names()) do
 			for _, w in ipairs(wezterm.mux.all_windows()) do
 				if w:get_workspace() == ws then
 					for tab_number, t in ipairs(w:tabs()) do
 						for _, p in ipairs(t:panes()) do
 							local uv = p:get_user_vars()
+							seen_pane_ids[p:pane_id()] = true
 							-- Only panes that have an actual agent_status (i.e. an agent
 							-- hook has fired there at some point) AND still have that
 							-- agent's process alive are included, so the sidebar doesn't
 							-- list plain shells or panes an agent has already exited.
-							if not uv.agent_sidebar and uv.agent_status and has_live_agent_process(p) then
+							if not uv.agent_sidebar and uv.agent_status and pane_agent_is_live(p) then
 								local agent_name = uv.agent_name or ""
 								local title = p:get_title() or ""
 								table.insert(
@@ -134,6 +159,15 @@ local function write_agent_status_snapshot()
 				end
 			end
 		end
+		-- Drop bookkeeping for panes that no longer exist at all (closed,
+		-- not just agent-exited), so agent_missing_ticks doesn't grow
+		-- unboundedly over a long-running wezterm session.
+		for pane_id in pairs(agent_missing_ticks) do
+			if not seen_pane_ids[pane_id] then
+				agent_missing_ticks[pane_id] = nil
+			end
+		end
+
 		local f = io.open(AGENT_STATUS_STATE_FILE, "w")
 		if f then
 			f:write(table.concat(lines, "\n") .. "\n")
