@@ -7,13 +7,18 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
-const hookScriptPath = "$HOME/.ghq/github.com/ucpr/dotfiles/wezterm/scripts/agent-status.sh"
-const fileChangeScriptPath = "$HOME/.ghq/github.com/ucpr/dotfiles/wezterm/scripts/agent-filechange.sh"
+// defaultDotfilesRepo is the ghq-managed repo (in "host/owner/repo" form)
+// that wezterm/scripts/*.sh live under. Overridable via `setup --repo` so a
+// fork of this dotfiles repo under a different path still works.
+const defaultDotfilesRepo = "github.com/ucpr/dotfiles"
 
 type hookSpec struct {
 	event  string
@@ -31,15 +36,48 @@ var hookSpecs = []hookSpec{
 	{"SessionEnd", "idle"},
 }
 
-func hookCommand(status, agentName string) string {
-	return fmt.Sprintf("%s %s %q", hookScriptPath, status, agentName)
+func hookCommand(scriptPath, status, agentName string) string {
+	return fmt.Sprintf("%s %s %q", scriptPath, status, agentName)
 }
 
 // fileChangeCommand builds the PostToolUse hook command that reports
 // per-edit line diffs to agent-filechange.sh, which the status hooks above
 // have no channel for (they only ever report a status word).
-func fileChangeCommand(agentName string) string {
-	return fmt.Sprintf("%s %q", fileChangeScriptPath, agentName)
+func fileChangeCommand(scriptPath, agentName string) string {
+	return fmt.Sprintf("%s %q", scriptPath, agentName)
+}
+
+// ghqRoot resolves ghq's configured root directory the same way `ghq root`
+// itself does: from gitconfig's ghq.root, not a hardcoded ~/.ghq guess. This
+// is git config rather than the ghq binary specifically so setup still works
+// in environments that have ghq's gitconfig convention but not ghq installed.
+func ghqRoot() (string, error) {
+	out, err := exec.Command("git", "config", "--get", "ghq.root").Output()
+	if err != nil {
+		return "", fmt.Errorf("reading ghq.root from gitconfig (run `git config --global ghq.root <path>` to set it): %w", err)
+	}
+	root := strings.TrimSpace(string(out))
+	if root == "" {
+		return "", fmt.Errorf("ghq.root is set but empty in gitconfig")
+	}
+	// git config returns the raw string (e.g. "~/.ghq") without expanding
+	// it, unlike the ghq binary's own `ghq root` output.
+	if root == "~" || strings.HasPrefix(root, "~/") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("expanding ~ in ghq.root: %w", err)
+		}
+		root = filepath.Join(home, strings.TrimPrefix(root, "~"))
+	}
+	return root, nil
+}
+
+// scriptPaths resolves the absolute paths to agent-status.sh and
+// agent-filechange.sh, which live in the same dotfiles repo as this program
+// under wezterm/scripts/.
+func scriptPaths(ghqRoot, repo string) (hookScriptPath, fileChangeScriptPath string) {
+	dir := filepath.Join(ghqRoot, repo, "wezterm", "scripts")
+	return filepath.Join(dir, "agent-status.sh"), filepath.Join(dir, "agent-filechange.sh")
 }
 
 // claudeSettingsPath honors $CLAUDE_CONFIG_DIR, which relocates Claude
@@ -61,12 +99,22 @@ func codexHooksPath(home string) string {
 	return filepath.Join(home, ".codex", "hooks.json")
 }
 
-func runSetup() {
+func runSetup(args []string) {
+	fs := flag.NewFlagSet("setup", flag.ExitOnError)
+	repo := fs.String("repo", defaultDotfilesRepo, "ghq-managed repo containing wezterm/scripts, in \"host/owner/repo\" form")
+	fs.Parse(args)
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "setup: could not determine home directory:", err)
 		os.Exit(1)
 	}
+	root, err := ghqRoot()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "setup:", err)
+		os.Exit(1)
+	}
+	hookScriptPath, fileChangeScriptPath := scriptPaths(root, *repo)
 
 	claudePath := claudeSettingsPath(home)
 	codexPath := codexHooksPath(home)
@@ -82,7 +130,7 @@ func runSetup() {
 
 	failed := false
 	for _, t := range targets {
-		changed, err := ensureHooks(t.path, t.agentName)
+		changed, err := ensureHooks(t.path, t.agentName, hookScriptPath, fileChangeScriptPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "✗ %s: %v\n", t.label, err)
 			failed = true
@@ -108,7 +156,7 @@ func runSetup() {
 
 // ensureHooks merges agent-status.sh into path's "hooks" section for every
 // event in hookSpecs, preserving any other content already in the file.
-func ensureHooks(path, agentName string) (changed bool, err error) {
+func ensureHooks(path, agentName, hookScriptPath, fileChangeScriptPath string) (changed bool, err error) {
 	root := map[string]interface{}{}
 	data, err := os.ReadFile(path)
 	switch {
@@ -128,14 +176,14 @@ func ensureHooks(path, agentName string) (changed bool, err error) {
 	}
 
 	for _, spec := range hookSpecs {
-		if mergeHookCommand(hooks, spec.event, hookCommand(spec.status, agentName)) {
+		if mergeHookCommand(hooks, spec.event, hookCommand(hookScriptPath, spec.status, agentName)) {
 			changed = true
 		}
 	}
 	// The file-change stream rides on the same PostToolUse event as the
 	// "working" status hook above but is a separate command, since it reports
 	// a per-edit diff rather than a status word.
-	if mergeHookCommand(hooks, "PostToolUse", fileChangeCommand(agentName)) {
+	if mergeHookCommand(hooks, "PostToolUse", fileChangeCommand(fileChangeScriptPath, agentName)) {
 		changed = true
 	}
 
