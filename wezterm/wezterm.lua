@@ -127,7 +127,20 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 
 	local edge_foreground = background
 
-	local title = "   " .. wezterm.truncate_right(tab.active_pane.title, max_width - 1) .. "   "
+	-- When the sidebar pane itself is focused, tab.active_pane.title is just
+	-- "go" (the `go run .` process). Show the sibling work pane's title
+	-- instead, since that's the tab the user actually cares about.
+	local pane_title = tab.active_pane.title
+	if tab.active_pane.user_vars.agent_sidebar then
+		for _, p in ipairs(panes) do
+			if not p.user_vars.agent_sidebar then
+				pane_title = p.title
+				break
+			end
+		end
+	end
+
+	local title = "   " .. wezterm.truncate_right(pane_title, max_width - 1) .. "   "
 
 	return {
 		{ Background = { Color = edge_background } },
