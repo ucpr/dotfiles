@@ -191,7 +191,26 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 
 	local edge_foreground = background
 
-	local title = "   " .. wezterm.truncate_right(tab.active_pane.title, max_width - 1) .. "   "
+	-- If this tab contains the agent-sidebar pane, anchor the title to
+	-- whichever OTHER pane is in the tab, unconditionally - not just when
+	-- the sidebar happens to be focused. Otherwise the title flips between
+	-- "go" (the sidebar's own process name) and the work pane's title as
+	-- focus moves between panes or tabs, even though the work pane's name
+	-- is the only one that's ever actually meaningful here.
+	--
+	-- Deliberately uses tab.panes, not the "panes" argument above - the
+	-- latter is scoped to the currently-*active* tab regardless of which
+	-- tab this callback invocation is formatting, so using it here applied
+	-- the active tab's sibling-pane title to every tab's label at once.
+	local pane_title = tab.active_pane.title
+	for _, p in ipairs(tab.panes) do
+		if not p.user_vars.agent_sidebar then
+			pane_title = p.title
+			break
+		end
+	end
+
+	local title = "   " .. wezterm.truncate_right(pane_title, max_width - 1) .. "   "
 
 	return {
 		{ Background = { Color = edge_background } },
