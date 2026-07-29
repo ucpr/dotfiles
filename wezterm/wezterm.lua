@@ -70,53 +70,6 @@ local TAB_BACKGROUND = "#1E2127"
 local ACTIVE_TAB_BACKGROUND = "#ae8b2d"
 local TAB_FOREGROUND = "#FFFFFF"
 
-local AGENT_STATUS_PRIORITY = { blocked = 4, working = 3, done = 2, idle = 1 }
-local AGENT_STATUS_ICON = { blocked = "⛔", working = "⚙", done = "✔", idle = "" }
-local AGENT_STATUS_COLOR = { blocked = "#ff5555", done = "#2ecc71" }
-
-local function pane_agent_status(pane_info)
-	return pane_info.user_vars and pane_info.user_vars.agent_status or nil
-end
-
-local function rollup_status(statuses)
-	local best, best_pri
-	for _, s in ipairs(statuses) do
-		local pri = AGENT_STATUS_PRIORITY[s] or 0
-		if not best_pri or pri > best_pri then
-			best, best_pri = s, pri
-		end
-	end
-	return best
-end
-
-local function tab_agent_status(panes)
-	local statuses = {}
-	for _, p in ipairs(panes) do
-		local s = pane_agent_status(p)
-		if s then
-			table.insert(statuses, s)
-		end
-	end
-	return rollup_status(statuses)
-end
-
-local function workspace_agent_status(ws_name)
-	local statuses = {}
-	for _, w in ipairs(wezterm.mux.all_windows()) do
-		if w:get_workspace() == ws_name then
-			for _, t in ipairs(w:tabs()) do
-				for _, p in ipairs(t:panes()) do
-					local uv = p:get_user_vars()
-					if uv.agent_status then
-						table.insert(statuses, uv.agent_status)
-					end
-				end
-			end
-		end
-	end
-	return rollup_status(statuses)
-end
-
 -- Snapshot of every workspace/pane's agent_status, written to disk so that an
 -- external process (the sidebar, which has no access to WezTerm's Lua
 -- user_vars) can render a vertical status list. One line per PANE (not per
@@ -172,15 +125,9 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 		foreground = TAB_FOREGROUND
 	end
 
-	local status = tab_agent_status(panes)
-	if status and AGENT_STATUS_COLOR[status] then
-		background = AGENT_STATUS_COLOR[status]
-	end
-
 	local edge_foreground = background
 
-	local icon = status and (AGENT_STATUS_ICON[status] .. " ") or ""
-	local title = "   " .. icon .. wezterm.truncate_right(tab.active_pane.title, max_width - 1) .. "   "
+	local title = "   " .. wezterm.truncate_right(tab.active_pane.title, max_width - 1) .. "   "
 
 	return {
 		{ Background = { Color = edge_background } },
@@ -196,21 +143,12 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 end)
 
 wezterm.on("update-right-status", function(window, _)
-	local summary = {}
-	for _, ws in ipairs(wezterm.mux.get_workspace_names()) do
-		local status = workspace_agent_status(ws)
-		if status and status ~= "idle" then
-			table.insert(summary, ws .. AGENT_STATUS_ICON[status])
-		end
-	end
-	local summary_text = #summary > 0 and (table.concat(summary, " ") .. "  ") or ""
-
 	write_agent_status_snapshot()
 
 	window:set_right_status(wezterm.format({
 		{ Background = { Color = ACTIVE_TAB_BACKGROUND } },
 		{ Foreground = { Color = TAB_FOREGROUND } },
-		{ Text = "  " .. summary_text .. "ws: " .. window:active_workspace() .. "  " },
+		{ Text = "  ws: " .. window:active_workspace() .. "  " },
 	}))
 end)
 
