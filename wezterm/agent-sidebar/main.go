@@ -23,6 +23,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 )
 
 type entry struct {
@@ -211,15 +212,17 @@ func (m model) renderIcon(status string) string {
 	return icon + " "
 }
 
+// truncate shortens s to fit within max terminal cells, measuring display
+// width rather than rune count so wide characters (CJK, emoji - common in
+// window titles) can't push a line past the pane's actual column width. A
+// rune-count-based truncate let such a line wrap onto a second physical
+// terminal row, silently shifting every row index below it out of sync with
+// paneIDAtRow()'s click hit-testing.
 func truncate(s string, max int) string {
-	runes := []rune(s)
-	if max < 1 || len(runes) <= max {
+	if max < 1 {
 		return s
 	}
-	if max == 1 {
-		return "…"
-	}
-	return string(runes[:max-1]) + "…"
+	return ansi.Truncate(s, max, "…")
 }
 
 func (m model) View() string {
