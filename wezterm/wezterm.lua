@@ -79,6 +79,25 @@ local AGENT_STATUS_STATE_DIR = os.getenv("HOME") .. "/.cache/wezterm"
 local AGENT_STATUS_STATE_FILE = AGENT_STATUS_STATE_DIR .. "/agent-status.txt"
 os.execute('mkdir -p "' .. AGENT_STATUS_STATE_DIR .. '"')
 
+-- Reports whether p's foreground process still looks like a live agent CLI,
+-- as opposed to the plain shell the pane drops back to once the agent exits.
+-- Bash-tool subprocesses spawned by Claude Code / Codex don't take over the
+-- pty's foreground process group (verified via `ps -o tpgid` against a live
+-- session), so this stays true for the whole session and only flips once
+-- the agent process itself actually exits - unlike agent_status, which only
+-- updates when a hook happens to fire (SessionEnd, e.g.) and never notices
+-- e.g. a Ctrl+C kill.
+local function has_live_agent_process(p)
+	local ok, proc = pcall(function()
+		return p:get_foreground_process_name()
+	end)
+	if not ok or not proc then
+		return false
+	end
+	local lower = proc:lower()
+	return lower:find("claude", 1, true) ~= nil or lower:find("codex", 1, true) ~= nil
+end
+
 local function write_agent_status_snapshot()
 	local ok, err = pcall(function()
 		local lines = {}
@@ -89,9 +108,10 @@ local function write_agent_status_snapshot()
 						for _, p in ipairs(t:panes()) do
 							local uv = p:get_user_vars()
 							-- Only panes that have an actual agent_status (i.e. an agent
-							-- hook has fired there at some point) are included, so the
-							-- sidebar doesn't list every plain shell pane.
-							if not uv.agent_sidebar and uv.agent_status then
+							-- hook has fired there at some point) AND still have that
+							-- agent's process alive are included, so the sidebar doesn't
+							-- list plain shells or panes an agent has already exited.
+							if not uv.agent_sidebar and uv.agent_status and has_live_agent_process(p) then
 								local agent_name = uv.agent_name or ""
 								local title = p:get_title() or ""
 								table.insert(
