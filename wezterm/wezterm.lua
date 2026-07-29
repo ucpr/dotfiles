@@ -31,11 +31,6 @@ local keys = {
 				wezterm.action.SplitPane({
 					direction = "Left",
 					size = { Cells = 30 },
-					-- Without this, the split is relative to whichever pane is
-					-- currently focused - e.g. splitting just the top half of an
-					-- already up/down-split tab, instead of spanning the tab's
-					-- full height at its left edge like a proper sidebar.
-					top_level = true,
 					command = {
 						-- WezTerm spawns this directly (not via the user's shell), so PATH is
 						-- just the system default and doesn't include mise's `go` shim. mise
