@@ -24,6 +24,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/charmbracelet/x/term"
 )
 
 type entry struct {
@@ -181,6 +182,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		m.entries = loadEntries()
 		m.fileChanges = loadFileChanges()
+		// A top_level split (see wezterm.lua) doesn't reliably deliver an
+		// accurate tea.WindowSizeMsg for the newly-created pane, leaving
+		// m.width stuck at some earlier (too-wide) value - which drew the
+		// "─" section-divider rule well past the pane's real right edge.
+		// Polling the pty's actual size directly on every tick self-corrects
+		// regardless of whether WezTerm ever sends that resize event.
+		if w, h, err := term.GetSize(os.Stdout.Fd()); err == nil {
+			m.width = w
+			m.height = h
+		}
 		return m, tickCmd()
 	case tea.MouseMsg:
 		if msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft {
