@@ -228,10 +228,28 @@ func (m model) View() string {
 	}
 	agentLines, changeLines := m.sectionHeights()
 
+	// Padded out to its full budget (rather than left as short as its actual
+	// content) so CHANGES always starts at a fixed row - pinned to the bottom
+	// third of the pane - instead of drifting up when AGENTS has few entries.
+	agentSection := m.renderAgentSection(width, agentLines)
+	if agentLines > 0 {
+		agentSection = padToLines(agentSection, 2+agentLines)
+	}
+
 	var b strings.Builder
-	b.WriteString(m.renderAgentSection(width, agentLines))
+	b.WriteString(agentSection)
 	b.WriteString(m.renderChangeSection(width, changeLines))
 	return b.String()
+}
+
+// padToLines appends blank lines to s (each already ending in "\n") until it
+// has target lines total.
+func padToLines(s string, target int) string {
+	count := strings.Count(s, "\n")
+	for ; count < target; count++ {
+		s += "\n"
+	}
+	return s
 }
 
 // sectionHeights splits the whole pane height into thirds: the bottom third
@@ -301,19 +319,19 @@ func (m model) agentUnits(width int) []agentUnit {
 }
 
 // agentSectionLineCount returns how many screen lines the AGENTS section
-// actually renders (title+rule, plus body up to maxLines), which can be
-// fewer than its budget if there isn't enough data to fill it. The CHANGES
-// section below it starts immediately at this row, since View() concatenates
-// the two sections with no padding in between.
+// occupies before CHANGES starts. When maxLines (its body budget) is set,
+// View() pads the section out to fill it exactly, pinning CHANGES to the
+// bottom third of the pane; otherwise (maxLines <= 0, height not yet known)
+// it's just however many lines the actual content takes.
 func (m model) agentSectionLineCount(width, maxLines int) int {
+	if maxLines > 0 {
+		return 2 + maxLines
+	}
 	if len(m.entries) == 0 {
 		return 3 // title + rule + "(no agents yet)"
 	}
 	body := 0
 	for _, u := range m.agentUnits(width) {
-		if maxLines > 0 && body+len(u.lines) > maxLines {
-			break
-		}
 		body += len(u.lines)
 	}
 	return 2 + body
