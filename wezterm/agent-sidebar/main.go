@@ -6,13 +6,14 @@
 // expose them), so it just polls the snapshot file that wezterm.lua writes
 // via write_agent_status_snapshot():
 //
-//	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\tagent_name\ttitle per line)
+//	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\tagent_name\ttitle\tpane_id per line)
 package main
 
 import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -29,6 +30,7 @@ type entry struct {
 	status    string
 	agentName string
 	title     string
+	paneID    string
 }
 
 type fileChange struct {
@@ -36,6 +38,7 @@ type fileChange struct {
 	agent   string
 	added   int
 	removed int
+	paneID  string
 }
 
 type tickMsg time.Time
@@ -88,7 +91,16 @@ func loadEntries() []entry {
 		if len(parts) < 4 || parts[0] == "" {
 			continue
 		}
-		entries = append(entries, entry{workspace: parts[0], status: parts[1], agentName: parts[2], title: parts[3]})
+		// pane_id is split off the end (rather than via one big SplitN) so a
+		// title that happens to contain a literal tab still parses correctly;
+		// pane_id itself is always a plain number with no tab in it.
+		titleAndPaneID := parts[3]
+		idx := strings.LastIndex(titleAndPaneID, "\t")
+		if idx < 0 {
+			continue
+		}
+		title, paneID := titleAndPaneID[:idx], titleAndPaneID[idx+1:]
+		entries = append(entries, entry{workspace: parts[0], status: parts[1], agentName: parts[2], title: title, paneID: paneID})
 	}
 	return entries
 }
@@ -118,13 +130,13 @@ func loadFileChanges() []fileChange {
 		if line == "" {
 			continue
 		}
-		parts := strings.SplitN(line, "\t", 4)
-		if len(parts) < 4 || parts[0] == "" {
+		parts := strings.SplitN(line, "\t", 5)
+		if len(parts) < 5 || parts[0] == "" {
 			continue
 		}
 		added, _ := strconv.Atoi(strings.TrimPrefix(parts[2], "+"))
 		removed, _ := strconv.Atoi(strings.TrimPrefix(parts[3], "-"))
-		changes = append(changes, fileChange{file: parts[0], agent: parts[1], added: added, removed: removed})
+		changes = append(changes, fileChange{file: parts[0], agent: parts[1], added: added, removed: removed, paneID: parts[4]})
 	}
 	return changes
 }
@@ -168,6 +180,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.entries = loadEntries()
 		m.fileChanges = loadFileChanges()
 		return m, tickCmd()
+	case tea.MouseMsg:
+		if msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft {
+			if paneID := m.paneIDAtRow(msg.Y); paneID != "" {
+				return m, activatePaneCmd(paneID)
+			}
+		}
+		return m, nil
 	default:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
@@ -240,6 +259,164 @@ func bodyLines(sectionHeight int) int {
 	return lines
 }
 
+// agentUnit is one renderable chunk of the AGENTS body: either a 1-line
+// workspace header (paneID "") or a 2-line entry (icon + agent name, then
+// title). agentUnits is the single source of truth for this layout so
+// rendering and mouse click hit-testing can never drift apart.
+type agentUnit struct {
+	lines  []string
+	paneID string
+}
+
+func (m model) agentUnits(width int) []agentUnit {
+	byWorkspace := map[string][]entry{}
+	var workspaces []string
+	for _, e := range m.entries {
+		if _, ok := byWorkspace[e.workspace]; !ok {
+			workspaces = append(workspaces, e.workspace)
+		}
+		byWorkspace[e.workspace] = append(byWorkspace[e.workspace], e)
+	}
+	sort.Strings(workspaces)
+
+	maxTitle := width - 3
+	if maxTitle < 4 {
+		maxTitle = 4
+	}
+
+	var units []agentUnit
+	for _, ws := range workspaces {
+		units = append(units, agentUnit{lines: []string{wsStyle.Render(ws)}})
+		for _, e := range byWorkspace[ws] {
+			units = append(units, agentUnit{
+				lines: []string{
+					" " + m.renderIcon(e.status) + agentNameStyle.Render(e.agentName),
+					"   " + truncate(e.title, maxTitle),
+				},
+				paneID: e.paneID,
+			})
+		}
+	}
+	return units
+}
+
+// agentSectionLineCount returns how many screen lines the AGENTS section
+// actually renders (title+rule, plus body up to maxLines), which can be
+// fewer than its budget if there isn't enough data to fill it. The CHANGES
+// section below it starts immediately at this row, since View() concatenates
+// the two sections with no padding in between.
+func (m model) agentSectionLineCount(width, maxLines int) int {
+	if len(m.entries) == 0 {
+		return 3 // title + rule + "(no agents yet)"
+	}
+	body := 0
+	for _, u := range m.agentUnits(width) {
+		if maxLines > 0 && body+len(u.lines) > maxLines {
+			break
+		}
+		body += len(u.lines)
+	}
+	return 2 + body
+}
+
+// changeUnit is one renderable chunk of the CHANGES body: a 2-line file edit
+// (agent name, then file + diff stat). Mirrors agentUnit so rendering and
+// mouse click hit-testing share the same layout.
+type changeUnit struct {
+	lines  []string
+	paneID string
+}
+
+func (m model) changeUnits(width int) []changeUnit {
+	var units []changeUnit
+	for _, c := range m.fileChanges {
+		stat := fmt.Sprintf("+%d -%d", c.added, c.removed)
+		maxFile := width - 5 - len([]rune(stat))
+		if maxFile < 4 {
+			maxFile = 4
+		}
+		units = append(units, changeUnit{
+			lines: []string{
+				" " + agentNameStyle.Render(c.agent),
+				"   " + truncate(c.file, maxFile) + " " +
+					addStyle.Render(fmt.Sprintf("+%d", c.added)) + " " +
+					removeStyle.Render(fmt.Sprintf("-%d", c.removed)),
+			},
+			paneID: c.paneID,
+		})
+	}
+	return units
+}
+
+// tailChangeUnits keeps only the most recent entries that fit maxLines body
+// lines (0 = unlimited), matching the tail-of-the-log behavior of the
+// CHANGES stream.
+func tailChangeUnits(units []changeUnit, maxLines int) []changeUnit {
+	if maxLines <= 0 {
+		return units
+	}
+	maxEntries := maxLines / 2
+	if maxEntries < 1 {
+		maxEntries = 1
+	}
+	if len(units) > maxEntries {
+		return units[len(units)-maxEntries:]
+	}
+	return units
+}
+
+// paneIDAtRow returns the pane id of the AGENTS or CHANGES entry rendered at
+// absolute screen row y (0-indexed from the very top of the view), or "" if
+// y falls on a header, a workspace header, or outside any clickable entry.
+// Used to resolve mouse clicks to a pane to focus.
+func (m model) paneIDAtRow(y int) string {
+	width := m.width
+	if width <= 0 {
+		width = 30
+	}
+	agentLines, changeLines := m.sectionHeights()
+
+	agentSectionRows := m.agentSectionLineCount(width, agentLines)
+
+	if y >= 2 && y < agentSectionRows {
+		bodyRow := y - 2
+		line := 0
+		for _, u := range m.agentUnits(width) {
+			if agentLines > 0 && line+len(u.lines) > agentLines {
+				break
+			}
+			if bodyRow >= line && bodyRow < line+len(u.lines) {
+				return u.paneID
+			}
+			line += len(u.lines)
+		}
+		return ""
+	}
+
+	changeBodyRow := y - agentSectionRows - 2 // 2 header lines: "CHANGES" title + rule
+	if changeBodyRow < 0 {
+		return ""
+	}
+	line := 0
+	for _, u := range tailChangeUnits(m.changeUnits(width), changeLines) {
+		if changeBodyRow >= line && changeBodyRow < line+len(u.lines) {
+			return u.paneID
+		}
+		line += len(u.lines)
+	}
+	return ""
+}
+
+// activatePaneCmd shells out to `wezterm cli activate-pane`, the same CLI
+// agent-status.sh already relies on to resolve tty paths, since agent-sidebar
+// has no direct IPC to the mux server to focus a pane itself.
+func activatePaneCmd(paneID string) tea.Cmd {
+	return func() tea.Msg {
+		exec.Command("wezterm", "cli", "activate-pane", "--pane-id", paneID).Run()
+		return nil
+	}
+}
+
 // renderAgentSection renders the "AGENTS" list, stopping once maxLines body
 // lines (0 = unlimited) have been written so it doesn't spill into the
 // file-change section below it.
@@ -256,56 +433,16 @@ func (m model) renderAgentSection(width, maxLines int) string {
 		return b.String()
 	}
 
-	byWorkspace := map[string][]entry{}
-	var workspaces []string
-	for _, e := range m.entries {
-		if _, ok := byWorkspace[e.workspace]; !ok {
-			workspaces = append(workspaces, e.workspace)
+	lineCount := 0
+	for _, u := range m.agentUnits(width) {
+		if maxLines > 0 && lineCount+len(u.lines) > maxLines {
+			break
 		}
-		byWorkspace[e.workspace] = append(byWorkspace[e.workspace], e)
-	}
-	sort.Strings(workspaces)
-
-	// Built as a flat slice (rather than written straight to b) so a tight
-	// maxLines can cut it off at exactly that many lines without ever
-	// leaving a workspace header dangling with none of its entries below it.
-	var lines []string
-	var isHeader []bool
-	for _, ws := range workspaces {
-		lines = append(lines, wsStyle.Render(ws))
-		isHeader = append(isHeader, true)
-		for _, e := range byWorkspace[ws] {
-			prefix := ""
-			if e.agentName != "" {
-				prefix = e.agentName + " · "
-			}
-			maxTitle := width - 4 - len([]rune(prefix))
-			if maxTitle < 4 {
-				maxTitle = 4
-			}
-
-			var line strings.Builder
-			line.WriteString(" ")
-			line.WriteString(m.renderIcon(e.status))
-			if prefix != "" {
-				line.WriteString(agentNameStyle.Render(e.agentName))
-				line.WriteString(dimStyle.Render(" · "))
-			}
-			line.WriteString(truncate(e.title, maxTitle))
-			lines = append(lines, line.String())
-			isHeader = append(isHeader, false)
+		for _, line := range u.lines {
+			b.WriteString(line)
+			b.WriteString("\n")
 		}
-	}
-	if maxLines > 0 && len(lines) > maxLines {
-		lines = lines[:maxLines]
-		isHeader = isHeader[:maxLines]
-	}
-	for len(lines) > 0 && isHeader[len(lines)-1] {
-		lines = lines[:len(lines)-1]
-	}
-	for _, line := range lines {
-		b.WriteString(line)
-		b.WriteString("\n")
+		lineCount += len(u.lines)
 	}
 
 	return b.String()
@@ -328,35 +465,11 @@ func (m model) renderChangeSection(width, maxLines int) string {
 		return b.String()
 	}
 
-	changes := m.fileChanges
-	if maxLines > 0 {
-		maxEntries := maxLines / 2
-		if maxEntries < 1 {
-			maxEntries = 1
+	for _, u := range tailChangeUnits(m.changeUnits(width), maxLines) {
+		for _, line := range u.lines {
+			b.WriteString(line)
+			b.WriteString("\n")
 		}
-		if len(changes) > maxEntries {
-			changes = changes[len(changes)-maxEntries:]
-		}
-	}
-
-	for _, c := range changes {
-		b.WriteString(" ")
-		b.WriteString(agentNameStyle.Render(c.agent))
-		b.WriteString("\n")
-
-		stat := fmt.Sprintf("+%d -%d", c.added, c.removed)
-		maxFile := width - 5 - len([]rune(stat))
-		if maxFile < 4 {
-			maxFile = 4
-		}
-
-		b.WriteString("   ")
-		b.WriteString(truncate(c.file, maxFile))
-		b.WriteString(" ")
-		b.WriteString(addStyle.Render(fmt.Sprintf("+%d", c.added)))
-		b.WriteString(" ")
-		b.WriteString(removeStyle.Render(fmt.Sprintf("-%d", c.removed)))
-		b.WriteString("\n")
 	}
 
 	return b.String()
@@ -381,7 +494,7 @@ func main() {
 	// the previous frame's line count to move the cursor back up before
 	// redrawing. A pane resize desyncs that count and corrupts the display.
 	// The alt screen gives it a dedicated full-screen buffer instead.
-	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
+	p := tea.NewProgram(initialModel(), tea.WithAltScreen(), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "agent-sidebar:", err)
 		os.Exit(1)

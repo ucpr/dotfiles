@@ -1,8 +1,9 @@
 #!/bin/sh
 # usage: agent-filechange.sh <agent-name>
 # PostToolUse hook: reads the hook JSON payload from stdin and, for Edit/Write
-# tool calls, appends "<file>\t<agent-name>\t+<added>\t-<removed>" to the
-# file-change stream log that agent-sidebar tails.
+# tool calls, appends "<file>\t<agent-name>\t+<added>\t-<removed>\t<pane_id>"
+# to the file-change stream log that agent-sidebar tails. pane_id lets the
+# sidebar focus the originating pane on click, same as agent-status.sh.
 #
 # tool_response.structuredPatch already carries unified-diff hunks (verified
 # by dumping a real PostToolUse payload for both Edit and Write), so line
@@ -35,7 +36,9 @@ if [ "$tool_name" = "Write" ] && [ "$added" = "0" ] && [ "$removed" = "0" ]; the
   added=$(printf '%s' "$payload" | jq -r '(.tool_input.content // "") | rtrimstr("\n") | split("\n") | length')
 fi
 
-printf '%s\t%s\t+%s\t-%s\n' "$(basename "$file_path")" "$AGENT_NAME" "$added" "$removed" >> "$LOG"
+# $WEZTERM_PANE is already the pane's id (agent-status.sh matches it against
+# `wezterm cli list`'s .pane_id), so it can be used directly with no lookup.
+printf '%s\t%s\t+%s\t-%s\t%s\n' "$(basename "$file_path")" "$AGENT_NAME" "$added" "$removed" "${WEZTERM_PANE:-}" >> "$LOG"
 
 # Trim the log so a long session doesn't grow it unbounded.
 if [ "$(wc -l < "$LOG")" -gt "$MAX_LINES" ]; then

@@ -141,7 +141,10 @@ local function write_agent_status_snapshot()
 							if not uv.agent_sidebar and uv.agent_status then
 								local agent_name = uv.agent_name or ""
 								local title = p:get_title() or ""
-								table.insert(lines, ws .. "\t" .. uv.agent_status .. "\t" .. agent_name .. "\t" .. title)
+								table.insert(
+									lines,
+									ws .. "\t" .. uv.agent_status .. "\t" .. agent_name .. "\t" .. title .. "\t" .. p:pane_id()
+								)
 							end
 						end
 					end

@@ -1,6 +1,6 @@
 # agent-sidebar
 
-A small Go/Bubble Tea TUI, meant to run inside a dedicated narrow WezTerm pane, that renders a live list of every pane running a coding agent (Claude Code, Codex) alongside its status (`working` / `blocked` / `done` / `idle`) and a stream of recent file edits.
+A small Go/Bubble Tea TUI, meant to run inside a dedicated narrow WezTerm pane, that renders a live list of every pane running a coding agent (Claude Code, Codex) alongside its status (`working` / `blocked` / `done` / `idle`) and a stream of recent file edits. Clicking any entry in either section focuses that pane.
 
 It has a second mode, `agent-sidebar setup`, that wires the hook plumbing into Claude Code's and Codex's config so they report status in the first place.
 
@@ -19,7 +19,7 @@ Claude Code / Codex hook
 ../wezterm.lua  write_agent_status_snapshot()
         │  reads every pane's user vars across all workspaces, writes
         │  $HOME/.cache/wezterm/agent-status.txt
-        │  (workspace\tstatus\tagent_name\ttitle, one line per pane)
+        │  (workspace\tstatus\tagent_name\ttitle\tpane_id, one line per pane)
         ▼
 agent-sidebar (this program)
         polls the snapshot file every 500ms and renders it, grouped by workspace
@@ -35,7 +35,7 @@ Claude Code / Codex PostToolUse hook
         │  calls appends a line to the file-change log
         ▼
 $HOME/.cache/wezterm/agent-file-changes.log
-        (file\tagent\t+added\t-removed, append-only, trimmed to 500 lines)
+        (file\tagent\t+added\t-removed\tpane_id, append-only, trimmed to 500 lines)
         ▼
 agent-sidebar (this program)
         polls the log alongside the status snapshot
