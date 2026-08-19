@@ -7,10 +7,16 @@
 // via write_agent_status_snapshot():
 //
 //	$HOME/.cache/wezterm/agent-status.txt   (workspace\tstatus\tagent_name\ttab_number\ttitle\tpane_id per line)
+//
+// It also raises a macOS notification (via osascript) whenever a pane
+// transitions into a wait state (blocked/done), skipping whichever pane the
+// user is currently focused on (per `wezterm cli list-clients`). See
+// waitTransitions and focusedPaneID.
 package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -67,6 +73,11 @@ var (
 		Frames: []string{"🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"},
 		FPS:    time.Second / 4,
 	}
+
+	// The two statuses that represent an agent waiting on the user (a
+	// permission prompt, or a finished turn awaiting the next prompt) and
+	// should raise a macOS notification when a pane transitions into them.
+	waitStatuses = map[string]bool{"blocked": true, "done": true}
 )
 
 func statePath() string {
@@ -150,12 +161,143 @@ type model struct {
 	width       int
 	height      int
 	spinner     spinner.Model
+	// prevStatus is the status each paneID had as of the previous tick, used
+	// by waitTransitions to detect a pane just entering a wait state rather
+	// than re-notifying on every tick it stays there.
+	prevStatus map[string]string
 }
 
 func initialModel() model {
 	s := spinner.New()
 	s.Spinner = clockSpinner
-	return model{entries: loadEntries(), fileChanges: loadFileChanges(), spinner: s}
+	entries := loadEntries()
+	// Seeded from the startup snapshot, not left empty, so a pane that's
+	// already blocked/done when the sidebar launches is treated as the
+	// notification baseline rather than a fresh transition worth a ping.
+	return model{entries: entries, fileChanges: loadFileChanges(), spinner: s, prevStatus: statusSnapshot(entries)}
+}
+
+// statusSnapshot captures entries' statuses by paneID for comparison against
+// the next tick's snapshot.
+func statusSnapshot(entries []entry) map[string]string {
+	snap := make(map[string]string, len(entries))
+	for _, e := range entries {
+		snap[e.paneID] = e.status
+	}
+	return snap
+}
+
+// waitTransitions returns the entries whose status just changed into a wait
+// state (see waitStatuses) since prev, e.g. working -> blocked. A paneID
+// absent from prev (freshly appeared this tick, or not yet seen) is never
+// reported: there's no real transition to compare against yet.
+func waitTransitions(prev map[string]string, entries []entry) []entry {
+	var out []entry
+	for _, e := range entries {
+		old, ok := prev[e.paneID]
+		if !ok || old == e.status || !waitStatuses[e.status] {
+			continue
+		}
+		out = append(out, e)
+	}
+	return out
+}
+
+// notifiedMarkerDir holds one empty marker file per paneID currently
+// "claimed" for a wait-state notification. It's shared filesystem state
+// (unlike prevStatus, which is per-process memory) so that when several
+// agent-sidebar instances are running at once - e.g. one per WezTerm window,
+// all polling the same snapshot file - a single pane's transition into a
+// wait state gets exactly one notification instead of one per instance.
+func notifiedMarkerDir() string {
+	return filepath.Join(filepath.Dir(statePath()), "agent-notified")
+}
+
+func markerPath(paneID string) string {
+	return filepath.Join(notifiedMarkerDir(), paneID)
+}
+
+// claimNotification atomically claims the right to notify for paneID's
+// current wait-state occurrence, returning whether this call is the one that
+// won the claim. os.O_EXCL makes file creation atomic at the filesystem
+// level (fails if the marker already exists), so when multiple instances
+// race to claim the same pane on the same tick, exactly one succeeds. If the
+// marker directory can't even be created, it fails open (returns true)
+// rather than silently dropping the notification everywhere.
+func claimNotification(paneID string) bool {
+	dir := notifiedMarkerDir()
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return true
+	}
+	f, err := os.OpenFile(markerPath(paneID), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
+	if err != nil {
+		return false
+	}
+	f.Close()
+	return true
+}
+
+// pruneNotificationMarkers removes the claim marker for any paneID that's no
+// longer in a wait state per current (including one that's disappeared from
+// the snapshot entirely), so a later re-entry into blocked/done can be
+// claimed - and therefore notified - again instead of staying silently
+// suppressed for the rest of the pane's life.
+func pruneNotificationMarkers(current map[string]string) {
+	entries, err := os.ReadDir(notifiedMarkerDir())
+	if err != nil {
+		return
+	}
+	for _, e := range entries {
+		if waitStatuses[current[e.Name()]] {
+			continue
+		}
+		os.Remove(markerPath(e.Name()))
+	}
+}
+
+// focusedPaneID returns the pane ID the user is currently looking at, per
+// `wezterm cli list-clients`'s focused_pane_id (distinct from `wezterm cli
+// list`'s per-tab is_active, which marks one pane per tab and so can't
+// identify the single pane actually on screen across tabs/windows). Returns
+// "" if it can't be determined, which simply disables the focus check rather
+// than blocking notifications outright. When multiple clients are attached,
+// the one with the lowest idle_time is assumed to be the one in front.
+func focusedPaneID() string {
+	out, err := exec.Command("wezterm", "cli", "list-clients", "--format", "json").Output()
+	if err != nil {
+		return ""
+	}
+	var clients []struct {
+		FocusedPaneID int `json:"focused_pane_id"`
+		IdleTime      struct {
+			Secs int64 `json:"secs"`
+		} `json:"idle_time"`
+	}
+	if err := json.Unmarshal(out, &clients); err != nil || len(clients) == 0 {
+		return ""
+	}
+	best := clients[0]
+	for _, c := range clients[1:] {
+		if c.IdleTime.Secs < best.IdleTime.Secs {
+			best = c
+		}
+	}
+	return strconv.Itoa(best.FocusedPaneID)
+}
+
+// notifyCmd raises a macOS notification for e via osascript. Values are
+// passed as argv items to an `on run argv` handler rather than interpolated
+// into the AppleScript source, so an agent/window title containing quotes
+// or other AppleScript-meaningful characters can't break out of the script.
+func notifyCmd(e entry) tea.Cmd {
+	title := fmt.Sprintf("%s %s", statusIcon[e.status], e.agentName)
+	message := fmt.Sprintf("%s (tab:%s)", e.title, e.tabNumber)
+	return func() tea.Msg {
+		exec.Command("osascript", "-e", `on run argv
+	display notification (item 2 of argv) with title (item 1 of argv) sound name "Ping"
+end run`, title, message).Run()
+		return nil
+	}
 }
 
 func tickCmd() tea.Cmd {
@@ -180,8 +322,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case tickMsg:
-		m.entries = loadEntries()
+		newEntries := loadEntries()
 		m.fileChanges = loadFileChanges()
+
+		newStatus := statusSnapshot(newEntries)
+		cmds := []tea.Cmd{tickCmd()}
+		// focusedPaneID shells out to `wezterm cli`, so it's only called when
+		// there's actually a transition to filter, not on every 500ms tick.
+		if transitions := waitTransitions(m.prevStatus, newEntries); len(transitions) > 0 {
+			focused := focusedPaneID()
+			for _, e := range transitions {
+				if e.paneID == focused {
+					continue
+				}
+				// claimNotification is what keeps multiple agent-sidebar
+				// instances (e.g. one per WezTerm window) from each firing
+				// their own notification for the same transition.
+				if claimNotification(e.paneID) {
+					cmds = append(cmds, notifyCmd(e))
+				}
+			}
+		}
+		pruneNotificationMarkers(newStatus)
+		m.prevStatus = newStatus
+		m.entries = newEntries
+
 		// A top_level split (see wezterm.lua) doesn't reliably deliver an
 		// accurate tea.WindowSizeMsg for the newly-created pane, leaving
 		// m.width stuck at some earlier (too-wide) value - which drew the
@@ -192,7 +357,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.width = w
 			m.height = h
 		}
-		return m, tickCmd()
+		return m, tea.Batch(cmds...)
 	case tea.MouseMsg:
 		if msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft {
 			if paneID := m.paneIDAtRow(msg.Y); paneID != "" {
