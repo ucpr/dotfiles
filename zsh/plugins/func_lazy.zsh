@@ -36,6 +36,50 @@ git_wt_fzf() {
   esac
 }
 
+# noti <command> [args...]: runs a long-running command to completion, then
+# appends a completion record to $HOME/.cache/wezterm/agent-notify.log, which
+# wezterm/agent-sidebar's NOTIFY section polls and renders. Exit status is
+# passed through so `noti build && next-step` still works as expected.
+noti() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: noti <command> [args...]" >&2
+        return 1
+    fi
+
+    local log="$HOME/.cache/wezterm/agent-notify.log"
+    local max_lines=200
+    mkdir -p "$(dirname "$log")"
+
+    local label="$*"
+    label="${label//$'\t'/ }"
+    label="${label//$'\n'/ }"
+
+    local start=$(date +%s)
+    "$@"
+    local exit_code=$?
+    local elapsed=$(( $(date +%s) - start ))
+
+    local h=$((elapsed / 3600))
+    local m=$(((elapsed % 3600) / 60))
+    local s=$((elapsed % 60))
+    local duration=""
+    [ "$h" -gt 0 ] && duration="${duration}${h}h"
+    [ "$m" -gt 0 ] && duration="${duration}${m}m"
+    duration="${duration}${s}s"
+
+    printf '%s\t%s\t%s\t%s\n' "$label" "$exit_code" "$duration" "${WEZTERM_PANE:-}" >> "$log"
+
+    if [ "$(wc -l < "$log")" -gt "$max_lines" ]; then
+        tail -n "$max_lines" "$log" > "$log.tmp" && mv "$log.tmp" "$log"
+    fi
+
+    local icon="✅"
+    [ "$exit_code" -ne 0 ] && icon="❌"
+    osascript-system-notify "$icon $label" "exit $exit_code · ${duration}" "" "Ping"
+
+    return $exit_code
+}
+
 osascript-system-notify() {
     local title="${1:-Notification}"
     local message="${2:-Message}"

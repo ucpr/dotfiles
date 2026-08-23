@@ -1,6 +1,6 @@
 # agent-sidebar
 
-A small Go/Bubble Tea TUI, meant to run inside a dedicated narrow WezTerm pane, that renders a live list of every pane running a coding agent (Claude Code, Codex) alongside its status (`working` / `blocked` / `done` / `idle`) and a stream of recent file edits. Clicking any entry in either section focuses that pane.
+A small Go/Bubble Tea TUI, meant to run inside a dedicated narrow WezTerm pane, that renders a live list of every pane running a coding agent (Claude Code, Codex) alongside its status (`working` / `blocked` / `done` / `idle`), a stream of recent file edits, and a stream of completed long-running commands run via `noti`. Clicking any entry in any section focuses that entry's originating pane.
 
 It has a second mode, `agent-sidebar setup`, that wires the hook plumbing into Claude Code's and Codex's config so they report status in the first place.
 
@@ -41,7 +41,22 @@ agent-sidebar (this program)
         polls the log alongside the status snapshot
 ```
 
-Because the snapshot/log formats are just tab-separated text files, and `agent-sidebar` itself never talks to WezTerm's Lua user vars (`wezterm cli list` doesn't expose them), any change to either wire format must be kept in sync by hand between this program, `../wezterm.lua`, and the two scripts.
+A third, independent stream feeds the "NOTIFY" section:
+
+```
+noti <command> [args...]           (shell function, ../../zsh/plugins/func_lazy.zsh)
+        │  runs <command> to completion, timing it and capturing its exit code
+        ▼
+$HOME/.cache/wezterm/agent-notify.log
+        (label\texit_code\tduration\tpane_id, append-only, trimmed to 200 lines)
+        ▼
+agent-sidebar (this program)
+        polls the log alongside the status snapshot and file-change log
+```
+
+`noti` is a plain interactive-shell wrapper, not a Claude Code/Codex hook - it's meant for wrapping any long-running command (`noti make build`, `noti go test ./...`) so its completion shows up in the sidebar (and as a macOS notification) instead of requiring you to keep checking a terminal you've switched away from. Its exit code is passed through, so `noti <cmd> && next-step` still works.
+
+Because the snapshot/log formats are just tab-separated text files, and `agent-sidebar` itself never talks to WezTerm's Lua user vars (`wezterm cli list` doesn't expose them), any change to any of the three wire formats must be kept in sync by hand between this program and whichever of `../wezterm.lua`, the two scripts, or `noti` produces it.
 
 ## Usage
 
@@ -75,6 +90,7 @@ After running `setup`:
 | --- | --- | --- |
 | `AGENT_SIDEBAR_STATE_FILE` | Path to the agent-status snapshot file | `$HOME/.cache/wezterm/agent-status.txt` |
 | `AGENT_SIDEBAR_FILECHANGE_FILE` | Path to the file-change log | `$HOME/.cache/wezterm/agent-file-changes.log` |
+| `AGENT_SIDEBAR_NOTIFY_FILE` | Path to the `noti` completion log | `$HOME/.cache/wezterm/agent-notify.log` |
 | `CLAUDE_CONFIG_DIR` | Overrides Claude Code's config directory (used by `setup`) | `$HOME/.claude` |
 | `CODEX_HOME` | Overrides Codex's config directory (used by `setup`) | `$HOME/.codex` |
 
@@ -91,7 +107,7 @@ There's no separate lint config; `go vet` is the extent of it.
 
 ## Code layout
 
-- **`main.go`** — the TUI (`model`/`Update`/`View` per Bubble Tea's Elm architecture). Polls the status snapshot and file-change log every 500ms and renders two sections: `AGENTS` (grouped by workspace, with a live spinner for `working` and static emoji for other statuses) and `AGENT CHANGES` (a tail of recent file edits).
+- **`main.go`** — the TUI (`model`/`Update`/`View` per Bubble Tea's Elm architecture). Polls the status snapshot, file-change log, and `noti` completion log every 500ms and renders three sections: `AGENTS` (grouped by workspace, with a live spinner for `working` and static emoji for other statuses), `AGENT CHANGES` (a tail of recent file edits), and `NOTIFY` (a tail of completed `noti`-wrapped commands, ✅/❌ by exit code).
 - **`setup.go`** — `agent-sidebar setup`, merging hook entries into Claude Code's and Codex's config files.
 - **`setup_test.go`** — covers `ensureHooks` from-scratch creation, idempotency, preservation of pre-existing unrelated config, and the `$CLAUDE_CONFIG_DIR` / `$CODEX_HOME` overrides.
 

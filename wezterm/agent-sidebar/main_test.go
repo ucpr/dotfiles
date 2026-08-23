@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -78,6 +79,33 @@ func TestWaitTransitions(t *testing.T) {
 
 	if len(got) != 1 || got[0].paneID != "1" {
 		t.Fatalf("waitTransitions(...) = %v, want exactly the pane 1 -> blocked transition", got)
+	}
+}
+
+// loadNotifications must parse the exact line format the `noti` shell
+// function (zsh/plugins/func_lazy.zsh) appends, including a nonzero exit
+// code and an empty pane_id (noti run outside a WezTerm pane).
+func TestLoadNotificationsParsesNotiLogFormat(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "agent-notify.log")
+	t.Setenv("AGENT_SIDEBAR_NOTIFY_FILE", path)
+
+	content := "sleep 1\t0\t1s\t45\nfalse\t1\t0s\t\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	got := loadNotifications()
+	want := []notification{
+		{label: "sleep 1", exitCode: 0, duration: "1s", paneID: "45"},
+		{label: "false", exitCode: 1, duration: "0s", paneID: ""},
+	}
+	if len(got) != len(want) {
+		t.Fatalf("loadNotifications() = %+v, want %+v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("loadNotifications()[%d] = %+v, want %+v", i, got[i], want[i])
+		}
 	}
 }
 

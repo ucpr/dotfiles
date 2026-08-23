@@ -50,6 +50,13 @@ type fileChange struct {
 	paneID  string
 }
 
+type notification struct {
+	label    string
+	exitCode int
+	duration string
+	paneID   string
+}
+
 type tickMsg time.Time
 
 var (
@@ -155,12 +162,49 @@ func loadFileChanges() []fileChange {
 	return changes
 }
 
+func notifyLogPath() string {
+	if p := os.Getenv("AGENT_SIDEBAR_NOTIFY_FILE"); p != "" {
+		return p
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(home, ".cache", "wezterm", "agent-notify.log")
+}
+
+// loadNotifications parses the `noti` shell function's completion log (see
+// zsh/plugins/func_lazy.zsh). Unlike loadEntries/loadFileChanges, the label
+// field can't contain a literal tab in the first place - `noti` sanitizes it
+// before appending - so a plain 4-way split is enough, no need for the
+// split-from-the-end trick those two use for their own tab-safe fields.
+func loadNotifications() []notification {
+	data, err := os.ReadFile(notifyLogPath())
+	if err != nil {
+		return nil
+	}
+	var notifications []notification
+	for _, line := range strings.Split(strings.TrimRight(string(data), "\n"), "\n") {
+		if line == "" {
+			continue
+		}
+		parts := strings.SplitN(line, "\t", 4)
+		if len(parts) < 4 || parts[0] == "" {
+			continue
+		}
+		exitCode, _ := strconv.Atoi(parts[1])
+		notifications = append(notifications, notification{label: parts[0], exitCode: exitCode, duration: parts[2], paneID: parts[3]})
+	}
+	return notifications
+}
+
 type model struct {
-	entries     []entry
-	fileChanges []fileChange
-	width       int
-	height      int
-	spinner     spinner.Model
+	entries       []entry
+	fileChanges   []fileChange
+	notifications []notification
+	width         int
+	height        int
+	spinner       spinner.Model
 	// prevStatus is the status each paneID had as of the previous tick, used
 	// by waitTransitions to detect a pane just entering a wait state rather
 	// than re-notifying on every tick it stays there.
@@ -174,7 +218,7 @@ func initialModel() model {
 	// Seeded from the startup snapshot, not left empty, so a pane that's
 	// already blocked/done when the sidebar launches is treated as the
 	// notification baseline rather than a fresh transition worth a ping.
-	return model{entries: entries, fileChanges: loadFileChanges(), spinner: s, prevStatus: statusSnapshot(entries)}
+	return model{entries: entries, fileChanges: loadFileChanges(), notifications: loadNotifications(), spinner: s, prevStatus: statusSnapshot(entries)}
 }
 
 // statusSnapshot captures entries' statuses by paneID for comparison against
@@ -324,6 +368,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		newEntries := loadEntries()
 		m.fileChanges = loadFileChanges()
+		m.notifications = loadNotifications()
 
 		newStatus := statusSnapshot(newEntries)
 		cmds := []tea.Cmd{tickCmd()}
@@ -406,19 +451,26 @@ func (m model) View() string {
 	if width <= 0 {
 		width = 30
 	}
-	agentLines, changeLines := m.sectionHeights()
+	agentLines, changeLines, notifyLines := m.sectionHeights()
 
 	// Padded out to its full budget (rather than left as short as its actual
-	// content) so AGENT CHANGES always starts at a fixed row - pinned to the bottom
-	// third of the pane - instead of drifting up when AGENTS has few entries.
+	// content) so the section below always starts at a fixed row, instead of
+	// drifting up when this one has few entries. NOTIFY, being last, needs no
+	// padding of its own.
 	agentSection := m.renderAgentSection(width, agentLines)
 	if agentLines > 0 {
 		agentSection = padToLines(agentSection, 2+agentLines)
 	}
+	changeSection := m.renderChangeSection(width, changeLines)
+	if changeLines > 0 {
+		changeSection = padToLines(changeSection, 2+changeLines)
+	}
 
 	var b strings.Builder
 	b.WriteString(agentSection)
-	b.WriteString(m.renderChangeSection(width, changeLines))
+	b.WriteString(changeSection)
+	b.WriteString("\n") // blank line separating AGENT CHANGES from NOTIFY
+	b.WriteString(m.renderNotifySection(width, notifyLines))
 	return b.String()
 }
 
@@ -432,19 +484,28 @@ func padToLines(s string, target int) string {
 	return s
 }
 
-// sectionHeights splits the whole pane height into thirds: the bottom third
-// (header included) goes to the file-change stream, and the remaining two
-// thirds above it to the agent list. Each result is then reduced by that
-// section's own title+rule (2 lines) to get its body-line budget. A height
-// of 0 (not yet known, e.g. before the first WindowSizeMsg) means "don't
-// truncate" and is returned as 0/0.
-func (m model) sectionHeights() (agentLines, changeLines int) {
+// sectionHeights splits the whole pane height across the three sections:
+// AGENT CHANGES and NOTIFY each get a quarter (header included), and the
+// agent list gets the remaining half above them - the same 2:1 weighting
+// AGENTS:AGENT CHANGES had before NOTIFY existed, extended to a 2:1:1 split.
+// One line is reserved up front for the blank line View() inserts between
+// AGENT CHANGES and NOTIFY, so that separator doesn't push NOTIFY's body
+// past the bottom of the pane. Each result is then reduced by that section's
+// own title+rule (2 lines) to get its body-line budget. A height of 0 (not
+// yet known, e.g. before the first WindowSizeMsg) means "don't truncate" and
+// is returned as 0/0/0.
+func (m model) sectionHeights() (agentLines, changeLines, notifyLines int) {
 	if m.height <= 0 {
-		return 0, 0
+		return 0, 0, 0
 	}
-	changeSection := m.height / 3
-	agentSection := m.height - changeSection
-	return bodyLines(agentSection), bodyLines(changeSection)
+	available := m.height - 1
+	if available < 0 {
+		available = 0
+	}
+	changeSection := available / 4
+	notifySection := available / 4
+	agentSection := available - changeSection - notifySection
+	return bodyLines(agentSection), bodyLines(changeSection), bodyLines(notifySection)
 }
 
 // bodyLines converts a section's total height (including its title+rule) to
@@ -563,6 +624,72 @@ func tailChangeUnits(units []changeUnit, maxLines int) []changeUnit {
 	return units
 }
 
+// changeSectionLineCount mirrors agentSectionLineCount for the AGENT CHANGES
+// section, which paneIDAtRow needs to know the total rendered height of now
+// that NOTIFY sits below it (AGENT CHANGES used to be the last section, so
+// nothing needed its row count before).
+func (m model) changeSectionLineCount(width, maxLines int) int {
+	if maxLines > 0 {
+		return 2 + maxLines
+	}
+	if len(m.fileChanges) == 0 {
+		return 3 // title + rule + "(no changes yet)"
+	}
+	body := 0
+	for _, u := range m.changeUnits(width) {
+		body += len(u.lines)
+	}
+	return 2 + body
+}
+
+// notifyUnit is one renderable chunk of the NOTIFY body: a 2-line completed
+// `noti` invocation (icon + label, then duration and, on failure, exit
+// code). Mirrors agentUnit/changeUnit so rendering and mouse click
+// hit-testing share the same layout.
+type notifyUnit struct {
+	lines  []string
+	paneID string
+}
+
+func (m model) notifyUnits(width int) []notifyUnit {
+	var units []notifyUnit
+	for _, n := range m.notifications {
+		icon := "✅"
+		status := ""
+		if n.exitCode != 0 {
+			icon = "❌"
+			status = removeStyle.Render(fmt.Sprintf(" exit %d", n.exitCode))
+		}
+		maxLabel := width - 3
+		if maxLabel < 4 {
+			maxLabel = 4
+		}
+		units = append(units, notifyUnit{
+			lines: []string{
+				" " + icon + " " + agentNameStyle.Render(truncate(n.label, maxLabel)),
+				"   " + dimStyle.Render(n.duration) + status,
+			},
+			paneID: n.paneID,
+		})
+	}
+	return units
+}
+
+// tailNotifyUnits mirrors tailChangeUnits for the NOTIFY stream.
+func tailNotifyUnits(units []notifyUnit, maxLines int) []notifyUnit {
+	if maxLines <= 0 {
+		return units
+	}
+	maxEntries := maxLines / 2
+	if maxEntries < 1 {
+		maxEntries = 1
+	}
+	if len(units) > maxEntries {
+		return units[len(units)-maxEntries:]
+	}
+	return units
+}
+
 // paneIDAtRow returns the pane id of the AGENTS or AGENT CHANGES entry rendered at
 // absolute screen row y (0-indexed from the very top of the view), or "" if
 // y falls on a header, a workspace header, or outside any clickable entry.
@@ -572,7 +699,7 @@ func (m model) paneIDAtRow(y int) string {
 	if width <= 0 {
 		width = 30
 	}
-	agentLines, changeLines := m.sectionHeights()
+	agentLines, changeLines, notifyLines := m.sectionHeights()
 
 	agentSectionRows := m.agentSectionLineCount(width, agentLines)
 
@@ -591,13 +718,28 @@ func (m model) paneIDAtRow(y int) string {
 		return ""
 	}
 
-	changeBodyRow := y - agentSectionRows - 2 // 2 header lines: "AGENT CHANGES" title + rule
-	if changeBodyRow < 0 {
+	changeSectionStart := agentSectionRows
+	changeSectionRows := m.changeSectionLineCount(width, changeLines)
+
+	if y >= changeSectionStart+2 && y < changeSectionStart+changeSectionRows {
+		changeBodyRow := y - changeSectionStart - 2
+		line := 0
+		for _, u := range tailChangeUnits(m.changeUnits(width), changeLines) {
+			if changeBodyRow >= line && changeBodyRow < line+len(u.lines) {
+				return u.paneID
+			}
+			line += len(u.lines)
+		}
+		return ""
+	}
+
+	notifyBodyRow := y - changeSectionStart - changeSectionRows - 1 - 2 // 1 blank line + 2 header lines: "NOTIFY" title + rule
+	if notifyBodyRow < 0 {
 		return ""
 	}
 	line := 0
-	for _, u := range tailChangeUnits(m.changeUnits(width), changeLines) {
-		if changeBodyRow >= line && changeBodyRow < line+len(u.lines) {
+	for _, u := range tailNotifyUnits(m.notifyUnits(width), notifyLines) {
+		if notifyBodyRow >= line && notifyBodyRow < line+len(u.lines) {
 			return u.paneID
 		}
 		line += len(u.lines)
@@ -664,6 +806,33 @@ func (m model) renderChangeSection(width, maxLines int) string {
 	}
 
 	for _, u := range tailChangeUnits(m.changeUnits(width), maxLines) {
+		for _, line := range u.lines {
+			b.WriteString(line)
+			b.WriteString("\n")
+		}
+	}
+
+	return b.String()
+}
+
+// renderNotifySection renders the "NOTIFY" stream: a tail of the most recent
+// `noti`-wrapped long-running commands to finish, oldest to newest. Each
+// entry takes two lines (icon + label, then duration/exit status), so
+// maxLines (0 = unlimited) is halved to get the entry count.
+func (m model) renderNotifySection(width, maxLines int) string {
+	var b strings.Builder
+	b.WriteString(titleStyle.Render("NOTIFY"))
+	b.WriteString("\n")
+	b.WriteString(dimStyle.Render(strings.Repeat("─", width)))
+	b.WriteString("\n")
+
+	if len(m.notifications) == 0 {
+		b.WriteString(dimStyle.Render("(no notifications yet)"))
+		b.WriteString("\n")
+		return b.String()
+	}
+
+	for _, u := range tailNotifyUnits(m.notifyUnits(width), maxLines) {
 		for _, line := range u.lines {
 			b.WriteString(line)
 			b.WriteString("\n")
