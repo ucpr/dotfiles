@@ -17,7 +17,7 @@
     k9s
     kustomize
     fastfetch
-    awscli
+    awscli2
     tailscale
     ast-grep
   ];
