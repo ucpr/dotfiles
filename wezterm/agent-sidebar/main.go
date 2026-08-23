@@ -409,7 +409,7 @@ func (m model) View() string {
 	agentLines, changeLines := m.sectionHeights()
 
 	// Padded out to its full budget (rather than left as short as its actual
-	// content) so CHANGES always starts at a fixed row - pinned to the bottom
+	// content) so AGENT CHANGES always starts at a fixed row - pinned to the bottom
 	// third of the pane - instead of drifting up when AGENTS has few entries.
 	agentSection := m.renderAgentSection(width, agentLines)
 	if agentLines > 0 {
@@ -499,8 +499,8 @@ func (m model) agentUnits(width int) []agentUnit {
 }
 
 // agentSectionLineCount returns how many screen lines the AGENTS section
-// occupies before CHANGES starts. When maxLines (its body budget) is set,
-// View() pads the section out to fill it exactly, pinning CHANGES to the
+// occupies before AGENT CHANGES starts. When maxLines (its body budget) is set,
+// View() pads the section out to fill it exactly, pinning AGENT CHANGES to the
 // bottom third of the pane; otherwise (maxLines <= 0, height not yet known)
 // it's just however many lines the actual content takes.
 func (m model) agentSectionLineCount(width, maxLines int) int {
@@ -517,7 +517,7 @@ func (m model) agentSectionLineCount(width, maxLines int) int {
 	return 2 + body
 }
 
-// changeUnit is one renderable chunk of the CHANGES body: a 2-line file edit
+// changeUnit is one renderable chunk of the AGENT CHANGES body: a 2-line file edit
 // (agent name, then file + diff stat). Mirrors agentUnit so rendering and
 // mouse click hit-testing share the same layout.
 type changeUnit struct {
@@ -548,7 +548,7 @@ func (m model) changeUnits(width int) []changeUnit {
 
 // tailChangeUnits keeps only the most recent entries that fit maxLines body
 // lines (0 = unlimited), matching the tail-of-the-log behavior of the
-// CHANGES stream.
+// AGENT CHANGES stream.
 func tailChangeUnits(units []changeUnit, maxLines int) []changeUnit {
 	if maxLines <= 0 {
 		return units
@@ -563,7 +563,7 @@ func tailChangeUnits(units []changeUnit, maxLines int) []changeUnit {
 	return units
 }
 
-// paneIDAtRow returns the pane id of the AGENTS or CHANGES entry rendered at
+// paneIDAtRow returns the pane id of the AGENTS or AGENT CHANGES entry rendered at
 // absolute screen row y (0-indexed from the very top of the view), or "" if
 // y falls on a header, a workspace header, or outside any clickable entry.
 // Used to resolve mouse clicks to a pane to focus.
@@ -591,7 +591,7 @@ func (m model) paneIDAtRow(y int) string {
 		return ""
 	}
 
-	changeBodyRow := y - agentSectionRows - 2 // 2 header lines: "CHANGES" title + rule
+	changeBodyRow := y - agentSectionRows - 2 // 2 header lines: "AGENT CHANGES" title + rule
 	if changeBodyRow < 0 {
 		return ""
 	}
@@ -646,13 +646,13 @@ func (m model) renderAgentSection(width, maxLines int) string {
 	return b.String()
 }
 
-// renderChangeSection renders the "CHANGES" stream: a tail of the most
+// renderChangeSection renders the "AGENT CHANGES" stream: a tail of the most
 // recent file edits, oldest to newest so the latest edit reads at the bottom
 // like a scrolling log. Each edit takes two lines (agent name, then file +
 // diff stat), so maxLines (0 = unlimited) is halved to get the entry count.
 func (m model) renderChangeSection(width, maxLines int) string {
 	var b strings.Builder
-	b.WriteString(titleStyle.Render("CHANGES"))
+	b.WriteString(titleStyle.Render("AGENT CHANGES"))
 	b.WriteString("\n")
 	b.WriteString(dimStyle.Render(strings.Repeat("─", width)))
 	b.WriteString("\n")

@@ -25,7 +25,7 @@ agent-sidebar (this program)
         polls the snapshot file every 500ms and renders it, grouped by workspace
 ```
 
-A second, independent stream feeds the "CHANGES" section:
+A second, independent stream feeds the "AGENT CHANGES" section:
 
 ```
 Claude Code / Codex PostToolUse hook
@@ -91,7 +91,7 @@ There's no separate lint config; `go vet` is the extent of it.
 
 ## Code layout
 
-- **`main.go`** — the TUI (`model`/`Update`/`View` per Bubble Tea's Elm architecture). Polls the status snapshot and file-change log every 500ms and renders two sections: `AGENTS` (grouped by workspace, with a live spinner for `working` and static emoji for other statuses) and `CHANGES` (a tail of recent file edits).
+- **`main.go`** — the TUI (`model`/`Update`/`View` per Bubble Tea's Elm architecture). Polls the status snapshot and file-change log every 500ms and renders two sections: `AGENTS` (grouped by workspace, with a live spinner for `working` and static emoji for other statuses) and `AGENT CHANGES` (a tail of recent file edits).
 - **`setup.go`** — `agent-sidebar setup`, merging hook entries into Claude Code's and Codex's config files.
 - **`setup_test.go`** — covers `ensureHooks` from-scratch creation, idempotency, preservation of pre-existing unrelated config, and the `$CLAUDE_CONFIG_DIR` / `$CODEX_HOME` overrides.
 
