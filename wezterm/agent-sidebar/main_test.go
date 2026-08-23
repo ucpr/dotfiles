@@ -109,6 +109,31 @@ func TestLoadNotificationsParsesNotiLogFormat(t *testing.T) {
 	}
 }
 
+// loadPaneTabs must parse wezterm.lua's pane_id\ttab_number snapshot, which
+// - unlike agent-status.txt - covers every pane, not just agent panes, so
+// NOTIFY entries (from `noti`, run in a plain shell with no agent_status)
+// can still resolve a tab number.
+func TestLoadPaneTabsParsesSnapshotFormat(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "pane-tabs.txt")
+	t.Setenv("AGENT_SIDEBAR_PANE_TABS_FILE", path)
+
+	content := "45\t2\n46\t0\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	got := loadPaneTabs()
+	want := map[string]string{"45": "2", "46": "0"}
+	if len(got) != len(want) {
+		t.Fatalf("loadPaneTabs() = %+v, want %+v", got, want)
+	}
+	for k, v := range want {
+		if got[k] != v {
+			t.Errorf("loadPaneTabs()[%q] = %q, want %q", k, got[k], v)
+		}
+	}
+}
+
 // truncate must bound display width, not rune count: a title with wide
 // (CJK/emoji) characters that fits within maxTitle runes can still overflow
 // the pane's actual column width, wrapping onto a second physical terminal

@@ -77,6 +77,14 @@ local TAB_FOREGROUND = "#FFFFFF"
 -- instead of being collapsed into a single rolled-up row.
 local AGENT_STATUS_STATE_DIR = os.getenv("HOME") .. "/.cache/wezterm"
 local AGENT_STATUS_STATE_FILE = AGENT_STATUS_STATE_DIR .. "/agent-status.txt"
+-- Every pane's tab_number, not just agent panes: the `noti` shell function
+-- (zsh/plugins/func_lazy.zsh) runs in a plain interactive shell with no
+-- agent_status of its own, but agent-sidebar's NOTIFY section still wants to
+-- show which tab a completed `noti` command ran in. tab_number can only be
+-- computed here (ipairs(w:tabs())'s visual left-to-right order), not from
+-- `wezterm cli list` alone, so it's written unconditionally for every pane
+-- rather than derived a second way in shell.
+local PANE_TABS_STATE_FILE = AGENT_STATUS_STATE_DIR .. "/pane-tabs.txt"
 os.execute('mkdir -p "' .. AGENT_STATUS_STATE_DIR .. '"')
 
 -- Reports whether p's foreground process still looks like a live agent CLI,
@@ -124,6 +132,7 @@ end
 local function write_agent_status_snapshot()
 	local ok, err = pcall(function()
 		local lines = {}
+		local pane_tab_lines = {}
 		local seen_pane_ids = {}
 		for _, ws in ipairs(wezterm.mux.get_workspace_names()) do
 			for _, w in ipairs(wezterm.mux.all_windows()) do
@@ -132,6 +141,7 @@ local function write_agent_status_snapshot()
 						for _, p in ipairs(t:panes()) do
 							local uv = p:get_user_vars()
 							seen_pane_ids[p:pane_id()] = true
+							table.insert(pane_tab_lines, p:pane_id() .. "\t" .. tab_number)
 							-- Only panes that have an actual agent_status (i.e. an agent
 							-- hook has fired there at some point) AND still have that
 							-- agent's process alive are included, so the sidebar doesn't
@@ -172,6 +182,12 @@ local function write_agent_status_snapshot()
 		if f then
 			f:write(table.concat(lines, "\n") .. "\n")
 			f:close()
+		end
+
+		local pt = io.open(PANE_TABS_STATE_FILE, "w")
+		if pt then
+			pt:write(table.concat(pane_tab_lines, "\n") .. "\n")
+			pt:close()
 		end
 	end)
 	if not ok then

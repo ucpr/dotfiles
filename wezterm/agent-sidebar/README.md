@@ -56,7 +56,21 @@ agent-sidebar (this program)
 
 `noti` is a plain interactive-shell wrapper, not a Claude Code/Codex hook - it's meant for wrapping any long-running command (`noti make build`, `noti go test ./...`) so its completion shows up in the sidebar (and as a macOS notification) instead of requiring you to keep checking a terminal you've switched away from. Its exit code is passed through, so `noti <cmd> && next-step` still works.
 
-Because the snapshot/log formats are just tab-separated text files, and `agent-sidebar` itself never talks to WezTerm's Lua user vars (`wezterm cli list` doesn't expose them), any change to any of the three wire formats must be kept in sync by hand between this program and whichever of `../wezterm.lua`, the two scripts, or `noti` produces it.
+NOTIFY entries show a `(tab:N)` suffix the same way AGENTS entries do, resolved from a fourth stream:
+
+```
+../wezterm.lua  write_agent_status_snapshot()
+        │  writes every pane's tab_number - not just agent panes, since a
+        │  `noti`-run pane has no agent_status of its own to filter on
+        ▼
+$HOME/.cache/wezterm/pane-tabs.txt
+        (pane_id\ttab_number, one line per pane, rewritten in full every tick)
+        ▼
+agent-sidebar (this program)
+        looks up each NOTIFY entry's pane_id here at render time
+```
+
+Because the snapshot/log formats are just tab-separated text files, and `agent-sidebar` itself never talks to WezTerm's Lua user vars (`wezterm cli list` doesn't expose them), any change to any of these wire formats must be kept in sync by hand between this program and whichever of `../wezterm.lua`, the two scripts, or `noti` produces it.
 
 ## Usage
 
@@ -91,6 +105,7 @@ After running `setup`:
 | `AGENT_SIDEBAR_STATE_FILE` | Path to the agent-status snapshot file | `$HOME/.cache/wezterm/agent-status.txt` |
 | `AGENT_SIDEBAR_FILECHANGE_FILE` | Path to the file-change log | `$HOME/.cache/wezterm/agent-file-changes.log` |
 | `AGENT_SIDEBAR_NOTIFY_FILE` | Path to the `noti` completion log | `$HOME/.cache/wezterm/agent-notify.log` |
+| `AGENT_SIDEBAR_PANE_TABS_FILE` | Path to the pane_id → tab_number snapshot | `$HOME/.cache/wezterm/pane-tabs.txt` |
 | `CLAUDE_CONFIG_DIR` | Overrides Claude Code's config directory (used by `setup`) | `$HOME/.claude` |
 | `CODEX_HOME` | Overrides Codex's config directory (used by `setup`) | `$HOME/.codex` |
 
@@ -107,7 +122,7 @@ There's no separate lint config; `go vet` is the extent of it.
 
 ## Code layout
 
-- **`main.go`** — the TUI (`model`/`Update`/`View` per Bubble Tea's Elm architecture). Polls the status snapshot, file-change log, and `noti` completion log every 500ms and renders three sections: `AGENTS` (grouped by workspace, with a live spinner for `working` and static emoji for other statuses), `AGENT CHANGES` (a tail of recent file edits), and `NOTIFY` (a tail of completed `noti`-wrapped commands, ✅/❌ by exit code).
+- **`main.go`** — the TUI (`model`/`Update`/`View` per Bubble Tea's Elm architecture). Polls the status snapshot, file-change log, `noti` completion log, and pane-tabs snapshot every 500ms and renders three sections: `AGENTS` (grouped by workspace, with a live spinner for `working` and static emoji for other statuses), `AGENT CHANGES` (a tail of recent file edits), and `NOTIFY` (a tail of completed `noti`-wrapped commands, ✅/❌ by exit code, with a `(tab:N)` suffix looked up from the pane-tabs snapshot).
 - **`setup.go`** — `agent-sidebar setup`, merging hook entries into Claude Code's and Codex's config files.
 - **`setup_test.go`** — covers `ensureHooks` from-scratch creation, idempotency, preservation of pre-existing unrelated config, and the `$CLAUDE_CONFIG_DIR` / `$CODEX_HOME` overrides.
 

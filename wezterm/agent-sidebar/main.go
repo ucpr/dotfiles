@@ -198,10 +198,47 @@ func loadNotifications() []notification {
 	return notifications
 }
 
+func paneTabsPath() string {
+	if p := os.Getenv("AGENT_SIDEBAR_PANE_TABS_FILE"); p != "" {
+		return p
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(home, ".cache", "wezterm", "pane-tabs.txt")
+}
+
+// loadPaneTabs parses wezterm.lua's pane_id -> tab_number snapshot, written
+// for every pane (not just agent panes) since NOTIFY entries come from
+// `noti`, an arbitrary interactive shell command with no agent_status of its
+// own. tab_number can only be computed WezTerm-side (ipairs(w:tabs())'s
+// visual left-to-right order), so this is the only way to attach a tab
+// number to a NOTIFY entry.
+func loadPaneTabs() map[string]string {
+	data, err := os.ReadFile(paneTabsPath())
+	if err != nil {
+		return nil
+	}
+	tabs := make(map[string]string)
+	for _, line := range strings.Split(strings.TrimRight(string(data), "\n"), "\n") {
+		if line == "" {
+			continue
+		}
+		paneID, tabNumber, ok := strings.Cut(line, "\t")
+		if !ok || paneID == "" {
+			continue
+		}
+		tabs[paneID] = tabNumber
+	}
+	return tabs
+}
+
 type model struct {
 	entries       []entry
 	fileChanges   []fileChange
 	notifications []notification
+	paneTabs      map[string]string
 	width         int
 	height        int
 	spinner       spinner.Model
@@ -218,7 +255,7 @@ func initialModel() model {
 	// Seeded from the startup snapshot, not left empty, so a pane that's
 	// already blocked/done when the sidebar launches is treated as the
 	// notification baseline rather than a fresh transition worth a ping.
-	return model{entries: entries, fileChanges: loadFileChanges(), notifications: loadNotifications(), spinner: s, prevStatus: statusSnapshot(entries)}
+	return model{entries: entries, fileChanges: loadFileChanges(), notifications: loadNotifications(), paneTabs: loadPaneTabs(), spinner: s, prevStatus: statusSnapshot(entries)}
 }
 
 // statusSnapshot captures entries' statuses by paneID for comparison against
@@ -369,6 +406,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		newEntries := loadEntries()
 		m.fileChanges = loadFileChanges()
 		m.notifications = loadNotifications()
+		m.paneTabs = loadPaneTabs()
 
 		newStatus := statusSnapshot(newEntries)
 		cmds := []tea.Cmd{tickCmd()}
@@ -660,13 +698,20 @@ func (m model) notifyUnits(width int) []notifyUnit {
 			icon = "❌"
 			status = removeStyle.Render(fmt.Sprintf(" exit %d", n.exitCode))
 		}
-		maxLabel := width - 3
+		// paneTabs is keyed by pane_id (see loadPaneTabs); a NOTIFY entry with
+		// no matching pane (noti run outside WezTerm, or the pane has since
+		// closed) simply gets no tab suffix.
+		tabSuffix := ""
+		if tab := m.paneTabs[n.paneID]; tab != "" {
+			tabSuffix = " (tab:" + tab + ")"
+		}
+		maxLabel := width - 3 - len([]rune(tabSuffix))
 		if maxLabel < 4 {
 			maxLabel = 4
 		}
 		units = append(units, notifyUnit{
 			lines: []string{
-				" " + icon + " " + agentNameStyle.Render(truncate(n.label, maxLabel)),
+				" " + icon + " " + agentNameStyle.Render(truncate(n.label, maxLabel)) + dimStyle.Render(tabSuffix),
 				"   " + dimStyle.Render(n.duration) + status,
 			},
 			paneID: n.paneID,
