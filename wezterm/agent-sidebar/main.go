@@ -443,8 +443,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmds...)
 	case tea.MouseMsg:
 		if msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft {
-			if paneID := m.paneIDAtRow(msg.Y); paneID != "" {
-				return m, activatePaneCmd(paneID)
+			if paneID, workspace := m.paneIDAtRow(msg.Y); paneID != "" {
+				return m, activatePaneCmd(paneID, workspace)
 			}
 		}
 		return m, nil
@@ -561,8 +561,9 @@ func bodyLines(sectionHeight int) int {
 // title). agentUnits is the single source of truth for this layout so
 // rendering and mouse click hit-testing can never drift apart.
 type agentUnit struct {
-	lines  []string
-	paneID string
+	lines     []string
+	paneID    string
+	workspace string
 }
 
 func (m model) agentUnits(width int) []agentUnit {
@@ -590,7 +591,8 @@ func (m model) agentUnits(width int) []agentUnit {
 					" " + m.renderIcon(e.status) + agentNameStyle.Render(e.agentName) + " " + dimStyle.Render("(tab:"+e.tabNumber+")"),
 					"   " + truncate(e.title, maxTitle),
 				},
-				paneID: e.paneID,
+				paneID:    e.paneID,
+				workspace: e.workspace,
 			})
 		}
 	}
@@ -735,11 +737,13 @@ func tailNotifyUnits(units []notifyUnit, maxLines int) []notifyUnit {
 	return units
 }
 
-// paneIDAtRow returns the pane id of the AGENTS or AGENT CHANGES entry rendered at
-// absolute screen row y (0-indexed from the very top of the view), or "" if
-// y falls on a header, a workspace header, or outside any clickable entry.
-// Used to resolve mouse clicks to a pane to focus.
-func (m model) paneIDAtRow(y int) string {
+// paneIDAtRow returns the pane id (and, for an AGENTS entry, the workspace it
+// belongs to) of the entry rendered at absolute screen row y (0-indexed from
+// the very top of the view), or ("", "") if y falls on a header, a workspace
+// header, or outside any clickable entry. AGENT CHANGES and NOTIFY entries
+// carry no workspace of their own (their wire formats have no such field), so
+// they always report "". Used to resolve mouse clicks to a pane to focus.
+func (m model) paneIDAtRow(y int) (paneID, workspace string) {
 	width := m.width
 	if width <= 0 {
 		width = 30
@@ -756,11 +760,11 @@ func (m model) paneIDAtRow(y int) string {
 				break
 			}
 			if bodyRow >= line && bodyRow < line+len(u.lines) {
-				return u.paneID
+				return u.paneID, u.workspace
 			}
 			line += len(u.lines)
 		}
-		return ""
+		return "", ""
 	}
 
 	changeSectionStart := agentSectionRows
@@ -771,35 +775,64 @@ func (m model) paneIDAtRow(y int) string {
 		line := 0
 		for _, u := range tailChangeUnits(m.changeUnits(width), changeLines) {
 			if changeBodyRow >= line && changeBodyRow < line+len(u.lines) {
-				return u.paneID
+				return u.paneID, ""
 			}
 			line += len(u.lines)
 		}
-		return ""
+		return "", ""
 	}
 
 	notifyBodyRow := y - changeSectionStart - changeSectionRows - 1 - 2 // 1 blank line + 2 header lines: "NOTIFY" title + rule
 	if notifyBodyRow < 0 {
-		return ""
+		return "", ""
 	}
 	line := 0
 	for _, u := range tailNotifyUnits(m.notifyUnits(width), notifyLines) {
 		if notifyBodyRow >= line && notifyBodyRow < line+len(u.lines) {
-			return u.paneID
+			return u.paneID, ""
 		}
 		line += len(u.lines)
 	}
-	return ""
+	return "", ""
 }
 
 // activatePaneCmd shells out to `wezterm cli activate-pane`, the same CLI
 // agent-status.sh already relies on to resolve tty paths, since agent-sidebar
-// has no direct IPC to the mux server to focus a pane itself.
-func activatePaneCmd(paneID string) tea.Cmd {
+// has no direct IPC to the mux server to focus a pane itself. When workspace
+// is non-empty (an AGENTS entry belonging to a workspace other than whichever
+// one is currently displayed), it first raises switch_workspace so
+// wezterm.lua's user-var-changed handler switches the mux's active workspace
+// before activate-pane runs: activate-pane alone only changes which pane/tab
+// is active *within* its own window, it can't bring a window that belongs to
+// a currently-hidden workspace to the front.
+func activatePaneCmd(paneID, workspace string) tea.Cmd {
 	return func() tea.Msg {
+		if workspace != "" {
+			switchWorkspace(workspace)
+			// Give wezterm.lua's user-var-changed handler (which reads this
+			// escape sequence off our own pty) a moment to switch the active
+			// workspace before the activate-pane RPC below runs, since
+			// otherwise it can race and land on the pane's window before that
+			// window's workspace is actually the one on screen.
+			time.Sleep(50 * time.Millisecond)
+		}
 		exec.Command("wezterm", "cli", "activate-pane", "--pane-id", paneID).Run()
 		return nil
 	}
+}
+
+// switchWorkspace raises the same switch_workspace user var that
+// wezterm-workspace-fzf (../../zsh/plugins/fzf_lazy.zsh) uses to drive
+// wezterm.lua's user-var-changed handler: workspace and (left empty, since
+// we're switching to an already-running workspace rather than spawning a new
+// one) cwd are tab-separated and base64-encoded, with a trailing nanosecond
+// timestamp appended so the value always differs from whatever was last sent
+// and WezTerm's user-var-changed event reliably fires even for repeat clicks
+// on the same workspace.
+func switchWorkspace(workspace string) {
+	payload := fmt.Sprintf("%s\t\t%d", workspace, time.Now().UnixNano())
+	b64 := base64.StdEncoding.EncodeToString([]byte(payload))
+	fmt.Fprintf(os.Stdout, "\033]1337;SetUserVar=switch_workspace=%s\007", b64)
 }
 
 // renderAgentSection renders the "AGENTS" list, stopping once maxLines body
