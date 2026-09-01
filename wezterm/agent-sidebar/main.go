@@ -584,7 +584,15 @@ func (m model) agentUnits(width int) []agentUnit {
 
 	var units []agentUnit
 	for _, ws := range workspaces {
-		units = append(units, agentUnit{lines: []string{wsStyle.Render(ws)}})
+		// The header itself is clickable too: it carries the first entry's
+		// paneID so activatePaneCmd() has a concrete pane to land on once it
+		// switches to this workspace, since "switch to a workspace" alone
+		// isn't a click target activate-pane can act on.
+		units = append(units, agentUnit{
+			lines:     []string{wsStyle.Render(ws)},
+			paneID:    byWorkspace[ws][0].paneID,
+			workspace: ws,
+		})
 		for _, e := range byWorkspace[ws] {
 			units = append(units, agentUnit{
 				lines: []string{
@@ -737,12 +745,15 @@ func tailNotifyUnits(units []notifyUnit, maxLines int) []notifyUnit {
 	return units
 }
 
-// paneIDAtRow returns the pane id (and, for an AGENTS entry, the workspace it
-// belongs to) of the entry rendered at absolute screen row y (0-indexed from
-// the very top of the view), or ("", "") if y falls on a header, a workspace
-// header, or outside any clickable entry. AGENT CHANGES and NOTIFY entries
-// carry no workspace of their own (their wire formats have no such field), so
-// they always report "". Used to resolve mouse clicks to a pane to focus.
+// paneIDAtRow returns the pane id (and, for an AGENTS entry or workspace
+// header, the workspace it belongs to) of the entry rendered at absolute
+// screen row y (0-indexed from the very top of the view), or ("", "") if y
+// falls on a section header or outside any clickable entry. A workspace
+// header row resolves to the first entry in that workspace (see
+// agentUnits()), so clicking it switches to and focuses that workspace like
+// clicking any of its entries would. AGENT CHANGES and NOTIFY entries carry
+// no workspace of their own (their wire formats have no such field), so they
+// always report "". Used to resolve mouse clicks to a pane to focus.
 func (m model) paneIDAtRow(y int) (paneID, workspace string) {
 	width := m.width
 	if width <= 0 {
