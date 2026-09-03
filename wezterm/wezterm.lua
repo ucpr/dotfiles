@@ -1,5 +1,37 @@
 local wezterm = require("wezterm")
 
+-- Width (in cells) the agent-sidebar pane is created at (see SplitPane
+-- below) and the width ALT+r resets every sidebar pane back to. Resizing
+-- the WezTerm window reflows all panes' cell-widths proportionally, so the
+-- sidebar's actual width drifts away from this whenever the window is
+-- resized.
+local AGENT_SIDEBAR_WIDTH_CELLS = 30
+
+local function agent_sidebar_spawn_command()
+	return {
+		-- WezTerm spawns this directly (not via the user's shell), so PATH is
+		-- just the system default and doesn't include mise's `go` shim. mise
+		-- is activated from .zshrc, which only loads for interactive shells,
+		-- so both -i and -l are required (login alone is not enough).
+		args = {
+			"/bin/zsh",
+			"-i",
+			"-l",
+			"-c",
+			-- `go run <absolute-dir>` resolves go.mod from $PWD, not from that
+			-- directory, so it fails unless we cd into it first.
+			"cd "
+				.. os.getenv("HOME")
+				.. "/.ghq/github.com/ucpr/dotfiles/wezterm/agent-sidebar && exec go run .",
+		},
+	}
+end
+
+-- Defined further down, near write_agent_status_snapshot, since it needs
+-- wezterm.mux helpers; forward-declared here so the ALT+r keybinding below
+-- can reference it.
+local reset_agent_sidebar_widths
+
 local keys = {
 	{ key = "n", mods = "ALT", action = "ShowLauncher" },
 	{ key = "s", mods = "ALT", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
@@ -30,27 +62,18 @@ local keys = {
 			window:perform_action(
 				wezterm.action.SplitPane({
 					direction = "Left",
-					size = { Cells = 30 },
-					command = {
-						-- WezTerm spawns this directly (not via the user's shell), so PATH is
-						-- just the system default and doesn't include mise's `go` shim. mise
-						-- is activated from .zshrc, which only loads for interactive shells,
-						-- so both -i and -l are required (login alone is not enough).
-						args = {
-							"/bin/zsh",
-							"-i",
-							"-l",
-							"-c",
-							-- `go run <absolute-dir>` resolves go.mod from $PWD, not from that
-							-- directory, so it fails unless we cd into it first.
-							"cd "
-								.. os.getenv("HOME")
-								.. "/.ghq/github.com/ucpr/dotfiles/wezterm/agent-sidebar && exec go run .",
-						},
-					},
+					size = { Cells = AGENT_SIDEBAR_WIDTH_CELLS },
+					command = agent_sidebar_spawn_command(),
 				}),
 				pane
 			)
+		end),
+	},
+	{
+		key = "r",
+		mods = "ALT",
+		action = wezterm.action_callback(function(_, pane)
+			reset_agent_sidebar_widths(pane)
 		end),
 	},
 }
@@ -192,6 +215,65 @@ local function write_agent_status_snapshot()
 	end)
 	if not ok then
 		wezterm.log_warn("write_agent_status_snapshot failed: " .. tostring(err))
+	end
+end
+
+-- Resets every agent-sidebar pane, across every workspace/window/tab, back
+-- to AGENT_SIDEBAR_WIDTH_CELLS. WezTerm's Lua API has no way to set a
+-- pane's width to an absolute value - only AdjustPaneSize, which is
+-- relative and, for shrinking, would require first identifying and
+-- resizing whichever neighboring pane sits on the sidebar's other side.
+-- Closing and re-splitting the sidebar pane sidesteps that entirely by
+-- reusing SplitPane's own absolute `size = { Cells = ... }`, mirroring the
+-- ALT+a toggle-off/toggle-on sequence above but applied unconditionally
+-- rather than gated on the sidebar pane not existing yet.
+reset_agent_sidebar_widths = function(pane)
+	local ok, err = pcall(function()
+		local original_workspace = wezterm.mux.get_active_workspace()
+
+		for _, w in ipairs(wezterm.mux.all_windows()) do
+			local gui_win = w:gui_window()
+			if gui_win then
+				for _, t in ipairs(w:tabs()) do
+					local sidebar_pane, work_pane
+					for _, p in ipairs(t:panes()) do
+						if p:get_user_vars().agent_sidebar then
+							sidebar_pane = p
+						else
+							work_pane = p
+						end
+					end
+					if sidebar_pane and work_pane and sidebar_pane:get_dimensions().cols ~= AGENT_SIDEBAR_WIDTH_CELLS then
+						-- CloseCurrentPane closes whichever pane is actually
+						-- focused at call time, ignoring the pane passed to
+						-- perform_action (see the ALT+a handler above), so the
+						-- sidebar pane must be made active first.
+						sidebar_pane:activate()
+						gui_win:perform_action(wezterm.action.CloseCurrentPane({ confirm = false }), sidebar_pane)
+						gui_win:perform_action(
+							wezterm.action.SplitPane({
+								direction = "Left",
+								size = { Cells = AGENT_SIDEBAR_WIDTH_CELLS },
+								command = agent_sidebar_spawn_command(),
+							}),
+							work_pane
+						)
+					end
+				end
+			end
+		end
+
+		-- Walking other workspaces/panes above moves GUI focus around;
+		-- restore whatever the user was actually looking at before ALT+r.
+		-- pane:activate() can fail if `pane` was itself the sidebar pane
+		-- just closed and re-spawned above, which is fine to ignore.
+		pcall(wezterm.mux.set_active_workspace, original_workspace)
+		pcall(function()
+			pane:activate()
+		end)
+	end)
+	if not ok then
+		wezterm.log_warn("reset_agent_sidebar_widths failed: " .. tostring(err))
 	end
 end
 
