@@ -148,3 +148,68 @@ func TestTruncateBoundsDisplayWidthNotRuneCount(t *testing.T) {
 		t.Errorf("truncate(%q, %d) = %q, display width %d exceeds budget %d", title, maxTitle, got, w, maxTitle)
 	}
 }
+
+// unitsOfSizes builds agentUnits with the given per-unit line counts (e.g.
+// a 1-line workspace header followed by 2-line entries would be
+// unitsOfSizes(1, 2, 2, 2)), for exercising the AGENTS scroll math without
+// needing real entries.
+func unitsOfSizes(sizes ...int) []agentUnit {
+	units := make([]agentUnit, len(sizes))
+	for i, n := range sizes {
+		units[i] = agentUnit{lines: make([]string, n)}
+	}
+	return units
+}
+
+// The AGENTS section scrolls a whole unit (a workspace header or a 2-line
+// entry) at a time, never a partial one, so maxAgentScrollIndex must land on
+// the smallest start index whose remaining units still fill the body
+// without spilling a unit across the top edge.
+func TestMaxAgentScrollIndex(t *testing.T) {
+	units := unitsOfSizes(1, 2, 2, 2) // total 7 lines
+
+	if got, want := maxAgentScrollIndex(units, 4), 2; got != want {
+		t.Errorf("maxAgentScrollIndex(units, 4) = %d, want %d", got, want)
+	}
+	if got, want := maxAgentScrollIndex(units, 7), 0; got != want {
+		t.Errorf("maxAgentScrollIndex(units, 7) = %d, want %d (everything fits)", got, want)
+	}
+	if got, want := maxAgentScrollIndex(units, 0), 0; got != want {
+		t.Errorf("maxAgentScrollIndex(units, 0) = %d, want %d (height not yet known)", got, want)
+	}
+}
+
+func TestClampAgentScrollBoundsToContent(t *testing.T) {
+	units := unitsOfSizes(1, 2, 2, 2) // total 7 lines, maxAgentScrollIndex(_, 4) == 2
+
+	if got, want := clampAgentScroll(units, 4, -5), 0; got != want {
+		t.Errorf("clampAgentScroll(units, 4, -5) = %d, want %d", got, want)
+	}
+	if got, want := clampAgentScroll(units, 4, 100), 2; got != want {
+		t.Errorf("clampAgentScroll(units, 4, 100) = %d, want %d (stale offset from a shrunk list)", got, want)
+	}
+	if got, want := clampAgentScroll(units, 4, 1), 1; got != want {
+		t.Errorf("clampAgentScroll(units, 4, 1) = %d, want %d (already in range)", got, want)
+	}
+}
+
+// visibleAgentUnits must report how many units are hidden below so the
+// title's "▼N" indicator matches what's actually cut off.
+func TestVisibleAgentUnitsReportsHiddenBelow(t *testing.T) {
+	units := unitsOfSizes(1, 2, 2, 2) // total 7 lines
+
+	visible, hiddenBelow := visibleAgentUnits(units, 4, 0)
+	if len(visible) != 2 || hiddenBelow != 2 {
+		t.Errorf("visibleAgentUnits(units, 4, 0) = (%d units, hiddenBelow=%d), want (2 units, hiddenBelow=2)", len(visible), hiddenBelow)
+	}
+
+	visible, hiddenBelow = visibleAgentUnits(units, 4, 2)
+	if len(visible) != 2 || hiddenBelow != 0 {
+		t.Errorf("visibleAgentUnits(units, 4, 2) = (%d units, hiddenBelow=%d), want (2 units, hiddenBelow=0)", len(visible), hiddenBelow)
+	}
+
+	visible, hiddenBelow = visibleAgentUnits(units, 0, 0)
+	if len(visible) != len(units) || hiddenBelow != 0 {
+		t.Errorf("visibleAgentUnits(units, 0, 0) = (%d units, hiddenBelow=%d), want (%d units, hiddenBelow=0) (unlimited)", len(visible), hiddenBelow, len(units))
+	}
+}

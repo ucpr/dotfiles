@@ -246,6 +246,12 @@ type model struct {
 	// by waitTransitions to detect a pane just entering a wait state rather
 	// than re-notifying on every tick it stays there.
 	prevStatus map[string]string
+	// agentScroll is how many agentUnits (not lines) are scrolled past at the
+	// top of the AGENTS section, driven by the mouse wheel. Clamped against
+	// the current entry count/section height at render time (clampAgentScroll)
+	// rather than here, since both shrink independently as agents come and go
+	// or the pane is resized.
+	agentScroll int
 }
 
 func initialModel() model {
@@ -442,6 +448,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, tea.Batch(cmds...)
 	case tea.MouseMsg:
+		if msg.Button == tea.MouseButtonWheelUp || msg.Button == tea.MouseButtonWheelDown {
+			width := m.width
+			if width <= 0 {
+				width = 30
+			}
+			agentLines, _, _ := m.sectionHeights()
+			// Only the AGENTS section scrolls, so a wheel event over AGENT
+			// CHANGES/NOTIFY (which already tail their own logs) is ignored.
+			if msg.Y >= 0 && msg.Y < m.agentSectionLineCount(width, agentLines) {
+				switch msg.Button {
+				case tea.MouseButtonWheelUp:
+					m.agentScroll--
+				case tea.MouseButtonWheelDown:
+					m.agentScroll++
+				}
+				if m.agentScroll < 0 {
+					m.agentScroll = 0
+				}
+			}
+			return m, nil
+		}
 		if msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft {
 			if paneID, workspace := m.paneIDAtRow(msg.Y); paneID != "" {
 				return m, activatePaneCmd(paneID, workspace)
@@ -495,7 +522,7 @@ func (m model) View() string {
 	// content) so the section below always starts at a fixed row, instead of
 	// drifting up when this one has few entries. NOTIFY, being last, needs no
 	// padding of its own.
-	agentSection := m.renderAgentSection(width, agentLines)
+	agentSection := m.renderAgentSection(width, agentLines, m.agentScroll)
 	if agentLines > 0 {
 		agentSection = padToLines(agentSection, 2+agentLines)
 	}
@@ -605,6 +632,65 @@ func (m model) agentUnits(width int) []agentUnit {
 		}
 	}
 	return units
+}
+
+// maxAgentScrollIndex returns the largest scroll offset (in units, not
+// lines) that still leaves the AGENTS body full: the smallest starting index
+// whose remaining units' lines add up to no more than maxLines. Scrolling
+// unit-by-unit (rather than line-by-line) keeps every workspace header and
+// 2-line agent entry from ever being split across the top/bottom edge of the
+// section. maxLines <= 0 (height not yet known) means "don't scroll".
+func maxAgentScrollIndex(units []agentUnit, maxLines int) int {
+	if maxLines <= 0 {
+		return 0
+	}
+	total := 0
+	for _, u := range units {
+		total += len(u.lines)
+	}
+	if total <= maxLines {
+		return 0
+	}
+	sum := 0
+	for i := len(units) - 1; i >= 0; i-- {
+		sum += len(units[i].lines)
+		if sum > maxLines {
+			return i + 1
+		}
+	}
+	return 0
+}
+
+// clampAgentScroll bounds a raw scroll offset (units) to [0, maxAgentScrollIndex],
+// so a stale offset left over from a since-shrunk agent list or pane resize
+// never scrolls past the actual content.
+func clampAgentScroll(units []agentUnit, maxLines, scroll int) int {
+	if scroll < 0 {
+		return 0
+	}
+	if max := maxAgentScrollIndex(units, maxLines); scroll > max {
+		return max
+	}
+	return scroll
+}
+
+// visibleAgentUnits returns the slice of units that fit within maxLines body
+// lines starting at the (already-clamped) scroll offset, along with how many
+// units remain hidden below - used to render the "▼N" indicator.
+func visibleAgentUnits(units []agentUnit, maxLines, scroll int) (visible []agentUnit, hiddenBelow int) {
+	rest := units[scroll:]
+	if maxLines <= 0 {
+		return rest, 0
+	}
+	lineCount := 0
+	i := 0
+	for ; i < len(rest); i++ {
+		if lineCount+len(rest[i].lines) > maxLines {
+			break
+		}
+		lineCount += len(rest[i].lines)
+	}
+	return rest[:i], len(rest) - i
 }
 
 // agentSectionLineCount returns how many screen lines the AGENTS section
@@ -765,11 +851,11 @@ func (m model) paneIDAtRow(y int) (paneID, workspace string) {
 
 	if y >= 2 && y < agentSectionRows {
 		bodyRow := y - 2
+		units := m.agentUnits(width)
+		scroll := clampAgentScroll(units, agentLines, m.agentScroll)
+		visible, _ := visibleAgentUnits(units, agentLines, scroll)
 		line := 0
-		for _, u := range m.agentUnits(width) {
-			if agentLines > 0 && line+len(u.lines) > agentLines {
-				break
-			}
+		for _, u := range visible {
 			if bodyRow >= line && bodyRow < line+len(u.lines) {
 				return u.paneID, u.workspace
 			}
@@ -846,12 +932,28 @@ func switchWorkspace(workspace string) {
 	fmt.Fprintf(os.Stdout, "\033]1337;SetUserVar=switch_workspace=%s\007", b64)
 }
 
-// renderAgentSection renders the "AGENTS" list, stopping once maxLines body
-// lines (0 = unlimited) have been written so it doesn't spill into the
-// file-change section below it.
-func (m model) renderAgentSection(width, maxLines int) string {
+// renderAgentSection renders the "AGENTS" list, showing the unit-scrolled
+// window (see clampAgentScroll/visibleAgentUnits) that fits within maxLines
+// body lines (0 = unlimited) so it doesn't spill into the section below it.
+// The title carries a "▲hidden-above ▼hidden-below" indicator whenever the
+// mouse wheel (see Update's tea.MouseMsg case) has left part of the list
+// scrolled out of view, since otherwise a long AGENTS list looked identical
+// to one that was simply cut off with nothing more to show.
+func (m model) renderAgentSection(width, maxLines, scroll int) string {
+	units := m.agentUnits(width)
+	scroll = clampAgentScroll(units, maxLines, scroll)
+	visible, hiddenBelow := visibleAgentUnits(units, maxLines, scroll)
+
+	title := "AGENTS"
+	if scroll > 0 {
+		title += fmt.Sprintf(" ▲%d", scroll)
+	}
+	if hiddenBelow > 0 {
+		title += fmt.Sprintf(" ▼%d", hiddenBelow)
+	}
+
 	var b strings.Builder
-	b.WriteString(titleStyle.Render("AGENTS"))
+	b.WriteString(titleStyle.Render(title))
 	b.WriteString("\n")
 	b.WriteString(dimStyle.Render(strings.Repeat("─", width)))
 	b.WriteString("\n")
@@ -862,16 +964,11 @@ func (m model) renderAgentSection(width, maxLines int) string {
 		return b.String()
 	}
 
-	lineCount := 0
-	for _, u := range m.agentUnits(width) {
-		if maxLines > 0 && lineCount+len(u.lines) > maxLines {
-			break
-		}
+	for _, u := range visible {
 		for _, line := range u.lines {
 			b.WriteString(line)
 			b.WriteString("\n")
 		}
-		lineCount += len(u.lines)
 	}
 
 	return b.String()
