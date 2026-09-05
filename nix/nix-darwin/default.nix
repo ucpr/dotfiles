@@ -16,6 +16,8 @@
 
     defaults = {
       NSGlobalDomain = {
+        KeyRepeat = 1;
+        InitialKeyRepeat = 4;
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;
         AppleInterfaceStyle = "Dark";
