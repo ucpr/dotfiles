@@ -30,6 +30,10 @@ in
   xdg.configFile."aerospace".source = link "aerospace";
   # ~/.config/borders
   xdg.configFile."borders".source = link "borders";
+  # ~/.config/ghostty/config.ghostty
+  xdg.configFile."ghostty/config.ghostty".source = link "ghostty/config.ghostty";
+  # ~/.config/herdr/config.toml
+  xdg.configFile."herdr/config.toml".source = link "herdr/config.toml";
   # ~/.config/claude
   # xdg.configFile."claude".source = link "claude";
 }

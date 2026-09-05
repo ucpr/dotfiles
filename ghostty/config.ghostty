@@ -1,0 +1,33 @@
+# Herdr
+keybind = cmd+t=text:\x18c
+keybind = cmd+w=text:\x18x
+keybind = ctrl+s=text:\x18g
+keybind = ctrl+n=text:\x18N
+# Option を Alt として terminal application に渡す
+macos-option-as-alt = true
+
+# Ghostty 自身では処理しない
+keybind = opt+v=unbind
+keybind = opt+x=unbind
+
+# Cmd+1..9 -> Herdr tab 1..9
+keybind = cmd+1=text:\x181
+keybind = cmd+2=text:\x182
+keybind = cmd+3=text:\x183
+keybind = cmd+4=text:\x184
+keybind = cmd+5=text:\x185
+keybind = cmd+6=text:\x186
+keybind = cmd+7=text:\x187
+keybind = cmd+8=text:\x188
+keybind = cmd+9=text:\x189
+
+font-family = JetBrains Mono
+font-family = BIZ UDGothic
+font-feature = -dlig
+
+# Herdr split
+keybind = alt+v=esc:v
+keybind = alt+x=esc:x
+
+# init herdr
+initial-command = /opt/homebrew/bin/herdr
