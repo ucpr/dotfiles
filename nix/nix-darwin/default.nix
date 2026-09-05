@@ -146,6 +146,7 @@
       "openvpn-connect"
       "flutter"
       "claude-code"
+      "ghostty"
     ];
   };
 }
