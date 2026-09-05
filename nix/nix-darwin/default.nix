@@ -92,6 +92,11 @@
     };
   };
 
+  fonts.packages = with pkgs; [
+    jetbrains-mono
+    biz-ud-gothic
+  ];
+
   homebrew = {
     enable = true;
     onActivation = {
@@ -110,7 +115,7 @@
       "bazelisk"
       "herdr"
       "k1LoW/tap/mo"
-      "container"
+      # "container"
     ];
     extraConfig = ''
       brew "FelixKratz/formulae/borders", trusted: true
@@ -141,7 +146,6 @@
       "nani"
       "homerow"
       "chatgpt"
-      "font-jetbrains-mono"
       "nikitabobko/tap/aerospace"
       "codex-app"
       "codex"
