@@ -24,6 +24,7 @@ keybind = cmd+digit_9=text:\x189
 font-family = JetBrains Mono
 font-family = BIZ UDGothic
 font-feature = -dlig
+font-size = 10
 
 # Herdr split
 keybind = alt+v=esc:v
