@@ -18,7 +18,7 @@
     kustomize
     fastfetch
     awscli2
-    tailscale
+    # tailscale
     ast-grep
   ];
 }

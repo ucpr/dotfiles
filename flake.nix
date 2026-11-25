@@ -18,14 +18,17 @@
   outputs = { self, nixpkgs, home-manager, nix-darwin, ... }@inputs:
     let
       system = "aarch64-darwin";
-      user =
+      defaultUser =
         let u = builtins.getEnv "NIX_USER";
         in if u != "" then u else "ucpr";
+      user = defaultUser;
       pkgs = nixpkgs.legacyPackages.${system};
-    in
-    {
-      darwinConfigurations = {
-        mac = nix-darwin.lib.darwinSystem {
+      mkDarwin =
+        { user ? defaultUser
+        , extraModules ? [ ]
+        , extraHomeModules ? [ ]
+        }:
+        nix-darwin.lib.darwinSystem {
           inherit system;
           specialArgs = { inherit inputs user system; };
 
@@ -33,9 +36,14 @@
             ./nix/nix-darwin/default.nix
             home-manager.darwinModules.home-manager
             ./nix/home-manager/default.nix
-          ];
+            { home-manager.users.${user}.imports = extraHomeModules; }
+          ] ++ extraModules;
         };
-      };
+    in
+    {
+      lib.mkDarwin = mkDarwin;
+
+      darwinConfigurations.mac = mkDarwin { };
 
       homeConfigurations = {
         mac = home-manager.lib.homeManagerConfiguration {

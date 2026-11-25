@@ -8,7 +8,7 @@
     enable = false;  # Determinate Nix を使用するため無効化
   };
 
-  services.tailscale.enable = true;
+  services.tailscale.enable = false;
 
   system = {
     stateVersion = 6;
@@ -16,8 +16,8 @@
 
     defaults = {
       NSGlobalDomain = {
-        KeyRepeat = 1;
-        InitialKeyRepeat = 4;
+        KeyRepeat = 2;
+        InitialKeyRepeat = 15;
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;
         AppleInterfaceStyle = "Dark";
@@ -85,7 +85,7 @@
         wvous-tr-corner = 10;
         persistent-apps = [
           { app = "/Applications/Google\ Chrome.app"; }
-          { app = "/Applications/WezTerm.app"; }
+          { app = "/Applications/Rex.app"; }
           { app = "/Applications/Slack.app"; }
         ];
       };
@@ -112,8 +112,6 @@
       "mise"
       "sheldon"
       "git-lfs"
-      "bazelisk"
-      "herdr"
       "k1LoW/tap/mo"
       # "container"
     ];
@@ -134,25 +132,19 @@
       "spotify"
       "zoom"
       "wireshark-app"
-      "wezterm@nightly"
       "notion"
       "notion-calendar"
-      "rectangle"
       "karabiner-elements"
       "alfred"
-      "bitwarden"
       "craft"
       "claude"
       "nani"
       "homerow"
       "chatgpt"
       "nikitabobko/tap/aerospace"
-      "codex-app"
       "codex"
-      "openvpn-connect"
       "flutter"
       "claude-code"
-      "ghostty"
     ];
   };
 }
