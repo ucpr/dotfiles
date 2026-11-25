@@ -89,7 +89,57 @@
           { app = "/Applications/Slack.app"; }
         ];
       };
+      CustomUserPreferences = {
+        "com.apple.symbolichotkeys".AppleSymbolicHotKeys = {
+          "60" = {
+            enabled = true;
+            value = {
+              type = "standard";
+              parameters = [ 32 49 524288 ];
+            };
+          };
+          "64".enabled = false;
+          "65".enabled = false;
+        };
+        "com.apple.HIToolbox" = {
+          AppleFnUsageType = 1;
+          AppleEnabledInputSources = [
+            {
+              InputSourceKind = "Keyboard Layout";
+              "KeyboardLayout ID" = 252;
+              "KeyboardLayout Name" = "ABC";
+            }
+            {
+              "Bundle ID" = "com.apple.CharacterPaletteIM";
+              InputSourceKind = "Non Keyboard Input Method";
+            }
+            {
+              "Bundle ID" = "com.apple.PressAndHold";
+              InputSourceKind = "Non Keyboard Input Method";
+            }
+            {
+              "Bundle ID" = "com.apple.50onPaletteIM";
+              InputSourceKind = "Non Keyboard Input Method";
+            }
+          ];
+        };
+        "com.apple.inputsources".AppleEnabledThirdPartyInputSources = [
+          {
+            "Bundle ID" = "com.google.inputmethod.Japanese";
+            "Input Mode" = "com.apple.inputmethod.Japanese";
+            InputSourceKind = "Input Mode";
+          }
+          {
+            "Bundle ID" = "com.google.inputmethod.Japanese";
+            InputSourceKind = "Keyboard Input Method";
+          }
+        ];
+      };
     };
+
+    activationScripts.postActivation.text = ''
+      sudo -u ${user} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    '';
   };
 
   fonts.packages = with pkgs; [
@@ -130,7 +180,6 @@
       "docker-desktop"
       "visual-studio-code"
       "spotify"
-      "zoom"
       "wireshark-app"
       "notion"
       "notion-calendar"
