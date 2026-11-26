@@ -13,6 +13,7 @@
   system = {
     stateVersion = 6;
     primaryUser = user;
+    startup.chime = false;
 
     defaults = {
       NSGlobalDomain = {
