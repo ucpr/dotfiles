@@ -11,3 +11,10 @@ export EDITOR=nvim
 
 export CLAUDE_CONFIG_DIR="${HOME}/.config/claude/"
 export PATH="$HOME/.local/bin:$PATH"
+
+rex_bin_dir="$HOME/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS"
+if [[ -x "$rex_bin_dir/rex" ]]; then
+  export REX_BIN_DIR="$rex_bin_dir"
+  export PATH="$REX_BIN_DIR:$PATH"
+fi
+unset rex_bin_dir
